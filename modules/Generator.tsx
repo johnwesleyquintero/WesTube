@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
-import { generateVideoPackage, generateThumbnail } from '../lib/gemini';
+import { generateVideoPackage, generateThumbnail, generateSpeech } from '../lib/gemini';
+import { playRawAudio } from '../lib/audio';
 
 const Loader = () => (
   <div className="flex flex-col items-center justify-center p-12 space-y-4 animate-pulse">
@@ -21,17 +22,24 @@ export const Generator: React.FC = () => {
   // Image Generation State
   const [generatingImage, setGeneratingImage] = useState<number | null>(null);
 
+  // Audio Playback State
+  const [playingScene, setPlayingScene] = useState<number | null>(null);
+  const [audioCache, setAudioCache] = useState<Record<number, string>>({});
+
   // Form State
   const [topic, setTopic] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelId>(ChannelId.TECH);
   const [mood, setMood] = useState(MOODS[0]);
   const [duration, setDuration] = useState<GenerationRequest['duration']>('Medium (5-8m)');
 
+  const activeChannelConfig = CHANNELS[selectedChannel];
+
   const handleGenerate = async () => {
     if (!topic) return;
     
     setLoading(true);
     setResult(null);
+    setAudioCache({}); // Clear audio cache on new generation
     setActiveTab('script');
     
     try {
@@ -40,7 +48,7 @@ export const Generator: React.FC = () => {
         channelId: selectedChannel,
         mood,
         duration
-      }, CHANNELS[selectedChannel]);
+      }, activeChannelConfig);
       
       setResult(data);
     } catch (error) {
@@ -74,6 +82,29 @@ export const Generator: React.FC = () => {
     }
   };
 
+  const handlePlayAudio = async (text: string, index: number) => {
+    if (playingScene !== null) return; // Prevent multiple streams
+    setPlayingScene(index);
+
+    try {
+      let base64Audio = audioCache[index];
+      
+      // If not cached, generate it
+      if (!base64Audio) {
+        base64Audio = await generateSpeech(text, activeChannelConfig.voice);
+        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
+      }
+
+      // Play it
+      await playRawAudio(base64Audio);
+    } catch (e) {
+      console.error("Audio playback failed", e);
+      alert("Failed to generate audio preview.");
+    } finally {
+      setPlayingScene(null);
+    }
+  };
+
   const downloadPackage = () => {
     if (!result) return;
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
@@ -84,8 +115,6 @@ export const Generator: React.FC = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  const activeChannelConfig = CHANNELS[selectedChannel];
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 h-full overflow-hidden">
@@ -280,7 +309,27 @@ export const Generator: React.FC = () => {
                                   <span className="bg-wes-900 px-2 py-1 rounded text-slate-400 inline-block mb-1 border border-wes-700/50">B-Roll</span>
                                   <p className="italic">{scene.visual}</p>
                                 </td>
-                                <td className="px-4 py-4 text-slate-200 align-top leading-relaxed">{scene.audio}</td>
+                                <td className="px-4 py-4 text-slate-200 align-top leading-relaxed">
+                                  <div className="flex gap-3">
+                                    <button 
+                                      onClick={() => handlePlayAudio(scene.audio, idx)}
+                                      disabled={playingScene !== null}
+                                      className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                        playingScene === idx 
+                                          ? 'bg-wes-accent text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
+                                          : 'bg-wes-700 text-slate-400 hover:bg-wes-600 hover:text-white'
+                                      } ${playingScene !== null && playingScene !== idx ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                      title="Play Narration"
+                                    >
+                                      {playingScene === idx ? (
+                                        <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
+                                      ) : (
+                                        <i className="fa-solid fa-play text-xs pl-0.5"></i>
+                                      )}
+                                    </button>
+                                    <p>{scene.audio}</p>
+                                  </div>
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -326,11 +375,23 @@ export const Generator: React.FC = () => {
                              
                              <div className="w-full md:w-64 bg-black/40 min-h-[160px] flex items-center justify-center border-t md:border-t-0 md:border-l border-wes-700 relative">
                                 {result.generatedImages?.[i] ? (
-                                  <img 
-                                    src={result.generatedImages[i]} 
-                                    alt={`Thumbnail ${i+1}`} 
-                                    className="w-full h-full object-cover"
-                                  />
+                                  <div className="relative w-full h-full group">
+                                    <img 
+                                      src={result.generatedImages[i]} 
+                                      alt={`Thumbnail ${i+1}`} 
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                      <a 
+                                        href={result.generatedImages[i]} 
+                                        download={`wes-thumbnail-${i}.png`}
+                                        className="px-3 py-2 bg-wes-accent text-white rounded-full text-xs font-bold hover:bg-blue-600 transition-colors"
+                                        title="Download Image"
+                                      >
+                                        <i className="fa-solid fa-download mr-1"></i> Save
+                                      </a>
+                                    </div>
+                                  </div>
                                 ) : (
                                   <div className="text-slate-600 flex flex-col items-center">
                                     <i className="fa-regular fa-image text-3xl mb-2"></i>

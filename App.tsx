@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Generator } from './modules/Generator';
+import { Logo } from './components/Logo';
 
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
@@ -32,9 +33,7 @@ export default function App() {
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Top Bar (Mobile Only) */}
         <div className="md:hidden h-16 border-b border-wes-700 flex items-center px-6 bg-wes-800">
-          <h1 className="text-lg font-bold tracking-wider text-wes-accent">
-            WES<span className="text-white">TUBE</span>
-          </h1>
+          <Logo withText={true} className="w-8 h-8" />
         </div>
 
         <div className="flex-1 p-4 md:p-6 overflow-hidden">

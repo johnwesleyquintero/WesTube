@@ -8,7 +8,8 @@ export const CHANNELS: Record<ChannelId, ChannelConfig> = {
     color: "text-purple-400",
     persona: "The Sage",
     tone: "Deep, existential, Socratic, calm",
-    audience: "Thinkers, seekers of meaning"
+    audience: "Thinkers, seekers of meaning",
+    voice: "Fenrir" // Deep, authoritative
   },
   [ChannelId.TECH]: {
     id: ChannelId.TECH,
@@ -17,7 +18,8 @@ export const CHANNELS: Record<ChannelId, ChannelConfig> = {
     color: "text-blue-400",
     persona: "The Architect",
     tone: "Precise, technical, efficient, fast-paced",
-    audience: "Developers, engineers, hackers"
+    audience: "Developers, engineers, hackers",
+    voice: "Zephyr" // Crisp, fast, modern
   },
   [ChannelId.MUSIC]: {
     id: ChannelId.MUSIC,
@@ -26,7 +28,8 @@ export const CHANNELS: Record<ChannelId, ChannelConfig> = {
     color: "text-pink-400",
     persona: "The Virtuoso",
     tone: "Abstract, sensory, rhythmic, flowing",
-    audience: "Artists, producers, audiophiles"
+    audience: "Artists, producers, audiophiles",
+    voice: "Kore" // Balanced, smooth
   },
   [ChannelId.LORE]: {
     id: ChannelId.LORE,
@@ -35,7 +38,8 @@ export const CHANNELS: Record<ChannelId, ChannelConfig> = {
     color: "text-amber-600",
     persona: "The Chronicler",
     tone: "Epic, descriptive, mysterious, immersive",
-    audience: "RPG fans, anime lovers, writers"
+    audience: "RPG fans, anime lovers, writers",
+    voice: "Charon" // Deep, narrative focus
   },
   [ChannelId.PRODUCTIVITY]: {
     id: ChannelId.PRODUCTIVITY,
@@ -44,7 +48,8 @@ export const CHANNELS: Record<ChannelId, ChannelConfig> = {
     color: "text-emerald-400",
     persona: "The Strategist",
     tone: "Actionable, pragmatic, direct, high-energy",
-    audience: "Entrepreneurs, hustlers, managers"
+    audience: "Entrepreneurs, hustlers, managers",
+    voice: "Puck" // Energetic, clear
   }
 };
 

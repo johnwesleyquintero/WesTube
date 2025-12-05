@@ -14,6 +14,7 @@ export interface ChannelConfig {
   persona: string;
   tone: string;
   audience: string;
+  voice: string; // Gemini TTS Voice Name (e.g., 'Fenrir', 'Zephyr')
 }
 
 export interface ScriptScene {

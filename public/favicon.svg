@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="wesFaviconGradient" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="64" fill="#0f172a" />
+  <path d="M48 80 L88 200 L128 100 L168 200 L208 80" stroke="url(#wesFaviconGradient)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>
