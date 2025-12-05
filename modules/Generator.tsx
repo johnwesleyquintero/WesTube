@@ -11,6 +11,7 @@ export const Generator: React.FC = () => {
     activeTab,
     setActiveTab,
     generatingImage,
+    generatingSceneVisual,
     playingScene,
     downloadingAudio,
     topic,
@@ -26,6 +27,7 @@ export const Generator: React.FC = () => {
     // Handlers
     handleGenerate,
     handleGenerateThumbnail,
+    handleGenerateSceneVisual,
     handlePlayAudio,
     handleDownloadAudio,
     downloadPackage
@@ -55,10 +57,12 @@ export const Generator: React.FC = () => {
         setActiveTab={setActiveTab}
         activeChannelConfig={activeChannelConfig}
         generatingImage={generatingImage}
+        generatingSceneVisual={generatingSceneVisual}
         playingScene={playingScene}
         downloadingAudio={downloadingAudio}
         downloadPackage={downloadPackage}
         handleGenerateThumbnail={handleGenerateThumbnail}
+        handleGenerateSceneVisual={handleGenerateSceneVisual}
         handlePlayAudio={handlePlayAudio}
         handleDownloadAudio={handleDownloadAudio}
       />

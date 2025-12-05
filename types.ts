@@ -22,9 +22,13 @@ export interface ScriptScene {
   timestamp: string;
   visual: string;
   audio: string;
+  generatedVisual?: string; // Base64 image string for the scene
 }
 
 export interface GeneratedPackage {
+  id?: string;
+  createdAt?: string;
+  channelId?: ChannelId;
   title: string;
   hook: string;
   description: string;

@@ -8,10 +8,12 @@ interface OutputPanelProps {
   setActiveTab: (tab: 'script' | 'assets' | 'seo') => void;
   activeChannelConfig: ChannelConfig;
   generatingImage: number | null;
+  generatingSceneVisual?: number | null;
   playingScene: number | null;
   downloadingAudio: number | null;
   downloadPackage: () => void;
   handleGenerateThumbnail: (prompt: string, idx: number) => void;
+  handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handlePlayAudio: (text: string, idx: number) => void;
   handleDownloadAudio: (text: string, idx: number) => void;
 }
@@ -61,8 +63,8 @@ const Loader = () => (
 
 export const OutputPanel: React.FC<OutputPanelProps> = ({
   loading, result, activeTab, setActiveTab, activeChannelConfig,
-  generatingImage, playingScene, downloadingAudio, downloadPackage, 
-  handleGenerateThumbnail, handlePlayAudio, handleDownloadAudio
+  generatingImage, generatingSceneVisual, playingScene, downloadingAudio, downloadPackage, 
+  handleGenerateThumbnail, handleGenerateSceneVisual, handlePlayAudio, handleDownloadAudio
 }) => {
   return (
     <div className="flex-1 bg-wes-900 rounded-xl border border-wes-700 flex flex-col overflow-hidden relative shadow-xl">
@@ -141,17 +143,46 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                         <thead className="bg-wes-900 text-slate-400 uppercase text-xs">
                           <tr>
                             <th className="px-4 py-3 w-24">Time</th>
-                            <th className="px-4 py-3 w-1/3">Visual Cue</th>
+                            <th className="px-4 py-3 w-5/12">Visual Cue</th>
                             <th className="px-4 py-3">Narration / Audio</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-wes-700">
                           {result.script.map((scene, idx) => (
-                            <tr key={idx} className="hover:bg-wes-700/30 transition-colors">
+                            <tr key={idx} className="hover:bg-wes-700/30 transition-colors group">
                               <td className="px-4 py-4 font-mono text-wes-accent text-xs align-top pt-5">{scene.timestamp}</td>
                               <td className="px-4 py-4 text-slate-300 text-xs align-top">
-                                <span className="bg-wes-900 px-2 py-1 rounded text-slate-400 inline-block mb-1 border border-wes-700/50">B-Roll</span>
-                                <p className="italic">{scene.visual}</p>
+                                <span className="bg-wes-900 px-2 py-1 rounded text-slate-400 inline-block mb-2 border border-wes-700/50">B-Roll</span>
+                                <p className="italic mb-3">{scene.visual}</p>
+                                
+                                {/* B-Roll Image or Generate Button */}
+                                {scene.generatedVisual ? (
+                                   <div className="relative rounded overflow-hidden border border-wes-700 mt-2 w-48 group/img">
+                                     <img src={scene.generatedVisual} alt="B-roll" className="w-full h-auto object-cover" />
+                                     <a 
+                                      href={scene.generatedVisual} 
+                                      download={`broll-${idx}.png`}
+                                      className="absolute bottom-1 right-1 bg-black/60 hover:bg-black/80 text-white p-1 rounded text-[10px] opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                     >
+                                       <i className="fa-solid fa-download"></i>
+                                     </a>
+                                   </div>
+                                ) : (
+                                  handleGenerateSceneVisual && (
+                                    <button 
+                                      onClick={() => handleGenerateSceneVisual(scene.visual, idx)}
+                                      disabled={generatingSceneVisual === idx}
+                                      className="text-[10px] bg-wes-700 hover:bg-wes-600 text-slate-300 hover:text-white px-2 py-1 rounded border border-wes-600 transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100"
+                                    >
+                                      {generatingSceneVisual === idx ? (
+                                        <i className="fa-solid fa-circle-notch fa-spin"></i>
+                                      ) : (
+                                        <i className="fa-solid fa-image"></i>
+                                      )}
+                                      Generate Visual
+                                    </button>
+                                  )
+                                )}
                               </td>
                               <td className="px-4 py-4 text-slate-200 align-top leading-relaxed">
                                 <div className="flex flex-col gap-2">

@@ -3,6 +3,7 @@ import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
 import { generateVideoPackage, generateThumbnail, generateSpeech } from '../lib/gemini';
 import { playRawAudio, createWavBlob } from '../lib/audio';
+import { saveHistoryItem } from '../lib/history';
 
 export const useGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,8 @@ export const useGenerator = () => {
   const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo'>('script');
   
   // Image Generation State
-  const [generatingImage, setGeneratingImage] = useState<number | null>(null);
+  const [generatingImage, setGeneratingImage] = useState<number | null>(null); // For Thumbnails
+  const [generatingSceneVisual, setGeneratingSceneVisual] = useState<number | null>(null); // For Script Scenes
 
   // Audio Playback/Download State
   const [playingScene, setPlayingScene] = useState<number | null>(null);
@@ -43,7 +45,17 @@ export const useGenerator = () => {
         duration
       }, activeChannelConfig);
       
-      setResult(data);
+      const packageWithMeta = {
+        ...data,
+        // ID and Date will be handled by Supabase on insert, but we set temp ones for UI
+        id: 'temp-pending', 
+        createdAt: new Date().toISOString()
+      };
+      
+      // Save to Cloud
+      await saveHistoryItem(packageWithMeta);
+      
+      setResult(packageWithMeta);
     } catch (error) {
       console.error(error);
       alert("Error generating content. Please check API Key configuration.");
@@ -57,21 +69,53 @@ export const useGenerator = () => {
     setGeneratingImage(index);
     try {
       const base64Image = await generateThumbnail(prompt);
-      setResult(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          generatedImages: {
-            ...(prev.generatedImages || {}),
-            [index]: base64Image
-          }
-        };
-      });
+      
+      const updatedResult = {
+        ...result,
+        generatedImages: {
+          ...(result.generatedImages || {}),
+          [index]: base64Image
+        }
+      };
+      
+      setResult(updatedResult);
+      // Note: Persisting this update to Supabase would require an UPDATE policy and call.
+      
     } catch (error) {
       console.error("Image generation failed", error);
       alert("Failed to generate image.");
     } finally {
       setGeneratingImage(null);
+    }
+  };
+
+  const handleGenerateSceneVisual = async (visualPrompt: string, index: number) => {
+    if (!result) return;
+    setGeneratingSceneVisual(index);
+    try {
+      // Enhance prompt for better B-Roll style
+      const enhancedPrompt = `Cinematic shot, ${activeChannelConfig.tone} style: ${visualPrompt}`;
+      const base64Image = await generateThumbnail(enhancedPrompt); // Reusing the generic image generator
+      
+      // Update the specific scene in the script
+      const updatedScript = [...result.script];
+      updatedScript[index] = {
+        ...updatedScript[index],
+        generatedVisual: base64Image
+      };
+
+      const updatedResult = {
+        ...result,
+        script: updatedScript
+      };
+      
+      setResult(updatedResult);
+      
+    } catch (error) {
+      console.error("Scene visual generation failed", error);
+      alert("Failed to generate scene visual.");
+    } finally {
+      setGeneratingSceneVisual(null);
     }
   };
 
@@ -145,6 +189,7 @@ export const useGenerator = () => {
     activeTab,
     setActiveTab,
     generatingImage,
+    generatingSceneVisual,
     playingScene,
     downloadingAudio,
     topic,
@@ -160,6 +205,7 @@ export const useGenerator = () => {
     // Handlers
     handleGenerate,
     handleGenerateThumbnail,
+    handleGenerateSceneVisual,
     handlePlayAudio,
     handleDownloadAudio,
     downloadPackage

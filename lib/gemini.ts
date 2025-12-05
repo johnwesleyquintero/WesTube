@@ -93,7 +93,11 @@ export const generateVideoPackage = async (
   }
 
   try {
-    return JSON.parse(response.text) as GeneratedPackage;
+    const data = JSON.parse(response.text) as GeneratedPackage;
+    return {
+      ...data,
+      channelId: request.channelId
+    };
   } catch (e) {
     console.error("Failed to parse JSON", response.text);
     throw new Error("Failed to parse Gemini response.");
