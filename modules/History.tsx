@@ -3,8 +3,7 @@ import { getHistory, deleteHistoryItem } from '../lib/history';
 import { GeneratedPackage, ChannelId } from '../types';
 import { CHANNELS } from '../constants';
 import { OutputPanel } from './generator/OutputPanel';
-import { generateSpeech } from '../lib/gemini';
-import { playRawAudio, createWavBlob } from '../lib/audio';
+import { useAudio } from '../hooks/useAudio';
 
 export const History: React.FC = () => {
   const [history, setHistory] = useState<GeneratedPackage[]>([]);
@@ -12,10 +11,14 @@ export const History: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<GeneratedPackage | null>(null);
   const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo'>('script');
 
-  // Audio State
-  const [playingScene, setPlayingScene] = useState<number | null>(null);
-  const [downloadingAudio, setDownloadingAudio] = useState<number | null>(null);
-  const [audioCache, setAudioCache] = useState<Record<number, string>>({});
+  // Audio Hook
+  const { 
+    playingIndex, 
+    downloadingIndex, 
+    playAudio, 
+    downloadAudio,
+    resetAudioState
+  } = useAudio();
 
   const refreshHistory = async () => {
     setIsLoading(true);
@@ -35,10 +38,8 @@ export const History: React.FC = () => {
 
   // Reset audio cache when switching items
   useEffect(() => {
-    setAudioCache({});
-    setPlayingScene(null);
-    setDownloadingAudio(null);
-  }, [selectedItem]);
+    resetAudioState();
+  }, [selectedItem, resetAudioState]);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -66,58 +67,14 @@ export const History: React.FC = () => {
     return CHANNELS[selectedItem.channelId] || CHANNELS[ChannelId.TECH];
   };
 
-  const handlePlayAudio = async (text: string, index: number) => {
-    if (!selectedItem || playingScene !== null) return;
-    setPlayingScene(index);
-
-    try {
-      let base64Audio = audioCache[index];
-      const config = getActiveChannelConfig();
-      
-      // If not cached, generate it
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, config.voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
-      // Play it
-      await playRawAudio(base64Audio);
-    } catch (e) {
-      console.error("Audio playback failed", e);
-      alert("Failed to generate audio preview.");
-    } finally {
-      setPlayingScene(null);
-    }
+  const handlePlayAudio = (text: string, index: number) => {
+    if (!selectedItem) return;
+    playAudio(text, getActiveChannelConfig().voice, index);
   };
 
-  const handleDownloadAudio = async (text: string, index: number) => {
-    if (!selectedItem || downloadingAudio !== null) return;
-    setDownloadingAudio(index);
-
-    try {
-      let base64Audio = audioCache[index];
-      const config = getActiveChannelConfig();
-      
-      // If not cached, generate it first
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, config.voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
-      // Create WAV blob and download
-      const wavBlob = createWavBlob(base64Audio);
-      const url = URL.createObjectURL(wavBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `wes-narrator-${selectedItem.id}-scene-${index}.wav`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Audio download failed", e);
-      alert("Failed to download audio.");
-    } finally {
-      setDownloadingAudio(null);
-    }
+  const handleDownloadAudio = (text: string, index: number) => {
+    if (!selectedItem) return;
+    downloadAudio(text, getActiveChannelConfig().voice, index, `wes-narrator-${selectedItem.id}`);
   };
 
   // Helper to format date
@@ -226,8 +183,8 @@ export const History: React.FC = () => {
                 setActiveTab={setViewerTab}
                 activeChannelConfig={getActiveChannelConfig()}
                 generatingImage={null}
-                playingScene={playingScene}
-                downloadingAudio={downloadingAudio}
+                playingScene={playingIndex}
+                downloadingAudio={downloadingIndex}
                 downloadPackage={() => {
                   const blob = new Blob([JSON.stringify(selectedItem, null, 2)], { type: 'application/json' });
                   const url = URL.createObjectURL(blob);

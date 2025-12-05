@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
-import { generateVideoPackage, generateThumbnail, generateSpeech } from '../lib/gemini';
-import { playRawAudio, createWavBlob } from '../lib/audio';
+import { generateVideoPackage, generateThumbnail } from '../lib/gemini';
 import { saveHistoryItem } from '../lib/history';
+import { useAudio } from './useAudio';
 
 export const useGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -14,10 +14,14 @@ export const useGenerator = () => {
   const [generatingImage, setGeneratingImage] = useState<number | null>(null); // For Thumbnails
   const [generatingSceneVisual, setGeneratingSceneVisual] = useState<number | null>(null); // For Script Scenes
 
-  // Audio Playback/Download State
-  const [playingScene, setPlayingScene] = useState<number | null>(null);
-  const [downloadingAudio, setDownloadingAudio] = useState<number | null>(null);
-  const [audioCache, setAudioCache] = useState<Record<number, string>>({});
+  // Audio Hook
+  const { 
+    playingIndex, 
+    downloadingIndex, 
+    playAudio, 
+    downloadAudio, 
+    resetAudioState 
+  } = useAudio();
 
   // Form State
   const [topic, setTopic] = useState('');
@@ -34,7 +38,7 @@ export const useGenerator = () => {
     
     setLoading(true);
     setResult(null);
-    setAudioCache({}); // Clear audio cache on new generation
+    resetAudioState();
     setActiveTab('script');
     
     try {
@@ -47,7 +51,6 @@ export const useGenerator = () => {
       
       const packageWithMeta = {
         ...data,
-        // ID and Date will be handled by Supabase on insert, but we set temp ones for UI
         id: 'temp-pending', 
         createdAt: new Date().toISOString()
       };
@@ -79,7 +82,6 @@ export const useGenerator = () => {
       };
       
       setResult(updatedResult);
-      // Note: Persisting this update to Supabase would require an UPDATE policy and call.
       
     } catch (error) {
       console.error("Image generation failed", error);
@@ -93,11 +95,9 @@ export const useGenerator = () => {
     if (!result) return;
     setGeneratingSceneVisual(index);
     try {
-      // Enhance prompt for better B-Roll style
       const enhancedPrompt = `Cinematic shot, ${activeChannelConfig.tone} style: ${visualPrompt}`;
-      const base64Image = await generateThumbnail(enhancedPrompt); // Reusing the generic image generator
+      const base64Image = await generateThumbnail(enhancedPrompt); 
       
-      // Update the specific scene in the script
       const updatedScript = [...result.script];
       updatedScript[index] = {
         ...updatedScript[index],
@@ -119,56 +119,12 @@ export const useGenerator = () => {
     }
   };
 
-  const handlePlayAudio = async (text: string, index: number) => {
-    if (playingScene !== null) return; // Prevent multiple streams
-    setPlayingScene(index);
-
-    try {
-      let base64Audio = audioCache[index];
-      
-      // If not cached, generate it
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, activeChannelConfig.voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
-      // Play it
-      await playRawAudio(base64Audio);
-    } catch (e) {
-      console.error("Audio playback failed", e);
-      alert("Failed to generate audio preview.");
-    } finally {
-      setPlayingScene(null);
-    }
+  const handlePlayAudio = (text: string, index: number) => {
+    playAudio(text, activeChannelConfig.voice, index);
   };
 
-  const handleDownloadAudio = async (text: string, index: number) => {
-    if (downloadingAudio !== null) return;
-    setDownloadingAudio(index);
-
-    try {
-      let base64Audio = audioCache[index];
-      
-      // If not cached, generate it first
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, activeChannelConfig.voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
-      // Create WAV blob and download
-      const wavBlob = createWavBlob(base64Audio);
-      const url = URL.createObjectURL(wavBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `wes-narrator-${selectedChannel}-${index}.wav`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Audio download failed", e);
-      alert("Failed to download audio.");
-    } finally {
-      setDownloadingAudio(null);
-    }
+  const handleDownloadAudio = (text: string, index: number) => {
+    downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
   };
 
   const downloadPackage = () => {
@@ -190,8 +146,8 @@ export const useGenerator = () => {
     setActiveTab,
     generatingImage,
     generatingSceneVisual,
-    playingScene,
-    downloadingAudio,
+    playingScene: playingIndex,
+    downloadingAudio: downloadingIndex,
     topic,
     setTopic,
     selectedChannel,
