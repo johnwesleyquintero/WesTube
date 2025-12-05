@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 import { getApiKey } from "./utils";
@@ -118,7 +117,14 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
-    contents: { parts: [{ text }] },
+    // Use the strict array format for TTS contents
+    contents: [
+      {
+        parts: [
+          { text: text }
+        ]
+      }
+    ],
     config: {
       responseModalities: [Modality.AUDIO],
       speechConfig: {

@@ -7,9 +7,10 @@ let audioContext: AudioContext | null = null;
 
 const getAudioContext = () => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ 
-      sampleRate: 24000 
-    });
+    // We do NOT force a sampleRate here. Most browsers/OS lock this to 44.1k or 48k.
+    // We let the browser handle the context rate, and we define the buffer rate later (24k).
+    // The Web Audio API handles the resampling automatically.
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
   return audioContext;
 };
@@ -33,6 +34,7 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
   // 2. Convert Raw PCM (16-bit integers) to AudioBuffer (Float32)
   const dataInt16 = new Int16Array(bytes.buffer);
   const frameCount = dataInt16.length;
+  // Here we explicitly tell the buffer that this data is 24kHz
   const buffer = ctx.createBuffer(1, frameCount, sampleRate);
   const channelData = buffer.getChannelData(0);
   
