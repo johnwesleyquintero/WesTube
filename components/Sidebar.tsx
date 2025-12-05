@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { Logo } from './Logo';
+import { NAV_ITEMS } from '../constants';
 
 interface SidebarProps {
   activeView: string;
@@ -9,14 +11,6 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onOpenSettings }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'fa-gauge-high' },
-    { id: 'scripts', label: 'Script Engine', icon: 'fa-file-lines' },
-    { id: 'assets', label: 'Asset Lab', icon: 'fa-photo-film' },
-    { id: 'seo', label: 'SEO Mastery', icon: 'fa-magnifying-glass-chart' },
-    { id: 'history', label: 'Production History', icon: 'fa-clock-rotate-left' },
-  ];
 
   return (
     <aside 
@@ -52,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar overflow-x-hidden">
         <ul className="space-y-2 px-3">
-          {menuItems.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <li key={item.id}>
               <button
                 onClick={() => setActiveView(item.id)}

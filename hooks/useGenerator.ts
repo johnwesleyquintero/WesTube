@@ -1,18 +1,27 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
-import { generateVideoPackage, generateThumbnail } from '../lib/gemini';
+import { generateVideoPackage } from '../lib/gemini';
 import { saveHistoryItem } from '../lib/history';
 import { useAudio } from './useAudio';
+import { useAssetGenerator } from './useAssetGenerator';
+import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/packageManipulation';
+import { useToast } from '../context/ToastContext';
 
 export const useGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GeneratedPackage | null>(null);
   const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo'>('script');
   
-  // Image Generation State
-  const [generatingImage, setGeneratingImage] = useState<number | null>(null); // For Thumbnails
-  const [generatingSceneVisual, setGeneratingSceneVisual] = useState<number | null>(null); // For Script Scenes
+  const toast = useToast();
+
+  // Asset Generation Hook
+  const { 
+    generatingImage, 
+    generatingSceneVisual, 
+    generateThumbnailAsset, 
+    generateSceneAsset 
+  } = useAssetGenerator();
 
   // Audio Hook
   const { 
@@ -33,8 +42,11 @@ export const useGenerator = () => {
 
   const activeChannelConfig = CHANNELS[selectedChannel];
 
-  const handleGenerate = async () => {
-    if (!topic) return;
+  const handleGenerate = useCallback(async () => {
+    if (!topic) {
+      toast.error("Please enter a topic before generating.");
+      return;
+    }
     
     setLoading(true);
     setResult(null);
@@ -59,75 +71,44 @@ export const useGenerator = () => {
       await saveHistoryItem(packageWithMeta);
       
       setResult(packageWithMeta);
+      toast.success("Package generated and saved to cloud.");
     } catch (error) {
       console.error(error);
-      alert("Error generating content. Please check API Key configuration.");
+      toast.error("Error generating content. Please check API Key configuration.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [topic, selectedChannel, mood, duration, activeChannelConfig, resetAudioState, toast]);
 
-  const handleGenerateThumbnail = async (prompt: string, index: number) => {
+  const handleGenerateThumbnail = useCallback(async (prompt: string, index: number) => {
     if (!result) return;
-    setGeneratingImage(index);
-    try {
-      const base64Image = await generateThumbnail(prompt);
-      
-      const updatedResult = {
-        ...result,
-        generatedImages: {
-          ...(result.generatedImages || {}),
-          [index]: base64Image
-        }
-      };
-      
-      setResult(updatedResult);
-      
-    } catch (error) {
-      console.error("Image generation failed", error);
-      alert("Failed to generate image.");
-    } finally {
-      setGeneratingImage(null);
-    }
-  };
+    
+    const base64Image = await generateThumbnailAsset(prompt, index);
+    if (!base64Image) return; // Hook handles error toast
 
-  const handleGenerateSceneVisual = async (visualPrompt: string, index: number) => {
+    setResult(prev => prev ? updatePackageThumbnail(prev, index, base64Image) : null);
+    toast.success("Thumbnail asset rendered successfully.");
+  }, [result, generateThumbnailAsset, toast]);
+
+  const handleGenerateSceneVisual = useCallback(async (visualPrompt: string, index: number) => {
     if (!result) return;
-    setGeneratingSceneVisual(index);
-    try {
-      const enhancedPrompt = `Cinematic shot, ${activeChannelConfig.tone} style: ${visualPrompt}`;
-      const base64Image = await generateThumbnail(enhancedPrompt); 
-      
-      const updatedScript = [...result.script];
-      updatedScript[index] = {
-        ...updatedScript[index],
-        generatedVisual: base64Image
-      };
+    
+    const base64Image = await generateSceneAsset(visualPrompt, index, activeChannelConfig);
+    if (!base64Image) return; // Hook handles error toast
 
-      const updatedResult = {
-        ...result,
-        script: updatedScript
-      };
-      
-      setResult(updatedResult);
-      
-    } catch (error) {
-      console.error("Scene visual generation failed", error);
-      alert("Failed to generate scene visual.");
-    } finally {
-      setGeneratingSceneVisual(null);
-    }
-  };
+    setResult(prev => prev ? updatePackageSceneVisual(prev, index, base64Image) : null);
+    toast.success("Scene visual rendered successfully.");
+  }, [result, generateSceneAsset, activeChannelConfig, toast]);
 
-  const handlePlayAudio = (text: string, index: number) => {
+  const handlePlayAudio = useCallback((text: string, index: number) => {
     playAudio(text, activeChannelConfig.voice, index);
-  };
+  }, [activeChannelConfig.voice, playAudio]);
 
-  const handleDownloadAudio = (text: string, index: number) => {
+  const handleDownloadAudio = useCallback((text: string, index: number) => {
     downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
-  };
+  }, [activeChannelConfig.voice, downloadAudio, selectedChannel]);
 
-  const downloadPackage = () => {
+  const downloadPackage = useCallback(() => {
     if (!result) return;
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -136,7 +117,8 @@ export const useGenerator = () => {
     a.download = `wes-tube-${selectedChannel}-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+    toast.info("Project JSON downloaded.");
+  }, [result, selectedChannel, toast]);
 
   return {
     // State

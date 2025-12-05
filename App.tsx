@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Generator } from './modules/Generator';
-import { History } from './modules/History';
-import { SettingsModal } from './components/SettingsModal';
-import { Logo } from './components/Logo';
+import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import { LandingPage } from './pages/LandingPage';
+import { Layout } from './components/Layout';
+import { Loader } from './components/Loader';
+import { ToastContainer } from './components/Toast';
+
+// Lazy load heavy modules for performance
+const Generator = React.lazy(() => import('./modules/Generator').then(module => ({ default: module.Generator })));
+const History = React.lazy(() => import('./modules/History').then(module => ({ default: module.History })));
 
 // Inner component to handle routing *after* auth context is available
 const AppContent = () => {
   const { user, loading, signOut } = useAuth();
   const [activeView, setActiveView] = useState('dashboard');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   if (loading) {
     return (
@@ -53,80 +54,30 @@ const AppContent = () => {
   };
 
   return (
-    <div className="flex h-screen text-slate-200 font-sans selection:bg-wes-accent selection:text-white">
-      
-      {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-
-      {/* Mobile Menu Button */}
-      <button 
-        className="fixed top-4 right-4 z-50 md:hidden bg-wes-800 p-2 rounded text-wes-accent border border-white/10 shadow-lg"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      >
-        <i className={`fa-solid ${mobileMenuOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
-      </button>
-
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-transform duration-300 md:relative md:bg-transparent md:translate-x-0 md:w-auto
-        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <Sidebar 
-          activeView={activeView} 
-          setActiveView={(view) => {
-            setActiveView(view);
-            setMobileMenuOpen(false);
-          }} 
-          onOpenSettings={() => {
-            setIsSettingsOpen(true);
-            setMobileMenuOpen(false);
-          }}
-        />
-      </div>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Top Bar */}
-        <div className="h-20 flex items-center justify-between px-8 shrink-0">
-          <div className="md:hidden">
-             <Logo withText={true} className="w-8 h-8" />
-          </div>
-          
-          <div className="hidden md:flex flex-col">
-             <h1 className="text-xl font-bold text-white tracking-tight">Production Studio</h1>
-             <p className="text-xs text-slate-500 font-mono">System Online // {new Date().toLocaleDateString()}</p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center text-sm text-slate-400">
-               <span className="glass-panel px-3 py-1.5 rounded-full text-xs flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  {user.email}
-               </span>
-            </div>
-
-            <button 
-              onClick={signOut}
-              className="text-xs text-slate-400 hover:text-white flex items-center gap-2 hover:bg-white/5 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              <i className="fa-solid fa-right-from-bracket"></i>
-              <span className="hidden md:inline">Sign Out</span>
-            </button>
-          </div>
+    <Layout 
+      user={user} 
+      activeView={activeView} 
+      setActiveView={setActiveView} 
+      signOut={signOut}
+    >
+      <ToastContainer />
+      <Suspense fallback={
+        <div className="h-full w-full flex items-center justify-center">
+          <Loader />
         </div>
-
-        <div className="flex-1 px-8 pb-8 overflow-hidden">
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+      }>
+        {renderContent()}
+      </Suspense>
+    </Layout>
   );
 };
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </AuthProvider>
   );
 }

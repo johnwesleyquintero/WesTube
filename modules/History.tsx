@@ -4,6 +4,9 @@ import { GeneratedPackage, ChannelId } from '../types';
 import { CHANNELS } from '../constants';
 import { OutputPanel } from './generator/OutputPanel';
 import { useAudio } from '../hooks/useAudio';
+import { useAssetGenerator } from '../hooks/useAssetGenerator';
+import { formatDate } from '../lib/utils';
+import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/packageManipulation';
 
 export const History: React.FC = () => {
   const [history, setHistory] = useState<GeneratedPackage[]>([]);
@@ -11,7 +14,14 @@ export const History: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<GeneratedPackage | null>(null);
   const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo'>('script');
 
-  // Audio Hook
+  // Shared Logic Hooks
+  const { 
+    generatingImage, 
+    generatingSceneVisual, 
+    generateThumbnailAsset, 
+    generateSceneAsset 
+  } = useAssetGenerator();
+
   const { 
     playingIndex, 
     downloadingIndex, 
@@ -77,12 +87,32 @@ export const History: React.FC = () => {
     downloadAudio(text, getActiveChannelConfig().voice, index, `wes-narrator-${selectedItem.id}`);
   };
 
-  // Helper to format date
-  const formatDate = (isoString?: string) => {
-    if (!isoString) return 'Unknown Date';
-    return new Date(isoString).toLocaleString('en-US', {
-      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+  // --- Optimized Update Logic using packageUtils ---
+
+  const handleGenerateThumbnail = async (prompt: string, index: number) => {
+    if (!selectedItem) return;
+    
+    const base64Image = await generateThumbnailAsset(prompt, index);
+    if (!base64Image) return;
+
+    const updatedItem = updatePackageThumbnail(selectedItem, index, base64Image);
+    
+    setSelectedItem(updatedItem);
+    // Persist to local list view
+    setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+  };
+
+  const handleGenerateSceneVisual = async (visualPrompt: string, index: number) => {
+    if (!selectedItem) return;
+    
+    const base64Image = await generateSceneAsset(visualPrompt, index, getActiveChannelConfig());
+    if (!base64Image) return;
+
+    const updatedItem = updatePackageSceneVisual(selectedItem, index, base64Image);
+    
+    setSelectedItem(updatedItem);
+    // Persist to local list view
+    setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
   };
 
   return (
@@ -175,14 +205,15 @@ export const History: React.FC = () => {
                </button>
              </div>
              
-             {/* Reusing OutputPanel in Read-Only Mode */}
+             {/* Reusing OutputPanel in Live Mode */}
              <OutputPanel 
                 loading={false}
                 result={selectedItem}
                 activeTab={viewerTab}
                 setActiveTab={setViewerTab}
                 activeChannelConfig={getActiveChannelConfig()}
-                generatingImage={null}
+                generatingImage={generatingImage}
+                generatingSceneVisual={generatingSceneVisual}
                 playingScene={playingIndex}
                 downloadingAudio={downloadingIndex}
                 downloadPackage={() => {
@@ -194,7 +225,8 @@ export const History: React.FC = () => {
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
-                handleGenerateThumbnail={() => alert('Live generation is disabled in History view.')}
+                handleGenerateThumbnail={handleGenerateThumbnail}
+                handleGenerateSceneVisual={handleGenerateSceneVisual}
                 handlePlayAudio={handlePlayAudio}
                 handleDownloadAudio={handleDownloadAudio}
              />

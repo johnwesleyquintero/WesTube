@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
 import { generateSpeech } from '../lib/gemini';
 import { playRawAudio, createWavBlob } from '../lib/audio';
+import { useToast } from '../context/ToastContext';
 
 export const useAudio = () => {
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const [downloadingIndex, setDownloadingIndex] = useState<number | null>(null);
   const [audioCache, setAudioCache] = useState<Record<number, string>>({});
+  const toast = useToast();
 
   const resetAudioState = useCallback(() => {
     setPlayingIndex(null);
@@ -30,7 +32,7 @@ export const useAudio = () => {
       await playRawAudio(base64Audio);
     } catch (e) {
       console.error("Audio playback failed", e);
-      alert("Failed to generate audio preview.");
+      toast.error("Failed to generate audio preview.");
     } finally {
       setPlayingIndex(null);
     }
@@ -57,9 +59,10 @@ export const useAudio = () => {
       a.download = `${filenamePrefix}-scene-${index}.wav`;
       a.click();
       URL.revokeObjectURL(url);
+      toast.success("Audio downloaded successfully.");
     } catch (e) {
       console.error("Audio download failed", e);
-      alert("Failed to download audio.");
+      toast.error("Failed to download audio.");
     } finally {
       setDownloadingIndex(null);
     }

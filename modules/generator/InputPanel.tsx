@@ -1,6 +1,7 @@
 import React from 'react';
 import { CHANNELS, MOODS } from '../../constants';
 import { ChannelId, GenerationRequest } from '../../types';
+import { GlassSelect } from '../../components/GlassSelect';
 
 interface InputPanelProps {
   topic: string;
@@ -74,40 +75,24 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Describe your video concept..."
-            className="w-full h-32 glass-input rounded-xl p-4 text-sm text-white placeholder-slate-600 resize-none font-medium"
+            className="w-full h-32 glass-input rounded-xl p-4 text-sm text-white placeholder-slate-600 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all"
           />
         </div>
 
         {/* Mood & Duration */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">Mood</label>
-            <div className="relative">
-              <select 
-                value={mood}
-                onChange={(e) => setMood(e.target.value)}
-                className="w-full glass-input rounded-xl p-3 text-sm text-white appearance-none cursor-pointer"
-              >
-                {MOODS.map(m => <option key={m} value={m} className="bg-wes-900 text-slate-300">{m}</option>)}
-              </select>
-              <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">Duration</label>
-            <div className="relative">
-              <select
-                value={duration}
-                onChange={(e) => setDuration(e.target.value as any)}
-                className="w-full glass-input rounded-xl p-3 text-sm text-white appearance-none cursor-pointer"
-              >
-                <option value="Short (<60s)" className="bg-wes-900 text-slate-300">Short (&lt;60s)</option>
-                <option value="Medium (5-8m)" className="bg-wes-900 text-slate-300">Medium (5-8m)</option>
-                <option value="Long (15m+)" className="bg-wes-900 text-slate-300">Long (15m+)</option>
-              </select>
-              <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
-            </div>
-          </div>
+          <GlassSelect 
+            label="Mood"
+            options={MOODS}
+            value={mood}
+            onChange={(e) => setMood(e.target.value)}
+          />
+          <GlassSelect 
+            label="Duration"
+            options={["Short (<60s)", "Medium (5-8m)", "Long (15m+)"]}
+            value={duration}
+            onChange={(e) => setDuration(e.target.value as any)}
+          />
         </div>
 
       </div>

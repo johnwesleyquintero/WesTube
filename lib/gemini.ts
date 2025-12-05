@@ -1,11 +1,8 @@
 
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
-
-// Helper to get API Key from Local Storage or Env
-const getApiKey = (): string => {
-  return localStorage.getItem('wes_gemini_api_key') || process.env.API_KEY || '';
-};
+import { getApiKey } from "./utils";
+import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } from "./prompts";
 
 // Helper to get Client instance
 const getClient = (): GoogleGenAI => {
@@ -24,26 +21,8 @@ export const generateVideoPackage = async (
   const ai = getClient();
   const model = "gemini-2.5-flash";
 
-  const systemInstruction = `
-    You are WesTube Engine, a specialized AI producer for the channel "${channelConfig.name}".
-    
-    Channel Persona: ${channelConfig.persona}
-    Tone: ${channelConfig.tone}
-    Target Audience: ${channelConfig.audience}
-    
-    Your goal is to generate a complete YouTube video production package based on the user's topic.
-    
-    For "script": Provide a scene-by-scene breakdown (Intro, Body Paragraphs, Outro).
-    For "thumbnailPrompts": Provide 3 distinct, highly visual descriptions.
-    For "brandingNote": One-sentence directive on specific channel branding.
-  `;
-
-  const prompt = `
-    Generate a video package for:
-    Topic: "${request.topic}"
-    Mood: "${request.mood}"
-    Duration: ${request.duration}
-  `;
+  const systemInstruction = constructSystemInstruction(channelConfig);
+  const prompt = constructUserPrompt(request);
 
   const response = await ai.models.generateContent({
     model,
@@ -106,12 +85,15 @@ export const generateVideoPackage = async (
 
 export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '16:9'): Promise<string> => {
   const ai = getClient();
+  
+  // Note: We are appending stylistic keywords here, but this could also move to prompts.ts if it gets complex
+  const finalPrompt = prompt + " --high quality, youtube thumbnail style, 4k, hyper detailed";
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {
       parts: [
-        { text: prompt + " --high quality, youtube thumbnail style, 4k, hyper detailed" }
+        { text: finalPrompt }
       ],
     },
     config: {

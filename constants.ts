@@ -1,3 +1,4 @@
+
 import { ChannelId, ChannelConfig } from './types';
 
 export const CHANNELS: Record<ChannelId, ChannelConfig> = {
@@ -61,4 +62,12 @@ export const MOODS = [
   "Mystery/Suspense",
   "Academic/Educational",
   "Sarcastic/Witty"
+];
+
+export const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', icon: 'fa-gauge-high' },
+  { id: 'scripts', label: 'Script Engine', icon: 'fa-file-lines' },
+  { id: 'assets', label: 'Asset Lab', icon: 'fa-photo-film' },
+  { id: 'seo', label: 'SEO Mastery', icon: 'fa-magnifying-glass-chart' },
+  { id: 'history', label: 'Production History', icon: 'fa-clock-rotate-left' },
 ];
