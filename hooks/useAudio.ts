@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { generateSpeech } from '../lib/gemini';
-import { playRawAudio, createWavBlob } from '../lib/audio';
+import { playRawAudio, createWavBlob, resumeAudioContext } from '../lib/audio';
 import { useToast } from '../context/ToastContext';
 
 export const useAudio = () => {
@@ -17,6 +17,11 @@ export const useAudio = () => {
 
   const playAudio = async (text: string, voice: string, index: number) => {
     if (playingIndex !== null) return; // Prevent multiple streams
+    
+    // Critical: Resume AudioContext immediately inside the click handler event loop
+    // to prevent browser autoplay blocking.
+    await resumeAudioContext();
+    
     setPlayingIndex(index);
 
     try {

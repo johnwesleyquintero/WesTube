@@ -15,6 +15,13 @@ const getAudioContext = () => {
   return audioContext;
 };
 
+export const resumeAudioContext = async () => {
+  const ctx = getAudioContext();
+  if (ctx.state === 'suspended') {
+    await ctx.resume();
+  }
+};
+
 export const playRawAudio = async (base64String: string, sampleRate = 24000): Promise<void> => {
   const ctx = getAudioContext();
   

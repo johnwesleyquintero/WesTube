@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getHistory, deleteHistoryItem } from '../lib/history';
 import { GeneratedPackage, ChannelId } from '../types';
 import { CHANNELS } from '../constants';
@@ -46,10 +46,10 @@ export const History: React.FC = () => {
     refreshHistory();
   }, []);
 
-  // Reset audio cache when switching items
+  // Reset audio cache when switching items (by ID), NOT on every state update
   useEffect(() => {
     resetAudioState();
-  }, [selectedItem, resetAudioState]);
+  }, [selectedItem?.id, resetAudioState]);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -72,20 +72,20 @@ export const History: React.FC = () => {
   };
 
   // Helper to get active channel config safely
-  const getActiveChannelConfig = () => {
+  const getActiveChannelConfig = useCallback(() => {
     if (!selectedItem || !selectedItem.channelId) return CHANNELS[ChannelId.TECH];
     return CHANNELS[selectedItem.channelId] || CHANNELS[ChannelId.TECH];
-  };
+  }, [selectedItem]);
 
-  const handlePlayAudio = (text: string, index: number) => {
-    if (!selectedItem) return;
+  const handlePlayAudio = useCallback((text: string, index: number) => {
+    if (!selectedItem || !text) return;
     playAudio(text, getActiveChannelConfig().voice, index);
-  };
+  }, [selectedItem, playAudio, getActiveChannelConfig]);
 
-  const handleDownloadAudio = (text: string, index: number) => {
-    if (!selectedItem) return;
+  const handleDownloadAudio = useCallback((text: string, index: number) => {
+    if (!selectedItem || !text) return;
     downloadAudio(text, getActiveChannelConfig().voice, index, `wes-narrator-${selectedItem.id}`);
-  };
+  }, [selectedItem, downloadAudio, getActiveChannelConfig]);
 
   // --- Optimized Update Logic using packageUtils ---
 
