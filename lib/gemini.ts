@@ -18,10 +18,17 @@ export const generateVideoPackage = async (
 ): Promise<GeneratedPackage> => {
   
   const ai = getClient();
+  // Using the preview model which supports thinking config best
   const model = "gemini-2.5-flash";
 
   const systemInstruction = constructSystemInstruction(channelConfig);
   const prompt = constructUserPrompt(request);
+
+  // We allocate a budget for the model to "think" about the channel persona 
+  // and script structure before generating the JSON.
+  const thinkingBudget = 2048; 
+  // Total tokens must include thinking budget + expected output size
+  const maxOutputTokens = 8192 + thinkingBudget; 
 
   const response = await ai.models.generateContent({
     model,
@@ -29,7 +36,9 @@ export const generateVideoPackage = async (
     config: {
       systemInstruction,
       responseMimeType: "application/json",
-      maxOutputTokens: 8192, 
+      maxOutputTokens: maxOutputTokens,
+      // @ts-ignore - The SDK types might lag behind the specific model capability in some versions, but 2.5 supports this.
+      thinkingConfig: { thinkingBudget }, 
       responseSchema: {
         type: Type.OBJECT,
         properties: {
