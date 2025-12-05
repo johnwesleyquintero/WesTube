@@ -6,9 +6,12 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
+type Tab = 'config' | 'manual';
+
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
+  const [activeTab, setActiveTab] = useState<Tab>('config');
   const [defaultDuration, setDefaultDuration] = useState('Medium (5-8m)');
   const [defaultMood, setDefaultMood] = useState(MOODS[0]);
   const [apiKey, setApiKey] = useState('');
@@ -34,84 +37,219 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
-      <div className="bg-wes-800 border border-wes-700 rounded-xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden transform transition-all scale-100">
-        {/* Header */}
-        <div className="p-4 border-b border-wes-700 flex justify-between items-center bg-wes-900/50">
-          <h2 className="text-lg font-bold text-white flex items-center">
-            <i className="fa-solid fa-gear text-slate-400 mr-2"></i>
-            System Configuration
-          </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-            <i className="fa-solid fa-xmark text-xl"></i>
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
+      <div className="bg-wes-950 border border-wes-700 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[90vh]">
+        
+        {/* Header & Tabs */}
+        <div className="flex flex-col border-b border-wes-700 bg-wes-900/50">
+          <div className="p-4 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-white flex items-center">
+              <span className="w-8 h-8 rounded-lg bg-wes-accent/10 flex items-center justify-center mr-3 border border-wes-accent/20 text-wes-accent">
+                <i className="fa-solid fa-sliders"></i>
+              </span>
+              Settings & Documentation
+            </h2>
+            <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+              <i className="fa-solid fa-xmark text-xl"></i>
+            </button>
+          </div>
+          
+          <div className="flex px-4 space-x-4">
+            <button
+              onClick={() => setActiveTab('config')}
+              className={`pb-3 text-sm font-bold uppercase tracking-wider border-b-2 transition-all ${
+                activeTab === 'config' 
+                  ? 'border-wes-accent text-white' 
+                  : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              Configuration
+            </button>
+            <button
+              onClick={() => setActiveTab('manual')}
+              className={`pb-3 text-sm font-bold uppercase tracking-wider border-b-2 transition-all ${
+                activeTab === 'manual' 
+                  ? 'border-wes-pop text-white' 
+                  : 'border-transparent text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              System Manual
+            </button>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-wes-950">
           
-          {/* API Key Section */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">API Connection</label>
-            <input 
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter Google Gemini API Key"
-              className="w-full bg-wes-900 border border-wes-700 rounded p-3 text-sm text-white focus:border-wes-accent outline-none placeholder-slate-600 transition-colors"
-            />
-            <p className="text-[10px] text-slate-500 leading-tight">
-              * Your API key is stored securely in your browser's local storage. Obtain one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-wes-accent hover:underline">Google AI Studio</a>.
-            </p>
-          </div>
+          {/* TAB: CONFIGURATION */}
+          {activeTab === 'config' && (
+            <div className="p-6 space-y-8">
+              {/* API Key Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                   <label className="text-xs font-bold text-wes-accent uppercase tracking-wider">API Connection</label>
+                   <span className="text-[10px] bg-wes-accent/10 text-wes-accent px-2 py-0.5 rounded border border-wes-accent/20">Required</span>
+                </div>
+                <div className="relative">
+                  <i className="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                  <input 
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter Google Gemini API Key"
+                    className="w-full bg-wes-900 border border-wes-700 rounded-lg py-3 pl-10 pr-3 text-sm text-white focus:border-wes-accent outline-none placeholder-slate-600 transition-colors shadow-inner"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-500 leading-relaxed bg-wes-900/50 p-3 rounded border border-white/5">
+                  <i className="fa-solid fa-shield-halved mr-1.5 text-wes-success"></i>
+                  Security Note: Your API key is stored locally in your browser. Obtain one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-wes-accent hover:underline decoration-dashed">Google AI Studio</a>.
+                </p>
+              </div>
 
-          <div className="h-px bg-wes-700/50"></div>
+              <div className="h-px bg-wes-800"></div>
 
-          {/* Defaults */}
-          <div className="space-y-4">
-             <h3 className="text-sm font-bold text-white">Production Defaults</h3>
-             
-             <div className="space-y-2">
-               <label className="text-xs text-slate-400">Default Duration</label>
-               <select 
-                 value={defaultDuration}
-                 onChange={(e) => setDefaultDuration(e.target.value)}
-                 className="w-full bg-wes-900 border border-wes-700 rounded p-2 text-sm text-white focus:border-wes-accent outline-none"
-               >
-                 <option value="Short (<60s)">Short (&lt;60s)</option>
-                 <option value="Medium (5-8m)">Medium (5-8m)</option>
-                 <option value="Long (15m+)">Long (15m+)</option>
-               </select>
-             </div>
+              {/* Defaults */}
+              <div className="space-y-4">
+                 <h3 className="text-sm font-bold text-white flex items-center">
+                    <i className="fa-solid fa-layer-group mr-2 text-slate-400"></i>
+                    Production Defaults
+                 </h3>
+                 
+                 <div className="grid grid-cols-2 gap-4">
+                   <div className="space-y-2">
+                     <label className="text-xs text-slate-400 font-medium">Default Duration</label>
+                     <div className="relative">
+                        <select 
+                          value={defaultDuration}
+                          onChange={(e) => setDefaultDuration(e.target.value)}
+                          className="w-full bg-wes-900 border border-wes-700 rounded-lg p-2.5 text-sm text-white focus:border-wes-accent outline-none appearance-none"
+                        >
+                          <option value="Short (<60s)">Short (&lt;60s)</option>
+                          <option value="Medium (5-8m)">Medium (5-8m)</option>
+                          <option value="Long (15m+)">Long (15m+)</option>
+                        </select>
+                        <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
+                     </div>
+                   </div>
 
-             <div className="space-y-2">
-               <label className="text-xs text-slate-400">Default Mood</label>
-               <select 
-                 value={defaultMood}
-                 onChange={(e) => setDefaultMood(e.target.value)}
-                 className="w-full bg-wes-900 border border-wes-700 rounded p-2 text-sm text-white focus:border-wes-accent outline-none"
-               >
-                 {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
-               </select>
-             </div>
-          </div>
+                   <div className="space-y-2">
+                     <label className="text-xs text-slate-400 font-medium">Default Mood</label>
+                     <div className="relative">
+                        <select 
+                          value={defaultMood}
+                          onChange={(e) => setDefaultMood(e.target.value)}
+                          className="w-full bg-wes-900 border border-wes-700 rounded-lg p-2.5 text-sm text-white focus:border-wes-accent outline-none appearance-none"
+                        >
+                          {MOODS.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                        <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: SYSTEM MANUAL */}
+          {activeTab === 'manual' && (
+            <div className="p-6 space-y-8 text-sm text-slate-300">
+              
+              {/* Introduction */}
+              <div className="bg-wes-900/40 p-4 rounded-lg border border-wes-700">
+                <h3 className="text-white font-bold mb-2 flex items-center">
+                  <i className="fa-solid fa-microchip text-wes-pop mr-2"></i>
+                  System Overview
+                </h3>
+                <p className="leading-relaxed">
+                  WesTube Engine v2.0 is a multi-channel content production system. It utilizes <strong>Google Gemini 2.5 Flash</strong> to transform a single topic into a complete production package (Script, SEO, Asset Prompts) tailored to specific channel personas.
+                </p>
+              </div>
+
+              {/* Workflow */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold text-wes-accent uppercase tracking-widest border-b border-wes-800 pb-2">
+                  Operational Workflow
+                </h4>
+                <ol className="space-y-4 list-decimal list-inside marker:text-wes-accent marker:font-bold">
+                  <li className="pl-2">
+                    <strong className="text-white">Input Vector:</strong> Select a target <em>Channel</em> (Persona), enter a <em>Topic</em>, and define the <em>Mood</em> in Mission Control.
+                  </li>
+                  <li className="pl-2">
+                    <strong className="text-white">Generation:</strong> The engine processes the input through specific persona filters to generate a script structure, branding directives, and SEO metadata.
+                  </li>
+                  <li className="pl-2">
+                    <strong className="text-white">Asset Lab:</strong> 
+                    <ul className="list-disc list-inside pl-6 mt-2 space-y-1 text-slate-400 text-xs">
+                      <li><strong>Visuals:</strong> Click "Generate" on thumbnail prompts or script scenes to create AI images.</li>
+                      <li><strong>Audio:</strong> Click the <i className="fa-solid fa-play mx-1"></i> Play button on script lines to preview TTS narration using the channel's specific voice ID.</li>
+                    </ul>
+                  </li>
+                  <li className="pl-2">
+                    <strong className="text-white">Export:</strong> Download the entire package as a JSON file or download individual assets (WAV audio, PNG images) for editing.
+                  </li>
+                </ol>
+              </div>
+
+              {/* Channels Legend */}
+              <div className="space-y-4">
+                 <h4 className="text-xs font-bold text-wes-pop uppercase tracking-widest border-b border-wes-800 pb-2">
+                  Channel Protocols (The Shivs)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-black/20 rounded border border-white/5">
+                    <div className="text-purple-400 font-bold text-xs mb-1">Philosophy & Life</div>
+                    <div className="text-[10px] text-slate-500">Tone: Deep, Socratic, Calm</div>
+                  </div>
+                  <div className="p-3 bg-black/20 rounded border border-white/5">
+                    <div className="text-blue-400 font-bold text-xs mb-1">Tech & Automation</div>
+                    <div className="text-[10px] text-slate-500">Tone: Technical, Fast, Precise</div>
+                  </div>
+                  <div className="p-3 bg-black/20 rounded border border-white/5">
+                    <div className="text-pink-400 font-bold text-xs mb-1">Creative Audio</div>
+                    <div className="text-[10px] text-slate-500">Tone: Abstract, Sensory</div>
+                  </div>
+                  <div className="p-3 bg-black/20 rounded border border-white/5">
+                    <div className="text-amber-600 font-bold text-xs mb-1">Lore & Narrative</div>
+                    <div className="text-[10px] text-slate-500">Tone: Epic, Mysterious</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-wes-700 bg-wes-900/50 flex justify-end gap-2">
-          <button 
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={handleSave}
-            className="px-4 py-2 bg-wes-accent hover:bg-blue-600 text-white text-sm font-bold rounded shadow-lg shadow-blue-900/20 transition-all hover:scale-105 active:scale-95"
-          >
-            Save Changes
-          </button>
-        </div>
+        {activeTab === 'config' && (
+          <div className="p-4 border-t border-wes-700 bg-wes-900/80 flex justify-end gap-3">
+            <button 
+              onClick={onClose}
+              className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSave}
+              className="px-6 py-2 bg-wes-accent hover:bg-indigo-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-indigo-900/20 transition-all hover:scale-105 active:scale-95 flex items-center"
+            >
+              <i className="fa-solid fa-save mr-2"></i>
+              Save Configuration
+            </button>
+          </div>
+        )}
+        
+        {activeTab === 'manual' && (
+           <div className="p-4 border-t border-wes-700 bg-wes-900/80 flex justify-end">
+             <button 
+              onClick={onClose}
+              className="px-6 py-2 bg-wes-800 hover:bg-wes-700 text-white text-sm font-bold rounded-lg border border-white/10 transition-colors"
+            >
+              Close Manual
+            </button>
+           </div>
+        )}
+
       </div>
     </div>
   );
