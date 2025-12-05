@@ -18,17 +18,17 @@ export const generateVideoPackage = async (
 ): Promise<GeneratedPackage> => {
   
   const ai = getClient();
-  // Using the preview model which supports thinking config best
+  // Using gemini-2.5-flash for balance of speed and capability on free tier
   const model = "gemini-2.5-flash";
 
   const systemInstruction = constructSystemInstruction(channelConfig);
   const prompt = constructUserPrompt(request);
 
-  // We allocate a budget for the model to "think" about the channel persona 
-  // and script structure before generating the JSON.
-  const thinkingBudget = 2048; 
-  // Total tokens must include thinking budget + expected output size
-  const maxOutputTokens = 8192 + thinkingBudget; 
+  // Optimized for Free Tier / Fast Dev:
+  // We disable the thinking budget (set to 0) to minimize token usage and latency.
+  // The 2.5-flash model is capable enough to generate the JSON schema without explicit thinking steps for this use case.
+  const thinkingBudget = 0; 
+  const maxOutputTokens = 8192; 
 
   const response = await ai.models.generateContent({
     model,
@@ -37,7 +37,7 @@ export const generateVideoPackage = async (
       systemInstruction,
       responseMimeType: "application/json",
       maxOutputTokens: maxOutputTokens,
-      // @ts-ignore - The SDK types might lag behind the specific model capability in some versions, but 2.5 supports this.
+      // @ts-ignore - Explicitly disabling thinking for speed
       thinkingConfig: { thinkingBudget }, 
       responseSchema: {
         type: Type.OBJECT,
