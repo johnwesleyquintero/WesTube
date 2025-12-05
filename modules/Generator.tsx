@@ -26,11 +26,14 @@ export const Generator: React.FC = () => {
   const [playingScene, setPlayingScene] = useState<number | null>(null);
   const [audioCache, setAudioCache] = useState<Record<number, string>>({});
 
-  // Form State
+  // Form State - Initialize with defaults from LocalStorage if available
   const [topic, setTopic] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelId>(ChannelId.TECH);
-  const [mood, setMood] = useState(MOODS[0]);
-  const [duration, setDuration] = useState<GenerationRequest['duration']>('Medium (5-8m)');
+  
+  const [mood, setMood] = useState(() => localStorage.getItem('wes_default_mood') || MOODS[0]);
+  const [duration, setDuration] = useState<GenerationRequest['duration']>(() => 
+    (localStorage.getItem('wes_default_duration') as GenerationRequest['duration']) || 'Medium (5-8m)'
+  );
 
   const activeChannelConfig = CHANNELS[selectedChannel];
 

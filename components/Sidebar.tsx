@@ -4,9 +4,10 @@ import { Logo } from './Logo';
 interface SidebarProps {
   activeView: string;
   setActiveView: (view: string) => void;
+  onOpenSettings: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onOpenSettings }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
@@ -89,15 +90,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) =
                 <div className="bg-wes-accent h-1.5 rounded-full w-1/4"></div>
               </div>
             </div>
-            <div className="mt-4 flex items-center text-xs text-slate-500">
-              <i className="fa-solid fa-robot mr-2"></i>
-              <span>WesAI Active</span>
+            
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center text-xs text-slate-500">
+                <i className="fa-solid fa-robot mr-2"></i>
+                <span>WesAI Active</span>
+              </div>
+              <button 
+                onClick={onOpenSettings}
+                className="w-6 h-6 rounded hover:bg-wes-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                title="Settings"
+              >
+                <i className="fa-solid fa-gear"></i>
+              </button>
             </div>
           </div>
         ) : (
            <div className="flex flex-col items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-wes-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" title="Tokens Healthy"></div>
-              <i className="fa-solid fa-robot text-slate-600 hover:text-wes-accent transition-colors cursor-help" title="WesAI Active"></i>
+              <button 
+                onClick={onOpenSettings}
+                className="text-slate-600 hover:text-wes-accent transition-colors"
+                title="Settings"
+              >
+                <i className="fa-solid fa-gear"></i>
+              </button>
            </div>
         )}
       </div>

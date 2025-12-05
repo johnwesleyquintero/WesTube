@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Generator } from './modules/Generator';
+import { SettingsModal } from './components/SettingsModal';
 import { Logo } from './components/Logo';
 
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-wes-900 text-slate-200 font-sans selection:bg-wes-accent selection:text-white">
       
+      {/* Settings Modal */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
       {/* Mobile Menu Button */}
       <button 
         className="fixed top-4 right-4 z-50 md:hidden bg-wes-800 p-2 rounded text-wes-accent border border-wes-700 shadow-lg"
@@ -23,10 +28,17 @@ export default function App() {
         fixed inset-0 z-40 bg-wes-900/95 backdrop-blur transition-transform duration-300 md:relative md:bg-transparent md:translate-x-0 md:w-auto
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <Sidebar activeView={activeView} setActiveView={(view) => {
-          setActiveView(view);
-          setMobileMenuOpen(false);
-        }} />
+        <Sidebar 
+          activeView={activeView} 
+          setActiveView={(view) => {
+            setActiveView(view);
+            setMobileMenuOpen(false);
+          }} 
+          onOpenSettings={() => {
+            setIsSettingsOpen(true);
+            setMobileMenuOpen(false);
+          }}
+        />
       </div>
 
       {/* Main Content */}
