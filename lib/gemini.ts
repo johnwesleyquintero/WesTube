@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 
@@ -23,6 +24,13 @@ export const generateVideoPackage = async (
   const ai = getClient();
   const model = "gemini-2.5-flash";
 
+  // Calculate target duration and segments
+  let targetSeconds = 60; // Default Short
+  if (request.duration.includes('Medium')) targetSeconds = 300; // 5 mins
+  if (request.duration.includes('Long')) targetSeconds = 600; // Cap at 10 mins to prevent token overflow
+
+  const segmentCount = Math.floor(targetSeconds / 5);
+
   const systemInstruction = `
     You are WesTube Engine, a specialized AI producer for the channel "${channelConfig.name}".
     
@@ -31,19 +39,27 @@ export const generateVideoPackage = async (
     Target Audience: ${channelConfig.audience}
     
     Your goal is to generate a complete YouTube video production package based on the user's topic.
-    The content must STRICTLY adhere to the channel's persona and tone.
     
-    For "script", provide a scene-by-scene breakdown.
-    For "thumbnailPrompts", provide 3 distinct, highly visual descriptions for an AI image generator.
-    For "musicPrompt", describe the audio mood, bpm, and instruments.
-    For "brandingNote", give a one-sentence directive on how the specific channel branding applies here.
+    CRITICAL RULE: VISUAL PACING
+    The video must be broken down into STRICT 5-SECOND INTERVALS.
+    Do not generate broad "scenes". You must generate a specific visual cue for every single 5-second block of the video.
+    The audio/narration for that block must fit within 5 seconds (approx 10-15 words).
+    
+    For a ${request.duration} video, you must generate approx ${segmentCount} items in the "script" array.
+    
+    For "script": Provide the 5-second interval breakdown.
+    For "thumbnailPrompts": Provide 3 distinct, highly visual descriptions.
+    For "brandingNote": One-sentence directive on specific channel branding.
   `;
 
   const prompt = `
     Generate a video package for:
     Topic: "${request.topic}"
     Mood: "${request.mood}"
-    Format/Duration: "${request.duration}"
+    Target Duration: ${targetSeconds} seconds (${segmentCount} intervals of 5s each).
+    
+    Ensure the "script" array contains exactly ${segmentCount} items, covering timestamps from 00:00 up to the end.
+    Example timestamps: "00:00-00:05", "00:05-00:10", "00:10-00:15", etc.
   `;
 
   const response = await ai.models.generateContent({
@@ -52,6 +68,8 @@ export const generateVideoPackage = async (
     config: {
       systemInstruction,
       responseMimeType: "application/json",
+      // We increase max output tokens to accommodate the long script array
+      maxOutputTokens: 8192, 
       responseSchema: {
         type: Type.OBJECT,
         properties: {
@@ -66,13 +84,13 @@ export const generateVideoPackage = async (
           brandingNote: { type: Type.STRING, description: "Specific branding instruction" },
           script: {
             type: Type.ARRAY,
-            description: "Scene by scene script",
+            description: `Array of exactly ${segmentCount} items. One item per 5 seconds.`,
             items: {
               type: Type.OBJECT,
               properties: {
-                timestamp: { type: Type.STRING, description: "e.g., 00:00 - 00:15" },
-                visual: { type: Type.STRING, description: "Visual description for B-Roll or Animation" },
-                audio: { type: Type.STRING, description: "Spoken narration or sound effects" }
+                timestamp: { type: Type.STRING, description: "Interval e.g., '00:00 - 00:05'" },
+                visual: { type: Type.STRING, description: "Specific visual prompt for this 5s clip. Highly descriptive." },
+                audio: { type: Type.STRING, description: "Narration line or SFX for this 5s clip." }
               }
             }
           },
