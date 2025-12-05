@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GeneratedPackage, ChannelConfig } from '../../types';
 
 interface OutputPanelProps {
@@ -13,6 +13,41 @@ interface OutputPanelProps {
   handleGenerateThumbnail: (prompt: string, idx: number) => void;
   handlePlayAudio: (text: string, idx: number) => void;
 }
+
+// -- Helper Component: Copy Button --
+const CopyButton: React.FC<{ text: string; className?: string }> = ({ text, className = "" }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`text-slate-500 hover:text-white transition-all flex items-center space-x-1.5 text-xs font-medium px-2 py-1 rounded hover:bg-wes-700 ${className}`}
+      title="Copy to clipboard"
+    >
+      {copied ? (
+        <>
+          <i className="fa-solid fa-check text-wes-success"></i>
+          <span className="text-wes-success">Copied</span>
+        </>
+      ) : (
+        <>
+          <i className="fa-regular fa-copy"></i>
+          <span>Copy</span>
+        </>
+      )}
+    </button>
+  );
+};
 
 const Loader = () => (
   <div className="flex flex-col items-center justify-center p-12 space-y-4 animate-pulse">
@@ -162,6 +197,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                               <div>
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Concept {i+1}</span>
+                                  <CopyButton text={prompt} />
                                 </div>
                                 <p className="text-sm text-slate-300 leading-relaxed mb-4">{prompt}</p>
                               </div>
@@ -217,7 +253,10 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                       Sonic Architecture
                     </h3>
                     <div className="bg-wes-800 p-5 rounded-lg border border-wes-700">
-                        <h4 className="text-xs font-bold text-pink-400 uppercase mb-2">Music Prompt (Suno/Udio)</h4>
+                        <div className="flex justify-between items-center mb-2">
+                           <h4 className="text-xs font-bold text-pink-400 uppercase">Music Prompt (Suno/Udio)</h4>
+                           <CopyButton text={result.musicPrompt} />
+                        </div>
                         <p className="text-sm text-slate-200 font-mono bg-wes-900 p-3 rounded border border-wes-700 mb-4">{result.musicPrompt}</p>
                         
                         <h4 className="text-xs font-bold text-pink-400 uppercase mb-2">General Visual Aesthetic</h4>
@@ -232,14 +271,20 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                 <div className="space-y-6 animate-fadeIn">
                   <div className="bg-wes-800 p-6 rounded-lg border border-wes-700">
                     <div className="mb-6">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Optimized Title</label>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Optimized Title</label>
+                        <CopyButton text={result.title} />
+                      </div>
                       <div className="text-xl text-white font-bold select-all bg-wes-900 p-3 rounded border border-wes-700">
                         {result.title}
                       </div>
                     </div>
 
                     <div className="mb-6">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Description</label>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
+                        <CopyButton text={result.description} />
+                      </div>
                       <textarea 
                         readOnly 
                         className="w-full h-48 bg-wes-900 p-3 rounded border border-wes-700 text-sm text-slate-300 font-mono resize-none focus:outline-none"
