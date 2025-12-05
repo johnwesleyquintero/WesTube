@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
-import { getApiKey } from "./utils";
+import { getApiKey, cleanJsonString } from "./utils";
 import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } from "./prompts";
 
 // Helper to get Client instance
@@ -71,7 +71,8 @@ export const generateVideoPackage = async (
   }
 
   try {
-    const data = JSON.parse(response.text) as GeneratedPackage;
+    const cleanedText = cleanJsonString(response.text);
+    const data = JSON.parse(cleanedText) as GeneratedPackage;
     return {
       ...data,
       channelId: request.channelId

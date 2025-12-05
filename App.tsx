@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
 import { ToastContainer } from './components/Toast';
+import { SplashScreen } from './components/SplashScreen';
 
 // Lazy load heavy modules for performance
 const Generator = React.lazy(() => import('./modules/Generator').then(module => ({ default: module.Generator })));
@@ -16,14 +17,7 @@ const AppContent = () => {
   const [activeView, setActiveView] = useState('dashboard');
 
   if (loading) {
-    return (
-      <div className="h-screen w-screen bg-wes-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-           <div className="w-12 h-12 rounded-full border-4 border-wes-accent border-t-transparent animate-spin"></div>
-           <p className="text-wes-accent font-mono text-sm tracking-widest animate-pulse">INITIALIZING...</p>
-        </div>
-      </div>
-    );
+    return <SplashScreen />;
   }
 
   if (!user) {

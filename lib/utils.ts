@@ -28,3 +28,15 @@ export const formatDate = (isoString?: string): string => {
  * Useful for debouncing or smooth UI transitions.
  */
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Sanitizes a raw string from LLM to ensure it is valid JSON.
+ * Removes Markdown code blocks (```json ... ```).
+ */
+export const cleanJsonString = (text: string): string => {
+  if (!text) return "{}";
+  // Remove markdown code block syntax
+  let cleaned = text.replace(/```json\n?|```/g, '');
+  // Trim whitespace
+  return cleaned.trim();
+};
