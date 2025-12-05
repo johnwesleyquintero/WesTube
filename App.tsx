@@ -16,8 +16,11 @@ const AppContent = () => {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen bg-wes-900 flex items-center justify-center text-wes-accent">
-        <i className="fa-solid fa-circle-notch fa-spin text-3xl"></i>
+      <div className="h-screen w-screen bg-wes-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+           <div className="w-12 h-12 rounded-full border-4 border-wes-accent border-t-transparent animate-spin"></div>
+           <p className="text-wes-accent font-mono text-sm tracking-widest animate-pulse">INITIALIZING...</p>
+        </div>
       </div>
     );
   }
@@ -34,13 +37,13 @@ const AppContent = () => {
         return <History />;
       default:
         return (
-          <div className="h-full flex flex-col items-center justify-center text-slate-500 bg-wes-800/50 rounded-xl border border-wes-700 border-dashed">
+          <div className="h-full flex flex-col items-center justify-center text-slate-500 glass-panel rounded-2xl border-dashed">
             <i className="fa-solid fa-person-digging text-4xl mb-4 text-wes-700"></i>
             <h2 className="text-xl font-bold text-slate-400">Under Construction</h2>
-            <p className="mt-2 text-sm">The module "{activeView}" is coming in v2.1</p>
+            <p className="mt-2 text-sm">The module "{activeView}" is coming in v2.3</p>
             <button 
               onClick={() => setActiveView('dashboard')}
-              className="mt-6 px-4 py-2 bg-wes-700 hover:bg-wes-600 text-white rounded text-sm transition-colors"
+              className="mt-6 px-4 py-2 bg-wes-800 hover:bg-wes-700 text-white rounded text-sm transition-colors border border-white/5"
             >
               Return to Dashboard
             </button>
@@ -50,14 +53,14 @@ const AppContent = () => {
   };
 
   return (
-    <div className="flex h-screen bg-wes-900 text-slate-200 font-sans selection:bg-wes-accent selection:text-white">
+    <div className="flex h-screen text-slate-200 font-sans selection:bg-wes-accent selection:text-white">
       
       {/* Settings Modal */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Mobile Menu Button */}
       <button 
-        className="fixed top-4 right-4 z-50 md:hidden bg-wes-800 p-2 rounded text-wes-accent border border-wes-700 shadow-lg"
+        className="fixed top-4 right-4 z-50 md:hidden bg-wes-800 p-2 rounded text-wes-accent border border-white/10 shadow-lg"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
         <i className={`fa-solid ${mobileMenuOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
@@ -65,7 +68,7 @@ const AppContent = () => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-0 z-40 bg-wes-900/95 backdrop-blur transition-transform duration-300 md:relative md:bg-transparent md:translate-x-0 md:w-auto
+        fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-transform duration-300 md:relative md:bg-transparent md:translate-x-0 md:w-auto
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <Sidebar 
@@ -79,36 +82,40 @@ const AppContent = () => {
             setMobileMenuOpen(false);
           }}
         />
-        
-        {/* Sign Out Button (Small, in sidebar area for now or handled via settings) */}
-        {/* We can also add it to the sidebar bottom via prop drilling, but let's put it in SettingsModal or top bar */}
       </div>
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Top Bar */}
-        <div className="h-16 border-b border-wes-700 flex items-center justify-between px-6 bg-wes-800">
+        <div className="h-20 flex items-center justify-between px-8 shrink-0">
           <div className="md:hidden">
              <Logo withText={true} className="w-8 h-8" />
           </div>
           
-          <div className="hidden md:flex items-center text-sm text-slate-400">
-             <span className="bg-wes-700/50 px-3 py-1 rounded-full border border-wes-700 text-xs">
-                <i className="fa-solid fa-user mr-2 text-wes-accent"></i>
-                {user.email}
-             </span>
+          <div className="hidden md:flex flex-col">
+             <h1 className="text-xl font-bold text-white tracking-tight">Production Studio</h1>
+             <p className="text-xs text-slate-500 font-mono">System Online // {new Date().toLocaleDateString()}</p>
           </div>
 
-          <button 
-            onClick={signOut}
-            className="text-xs text-slate-400 hover:text-white flex items-center gap-2 hover:bg-wes-700 px-3 py-1.5 rounded transition-colors"
-          >
-            <i className="fa-solid fa-right-from-bracket"></i>
-            <span className="hidden md:inline">Sign Out</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center text-sm text-slate-400">
+               <span className="glass-panel px-3 py-1.5 rounded-full text-xs flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  {user.email}
+               </span>
+            </div>
+
+            <button 
+              onClick={signOut}
+              className="text-xs text-slate-400 hover:text-white flex items-center gap-2 hover:bg-white/5 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <i className="fa-solid fa-right-from-bracket"></i>
+              <span className="hidden md:inline">Sign Out</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1 p-4 md:p-6 overflow-hidden">
+        <div className="flex-1 px-8 pb-8 overflow-hidden">
           {renderContent()}
         </div>
       </main>

@@ -6,72 +6,70 @@ export const LandingPage: React.FC = () => {
   const { signInWithGoogle } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-wes-900 text-white overflow-hidden font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-wes-950 text-white overflow-hidden font-sans">
       
       {/* Left Panel - The Brand */}
-      <div className="w-full md:w-1/2 bg-gradient-to-br from-wes-900 via-wes-800 to-[#1a237e] p-12 flex flex-col justify-between relative overflow-hidden">
-        {/* Background Accents */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-           <div className="absolute top-10 left-10 w-64 h-64 bg-wes-accent rounded-full blur-[100px]"></div>
-           <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-600 rounded-full blur-[120px]"></div>
+      <div className="w-full md:w-1/2 relative overflow-hidden flex flex-col justify-between p-12">
+        {/* Background Mesh Gradients */}
+        <div className="absolute inset-0 bg-wes-950">
+            <div className="absolute top-0 -left-20 w-[600px] h-[600px] bg-wes-accent/20 rounded-full blur-[120px]"></div>
+            <div className="absolute bottom-0 -right-20 w-[500px] h-[500px] bg-wes-pop/20 rounded-full blur-[120px]"></div>
         </div>
+        
+        {/* Glass Overlay */}
+        <div className="absolute inset-0 backdrop-blur-3xl z-0"></div>
 
         <div className="relative z-10">
           <Logo withText={true} className="w-10 h-10" />
           
-          <div className="mt-20">
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
-              Automate Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Content Empire</span>
+          <div className="mt-24">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6">
+                <span className="w-2 h-2 rounded-full bg-wes-success mr-2 animate-pulse"></span>
+                <span className="text-xs font-mono text-slate-300 uppercase tracking-wider">System v2.2 Online</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight">
+              Build Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-wes-accent to-wes-pop">Digital Empire</span>
             </h1>
-            <p className="text-lg text-slate-300 max-w-md leading-relaxed">
-              WesTube Engine v2.0 is the comprehensive AI production network for your multi-channel strategy. Generate scripts, visuals, and audio in seconds.
+            <p className="text-lg text-slate-400 max-w-lg leading-relaxed font-light">
+              WesTube Engine is the neural interface for your multi-channel production strategy. Deploy scripts, visuals, and sonics from a single command center.
             </p>
           </div>
         </div>
 
-        <div className="relative z-10 flex gap-4 text-xs font-mono text-slate-400 mt-10">
+        <div className="relative z-10 flex gap-8 text-xs font-mono text-slate-500 mt-10 uppercase tracking-widest">
            <div className="flex items-center gap-2">
-             <i className="fa-solid fa-check-circle text-wes-success"></i>
+             <i className="fa-solid fa-bolt text-wes-accent"></i>
              <span>Gemini 2.5 Flash</span>
            </div>
            <div className="flex items-center gap-2">
-             <i className="fa-solid fa-check-circle text-wes-success"></i>
-             <span>Supabase Cloud</span>
-           </div>
-           <div className="flex items-center gap-2">
-             <i className="fa-solid fa-check-circle text-wes-success"></i>
-             <span>Multi-Persona</span>
+             <i className="fa-solid fa-database text-wes-pop"></i>
+             <span>Supabase Vector</span>
            </div>
         </div>
       </div>
 
       {/* Right Panel - The Auth */}
-      <div className="w-full md:w-1/2 bg-white text-slate-900 flex flex-col items-center justify-center p-8 md:p-12 relative">
-         <div className="w-full max-w-sm">
-            <div className="mb-10">
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
-              <p className="text-slate-500">Sign in to access your production dashboard.</p>
+      <div className="w-full md:w-1/2 bg-black/20 backdrop-blur-md border-l border-white/5 flex flex-col items-center justify-center p-8 md:p-12 relative">
+         <div className="w-full max-w-sm relative z-10">
+            <div className="mb-10 text-center md:text-left">
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Identify</h2>
+              <p className="text-slate-500">Authenticate to access the production mainframe.</p>
             </div>
 
             <button 
               onClick={signInWithGoogle}
-              className="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-3 px-4 rounded-lg shadow-sm transition-all duration-200 transform active:scale-[0.98]"
+              className="group w-full flex items-center justify-center gap-3 bg-white text-black font-semibold py-4 px-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 transform hover:scale-[1.02]"
             >
-               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-               <span>Sign in with Google</span>
+               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+               <span>Initialize with Google</span>
             </button>
 
             <div className="mt-8 text-center">
-              <p className="text-xs text-slate-400">
-                By signing in, you agree to the Terms of Service and Privacy Policy of WesTube Inc.
+              <p className="text-[10px] text-slate-600 uppercase tracking-wider">
+                Authorized Personnel Only
               </p>
             </div>
-         </div>
-
-         {/* Footer Info */}
-         <div className="absolute bottom-6 w-full text-center text-xs text-slate-400">
-           Protected by WesAI Security Systems v2.2
          </div>
       </div>
     </div>
