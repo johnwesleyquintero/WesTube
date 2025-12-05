@@ -11,18 +11,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
   const [defaultDuration, setDefaultDuration] = useState('Medium (5-8m)');
   const [defaultMood, setDefaultMood] = useState(MOODS[0]);
+  const [apiKey, setApiKey] = useState('');
 
   // Load from local storage on mount
   useEffect(() => {
     const savedDuration = localStorage.getItem('wes_default_duration');
     const savedMood = localStorage.getItem('wes_default_mood');
+    const savedKey = localStorage.getItem('wes_gemini_api_key');
+
     if (savedDuration) setDefaultDuration(savedDuration);
     if (savedMood) setDefaultMood(savedMood);
+    if (savedKey) setApiKey(savedKey);
   }, []);
 
   const handleSave = () => {
     localStorage.setItem('wes_default_duration', defaultDuration);
     localStorage.setItem('wes_default_mood', defaultMood);
+    localStorage.setItem('wes_gemini_api_key', apiKey);
     onClose();
     // Force a reload to apply changes cleanly across the app
     window.location.reload(); 
@@ -45,20 +50,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         {/* Content */}
         <div className="p-6 space-y-6">
           
-          {/* API Key Section (Read Only per System Rules) */}
+          {/* API Key Section */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">API Connection</label>
-            <div className="flex items-center justify-between p-3 bg-wes-900 rounded border border-wes-700 opacity-70 cursor-not-allowed" title="Managed by Environment Variables">
-              <div className="flex items-center text-sm text-slate-300">
-                <i className="fa-solid fa-key mr-2 text-wes-success"></i>
-                <span>Google Gemini API</span>
-              </div>
-              <span className="text-xs bg-wes-700 px-2 py-1 rounded text-slate-400 flex items-center border border-wes-600">
-                <i className="fa-solid fa-lock mr-1.5 text-[10px]"></i> Env Locked
-              </span>
-            </div>
+            <input 
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Enter Google Gemini API Key"
+              className="w-full bg-wes-900 border border-wes-700 rounded p-3 text-sm text-white focus:border-wes-accent outline-none placeholder-slate-600 transition-colors"
+            />
             <p className="text-[10px] text-slate-500 leading-tight">
-              * Security Protocol: The API key is injected via secure environment variables and cannot be modified in the client interface.
+              * Your API key is stored securely in your browser's local storage. Obtain one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-wes-accent hover:underline">Google AI Studio</a>.
             </p>
           </div>
 

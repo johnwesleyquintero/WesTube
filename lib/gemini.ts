@@ -1,20 +1,26 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 
-const apiKey = process.env.API_KEY || '';
+// Helper to get API Key from Local Storage or Env
+const getApiKey = (): string => {
+  return localStorage.getItem('wes_gemini_api_key') || process.env.API_KEY || '';
+};
 
-// Initialize the client
-const ai = new GoogleGenAI({ apiKey });
+// Helper to get Client instance
+const getClient = (): GoogleGenAI => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please set it in Settings.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const generateVideoPackage = async (
   request: GenerationRequest, 
   channelConfig: ChannelConfig
 ): Promise<GeneratedPackage> => {
   
-  if (!apiKey) {
-    throw new Error("API Key is missing. Please set process.env.API_KEY.");
-  }
-
+  const ai = getClient();
   const model = "gemini-2.5-flash";
 
   const systemInstruction = `
@@ -95,7 +101,7 @@ export const generateVideoPackage = async (
 };
 
 export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '16:9'): Promise<string> => {
-  if (!apiKey) throw new Error("API Key missing");
+  const ai = getClient();
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
@@ -122,7 +128,7 @@ export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '1
 };
 
 export const generateSpeech = async (text: string, voiceName: string): Promise<string> => {
-  if (!apiKey) throw new Error("API Key missing");
+  const ai = getClient();
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
