@@ -15,6 +15,14 @@ export const useAudio = () => {
     setAudioCache({});
   }, []);
 
+  const invalidateCache = useCallback((index: number) => {
+    setAudioCache(prev => {
+      const newCache = { ...prev };
+      delete newCache[index];
+      return newCache;
+    });
+  }, []);
+
   const playAudio = async (text: string, voice: string, index: number) => {
     if (playingIndex !== null) return; // Prevent multiple streams
     
@@ -80,6 +88,7 @@ export const useAudio = () => {
     downloadingIndex,
     playAudio,
     downloadAudio,
-    resetAudioState
+    resetAudioState,
+    invalidateCache
   };
 };

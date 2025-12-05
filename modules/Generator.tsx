@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGenerator } from '../hooks/useGenerator';
 import { InputPanel } from './generator/InputPanel';
 import { OutputPanel } from './generator/OutputPanel';
 
-export const Generator: React.FC = () => {
+interface GeneratorProps {
+  initialTab?: string;
+}
+
+export const Generator: React.FC<GeneratorProps> = ({ initialTab }) => {
   const {
     // State
     loading,
@@ -26,12 +30,20 @@ export const Generator: React.FC = () => {
     
     // Handlers
     handleGenerate,
+    handleUpdateScript,
     handleGenerateThumbnail,
     handleGenerateSceneVisual,
     handlePlayAudio,
     handleDownloadAudio,
     downloadPackage
   } = useGenerator();
+
+  // Sync sidebar navigation with internal tabs
+  useEffect(() => {
+    if (initialTab && ['script', 'assets', 'seo'].includes(initialTab)) {
+      setActiveTab(initialTab as any);
+    }
+  }, [initialTab, setActiveTab]);
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 h-full overflow-hidden">
@@ -61,6 +73,7 @@ export const Generator: React.FC = () => {
         playingScene={playingScene}
         downloadingAudio={downloadingAudio}
         downloadPackage={downloadPackage}
+        handleUpdateScript={handleUpdateScript}
         handleGenerateThumbnail={handleGenerateThumbnail}
         handleGenerateSceneVisual={handleGenerateSceneVisual}
         handlePlayAudio={handlePlayAudio}

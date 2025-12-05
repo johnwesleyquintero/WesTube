@@ -4,6 +4,7 @@ import { CopyButton } from '../../../components/CopyButton';
 
 interface ScriptTabProps {
   result: GeneratedPackage;
+  handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
   handlePlayAudio: (text: string, idx: number) => void;
   handleDownloadAudio: (text: string, idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
@@ -14,6 +15,7 @@ interface ScriptTabProps {
 
 export const ScriptTab: React.FC<ScriptTabProps> = ({
   result,
+  handleUpdateScript,
   handlePlayAudio,
   handleDownloadAudio,
   handleGenerateSceneVisual,
@@ -21,6 +23,22 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   playingScene,
   downloadingAudio
 }) => {
+
+  const downloadScriptTxt = () => {
+    let text = `TITLE: ${result.title}\nHOOK: ${result.hook}\n\n`;
+    result.script.forEach((scene, i) => {
+      text += `[${scene.timestamp}]\nVISUAL: ${scene.visual}\nAUDIO: ${scene.audio}\n\n`;
+    });
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `script-${result.title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -39,16 +57,25 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
 
       <div className="space-y-3">
         <div className="flex justify-between items-end px-1">
-            <h3 className="text-lg font-bold text-white tracking-tight">Scene Breakdown</h3>
-            <span className="text-xs text-slate-500 font-mono">{result.script.length} Scenes Generated</span>
+            <div className="flex items-center gap-3">
+              <h3 className="text-lg font-bold text-white tracking-tight">Scene Breakdown</h3>
+              <span className="text-xs text-slate-500 font-mono bg-white/5 px-2 py-0.5 rounded">{result.script.length} Scenes</span>
+            </div>
+            <button 
+              onClick={downloadScriptTxt}
+              className="text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white flex items-center gap-2 px-3 py-1.5 hover:bg-white/5 rounded transition-colors"
+            >
+              <i className="fa-solid fa-file-lines"></i>
+              Export .txt
+            </button>
         </div>
         <div className="glass-panel rounded-xl overflow-hidden">
           <table className="w-full text-left text-sm">
             <thead className="bg-black/30 text-slate-500 uppercase text-[10px] tracking-wider font-bold">
               <tr>
                 <th className="px-5 py-3 w-28 border-b border-white/5">Timeline</th>
-                <th className="px-5 py-3 w-5/12 border-b border-white/5">Visual Protocol</th>
-                <th className="px-5 py-3 border-b border-white/5">Audio Stream</th>
+                <th className="px-5 py-3 w-5/12 border-b border-white/5">Visual Protocol (Editable)</th>
+                <th className="px-5 py-3 border-b border-white/5">Audio Stream (Editable)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -62,8 +89,15 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                   <td className="px-5 py-5 text-slate-300 text-xs align-top">
                     <div className="flex items-start gap-3">
                       <div className="w-1 h-full bg-wes-700 rounded-full mt-1"></div>
-                      <div className="flex-1">
-                        <p className="mb-4 leading-relaxed">{scene.visual}</p>
+                      <div className="flex-1 space-y-3">
+                        {/* Editable Visual Prompt */}
+                        <textarea 
+                          value={scene.visual}
+                          onChange={(e) => handleUpdateScript?.(idx, 'visual', e.target.value)}
+                          className="w-full bg-transparent text-slate-300 text-xs leading-relaxed resize-none outline-none focus:bg-black/20 focus:p-2 focus:rounded rounded -ml-2 p-2 border border-transparent focus:border-wes-accent/30 transition-all placeholder-slate-600"
+                          rows={3}
+                          placeholder="Describe the visual scene..."
+                        />
                         
                         {/* B-Roll Image or Generate Button */}
                         {scene.generatedVisual ? (
@@ -110,7 +144,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                                 ? 'bg-wes-accent text-white border-wes-accent shadow-[0_0_15px_rgba(99,102,241,0.5)]' 
                                 : 'bg-black/30 border-white/10 text-slate-500 hover:text-white hover:border-wes-accent/50'
                             } ${(playingScene !== null && playingScene !== idx) || downloadingAudio !== null ? 'opacity-30 cursor-not-allowed' : ''}`}
-                            title="Play Narration"
+                            title="Play Narration (Regenerates if edited)"
                           >
                             {playingScene === idx ? (
                               <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
@@ -137,7 +171,15 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                             )}
                           </button>
                       </div>
-                      <p className="text-slate-300 font-light">{scene.audio}</p>
+                      
+                      {/* Editable Audio Script */}
+                      <textarea 
+                          value={scene.audio}
+                          onChange={(e) => handleUpdateScript?.(idx, 'audio', e.target.value)}
+                          className="w-full bg-transparent text-slate-200 font-light leading-relaxed resize-none outline-none focus:bg-black/20 focus:p-2 focus:rounded rounded -ml-2 p-2 border border-transparent focus:border-wes-accent/30 transition-all"
+                          rows={4}
+                          placeholder="Enter narration text..."
+                      />
                     </div>
                   </td>
                 </tr>

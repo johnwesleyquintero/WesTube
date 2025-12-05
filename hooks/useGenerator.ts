@@ -29,7 +29,8 @@ export const useGenerator = () => {
     downloadingIndex, 
     playAudio, 
     downloadAudio, 
-    resetAudioState 
+    resetAudioState,
+    invalidateCache 
   } = useAudio();
 
   // Form State
@@ -79,6 +80,28 @@ export const useGenerator = () => {
       setLoading(false);
     }
   }, [topic, selectedChannel, mood, duration, activeChannelConfig, resetAudioState, toast]);
+
+  const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
+    if (!result) return;
+    
+    // Invalidate audio cache if audio text changes
+    if (field === 'audio') {
+      invalidateCache(index);
+    }
+
+    setResult(prev => {
+      if (!prev) return null;
+      const updatedScript = [...prev.script];
+      updatedScript[index] = {
+        ...updatedScript[index],
+        [field]: value
+      };
+      return {
+        ...prev,
+        script: updatedScript
+      };
+    });
+  }, [result, invalidateCache]);
 
   const handleGenerateThumbnail = useCallback(async (prompt: string, index: number) => {
     if (!result) return;
@@ -142,6 +165,7 @@ export const useGenerator = () => {
     
     // Handlers
     handleGenerate,
+    handleUpdateScript,
     handleGenerateThumbnail,
     handleGenerateSceneVisual,
     handlePlayAudio,

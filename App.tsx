@@ -27,7 +27,13 @@ const AppContent = () => {
   const renderContent = () => {
     switch (activeView) {
       case 'dashboard':
-        return <Generator />;
+        return <Generator initialTab="script" />;
+      case 'scripts':
+        return <Generator initialTab="script" />;
+      case 'assets':
+        return <Generator initialTab="assets" />;
+      case 'seo':
+        return <Generator initialTab="seo" />;
       case 'history':
         return <History />;
       default:

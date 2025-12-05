@@ -16,6 +16,7 @@ interface OutputPanelProps {
   playingScene: number | null;
   downloadingAudio: number | null;
   downloadPackage: () => void;
+  handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
   handleGenerateThumbnail: (prompt: string, idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handlePlayAudio: (text: string, idx: number) => void;
@@ -25,7 +26,7 @@ interface OutputPanelProps {
 export const OutputPanel: React.FC<OutputPanelProps> = ({
   loading, result, activeTab, setActiveTab, activeChannelConfig,
   generatingImage, generatingSceneVisual, playingScene, downloadingAudio, downloadPackage, 
-  handleGenerateThumbnail, handleGenerateSceneVisual, handlePlayAudio, handleDownloadAudio
+  handleUpdateScript, handleGenerateThumbnail, handleGenerateSceneVisual, handlePlayAudio, handleDownloadAudio
 }) => {
   return (
     <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden relative shadow-2xl shadow-black/50">
@@ -74,8 +75,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
               <button 
                 onClick={downloadPackage}
                 className="text-xs bg-wes-800 hover:bg-wes-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-white/10"
+                title="Download JSON Project"
               >
-                <i className="fa-solid fa-download"></i>
+                <i className="fa-solid fa-file-code"></i>
               </button>
             </div>
           </div>
@@ -86,6 +88,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
             {activeTab === 'script' && (
               <ScriptTab 
                 result={result}
+                handleUpdateScript={handleUpdateScript}
                 handlePlayAudio={handlePlayAudio}
                 handleDownloadAudio={handleDownloadAudio}
                 handleGenerateSceneVisual={handleGenerateSceneVisual}
