@@ -53,7 +53,7 @@ export const LandingPage: React.FC = () => {
       <div className="w-full md:w-1/2 bg-black/20 backdrop-blur-md border-l border-white/5 flex flex-col items-center justify-center p-8 md:p-12 relative">
          <div className="w-full max-w-sm relative z-10">
             <div className="mb-10 text-center md:text-left">
-              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Identify</h2>
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Authenticate</h2>
               <p className="text-slate-500">Authenticate to access the production mainframe.</p>
             </div>
 
