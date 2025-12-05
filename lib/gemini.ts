@@ -114,6 +114,10 @@ export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '1
 };
 
 export const generateSpeech = async (text: string, voiceName: string): Promise<string> => {
+  if (!text || !text.trim()) {
+    throw new Error("Text for speech generation cannot be empty.");
+  }
+  
   const ai = getClient();
 
   const response = await ai.models.generateContent({
@@ -127,7 +131,8 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
       }
     ],
     config: {
-      responseModalities: [Modality.AUDIO],
+      // Use string literal 'AUDIO' to ensure compatibility if Modality enum is undefined in some builds
+      responseModalities: ['AUDIO' as any],
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: { voiceName },
@@ -138,7 +143,7 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
 
   const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
   if (!base64Audio) {
-    throw new Error("No audio generated.");
+    throw new Error("No audio generated from API response.");
   }
   return base64Audio;
 };

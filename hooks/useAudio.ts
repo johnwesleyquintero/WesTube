@@ -35,9 +35,10 @@ export const useAudio = () => {
 
       // Play it
       await playRawAudio(base64Audio);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Audio playback failed", e);
-      toast.error("Failed to generate audio preview.");
+      const msg = e instanceof Error ? e.message : "Failed to generate audio preview.";
+      toast.error(msg);
     } finally {
       setPlayingIndex(null);
     }
@@ -65,9 +66,10 @@ export const useAudio = () => {
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Audio downloaded successfully.");
-    } catch (e) {
+    } catch (e: any) {
       console.error("Audio download failed", e);
-      toast.error("Failed to download audio.");
+      const msg = e instanceof Error ? e.message : "Failed to download audio.";
+      toast.error(msg);
     } finally {
       setDownloadingIndex(null);
     }

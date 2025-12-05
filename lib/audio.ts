@@ -39,7 +39,10 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
   }
 
   // 2. Convert Raw PCM (16-bit integers) to AudioBuffer (Float32)
-  const dataInt16 = new Int16Array(bytes.buffer);
+  // Ensure we have an even number of bytes for Int16Array
+  const alignedLen = len % 2 === 0 ? len : len - 1;
+  const dataInt16 = new Int16Array(bytes.buffer, 0, alignedLen / 2);
+  
   const frameCount = dataInt16.length;
   // Here we explicitly tell the buffer that this data is 24kHz
   const buffer = ctx.createBuffer(1, frameCount, sampleRate);
@@ -67,6 +70,10 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
 export const createWavBlob = (base64String: string, sampleRate = 24000): Blob => {
   const binaryString = atob(base64String);
   const len = binaryString.length;
+  // Ensure alignment for processing (though for blob we just dump bytes)
+  // For WAV header, we should ideally use the aligned length if we were processing samples,
+  // but here we just wrap the raw bytes. The player might ignore the last byte if odd.
+  
   const buffer = new ArrayBuffer(44 + len);
   const view = new DataView(buffer);
 
