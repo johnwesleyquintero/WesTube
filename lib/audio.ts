@@ -51,3 +51,57 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
     source.onended = () => resolve();
   });
 };
+
+/**
+ * Converts Base64 Raw PCM (16-bit, Mono, 24kHz) to a standard WAV file Blob.
+ */
+export const createWavBlob = (base64String: string, sampleRate = 24000): Blob => {
+  const binaryString = atob(base64String);
+  const len = binaryString.length;
+  const buffer = new ArrayBuffer(44 + len);
+  const view = new DataView(buffer);
+
+  // RIFF identifier
+  writeString(view, 0, 'RIFF');
+  // file length
+  view.setUint32(4, 36 + len, true);
+  // RIFF type
+  writeString(view, 8, 'WAVE');
+  // format chunk identifier
+  writeString(view, 12, 'fmt ');
+  // format chunk length
+  view.setUint32(16, 16, true);
+  // sample format (raw)
+  view.setUint16(20, 1, true);
+  // channel count
+  view.setUint16(22, 1, true);
+  // sample rate
+  view.setUint32(24, sampleRate, true);
+  // byte rate (sample rate * block align)
+  view.setUint32(28, sampleRate * 2, true);
+  // block align (channel count * bytes per sample)
+  view.setUint16(32, 2, true);
+  // bits per sample
+  view.setUint16(34, 16, true);
+  // data chunk identifier
+  writeString(view, 36, 'data');
+  // data chunk length
+  view.setUint32(40, len, true);
+
+  // write the PCM samples
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  
+  // Copy PCM data into the buffer after the header
+  new Uint8Array(buffer, 44).set(bytes);
+
+  return new Blob([buffer], { type: 'audio/wav' });
+};
+
+const writeString = (view: DataView, offset: number, string: string) => {
+  for (let i = 0; i < string.length; i++) {
+    view.setUint8(offset + i, string.charCodeAt(i));
+  }
+};

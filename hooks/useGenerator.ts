@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
 import { generateVideoPackage, generateThumbnail, generateSpeech } from '../lib/gemini';
-import { playRawAudio } from '../lib/audio';
+import { playRawAudio, createWavBlob } from '../lib/audio';
 
 export const useGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -12,8 +12,9 @@ export const useGenerator = () => {
   // Image Generation State
   const [generatingImage, setGeneratingImage] = useState<number | null>(null);
 
-  // Audio Playback State
+  // Audio Playback/Download State
   const [playingScene, setPlayingScene] = useState<number | null>(null);
+  const [downloadingAudio, setDownloadingAudio] = useState<number | null>(null);
   const [audioCache, setAudioCache] = useState<Record<number, string>>({});
 
   // Form State
@@ -97,6 +98,35 @@ export const useGenerator = () => {
     }
   };
 
+  const handleDownloadAudio = async (text: string, index: number) => {
+    if (downloadingAudio !== null) return;
+    setDownloadingAudio(index);
+
+    try {
+      let base64Audio = audioCache[index];
+      
+      // If not cached, generate it first
+      if (!base64Audio) {
+        base64Audio = await generateSpeech(text, activeChannelConfig.voice);
+        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
+      }
+
+      // Create WAV blob and download
+      const wavBlob = createWavBlob(base64Audio);
+      const url = URL.createObjectURL(wavBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `wes-narrator-${selectedChannel}-${index}.wav`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Audio download failed", e);
+      alert("Failed to download audio.");
+    } finally {
+      setDownloadingAudio(null);
+    }
+  };
+
   const downloadPackage = () => {
     if (!result) return;
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
@@ -116,6 +146,7 @@ export const useGenerator = () => {
     setActiveTab,
     generatingImage,
     playingScene,
+    downloadingAudio,
     topic,
     setTopic,
     selectedChannel,
@@ -130,6 +161,7 @@ export const useGenerator = () => {
     handleGenerate,
     handleGenerateThumbnail,
     handlePlayAudio,
+    handleDownloadAudio,
     downloadPackage
   };
 };

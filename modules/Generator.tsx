@@ -12,6 +12,7 @@ export const Generator: React.FC = () => {
     setActiveTab,
     generatingImage,
     playingScene,
+    downloadingAudio,
     topic,
     setTopic,
     selectedChannel,
@@ -26,6 +27,7 @@ export const Generator: React.FC = () => {
     handleGenerate,
     handleGenerateThumbnail,
     handlePlayAudio,
+    handleDownloadAudio,
     downloadPackage
   } = useGenerator();
 
@@ -54,9 +56,11 @@ export const Generator: React.FC = () => {
         activeChannelConfig={activeChannelConfig}
         generatingImage={generatingImage}
         playingScene={playingScene}
+        downloadingAudio={downloadingAudio}
         downloadPackage={downloadPackage}
         handleGenerateThumbnail={handleGenerateThumbnail}
         handlePlayAudio={handlePlayAudio}
+        handleDownloadAudio={handleDownloadAudio}
       />
     </div>
   );

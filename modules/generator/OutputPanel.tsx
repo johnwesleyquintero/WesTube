@@ -9,9 +9,11 @@ interface OutputPanelProps {
   activeChannelConfig: ChannelConfig;
   generatingImage: number | null;
   playingScene: number | null;
+  downloadingAudio: number | null;
   downloadPackage: () => void;
   handleGenerateThumbnail: (prompt: string, idx: number) => void;
   handlePlayAudio: (text: string, idx: number) => void;
+  handleDownloadAudio: (text: string, idx: number) => void;
 }
 
 // -- Helper Component: Copy Button --
@@ -59,7 +61,8 @@ const Loader = () => (
 
 export const OutputPanel: React.FC<OutputPanelProps> = ({
   loading, result, activeTab, setActiveTab, activeChannelConfig,
-  generatingImage, playingScene, downloadPackage, handleGenerateThumbnail, handlePlayAudio
+  generatingImage, playingScene, downloadingAudio, downloadPackage, 
+  handleGenerateThumbnail, handlePlayAudio, handleDownloadAudio
 }) => {
   return (
     <div className="flex-1 bg-wes-900 rounded-xl border border-wes-700 flex flex-col overflow-hidden relative shadow-xl">
@@ -151,23 +154,44 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                                 <p className="italic">{scene.visual}</p>
                               </td>
                               <td className="px-4 py-4 text-slate-200 align-top leading-relaxed">
-                                <div className="flex gap-3">
-                                  <button 
-                                    onClick={() => handlePlayAudio(scene.audio, idx)}
-                                    disabled={playingScene !== null}
-                                    className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                                      playingScene === idx 
-                                        ? 'bg-wes-accent text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
-                                        : 'bg-wes-700 text-slate-400 hover:bg-wes-600 hover:text-white'
-                                    } ${playingScene !== null && playingScene !== idx ? 'opacity-30 cursor-not-allowed' : ''}`}
-                                    title="Play Narration"
-                                  >
-                                    {playingScene === idx ? (
-                                      <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
-                                    ) : (
-                                      <i className="fa-solid fa-play text-xs pl-0.5"></i>
-                                    )}
-                                  </button>
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex gap-2">
+                                      {/* Play Button */}
+                                      <button 
+                                        onClick={() => handlePlayAudio(scene.audio, idx)}
+                                        disabled={playingScene !== null || downloadingAudio !== null}
+                                        className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                          playingScene === idx 
+                                            ? 'bg-wes-accent text-white shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
+                                            : 'bg-wes-700 text-slate-400 hover:bg-wes-600 hover:text-white'
+                                        } ${(playingScene !== null && playingScene !== idx) || downloadingAudio !== null ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                        title="Play Narration"
+                                      >
+                                        {playingScene === idx ? (
+                                          <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
+                                        ) : (
+                                          <i className="fa-solid fa-play text-xs pl-0.5"></i>
+                                        )}
+                                      </button>
+
+                                      {/* Download Button */}
+                                      <button 
+                                        onClick={() => handleDownloadAudio(scene.audio, idx)}
+                                        disabled={playingScene !== null || downloadingAudio !== null}
+                                        className={`mt-1 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                          downloadingAudio === idx 
+                                            ? 'bg-wes-success text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]' 
+                                            : 'bg-wes-900 border border-wes-700 text-slate-500 hover:border-wes-success hover:text-wes-success'
+                                        } ${(playingScene !== null) || (downloadingAudio !== null && downloadingAudio !== idx) ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                        title="Download WAV"
+                                      >
+                                        {downloadingAudio === idx ? (
+                                          <i className="fa-solid fa-circle-notch fa-spin text-xs"></i>
+                                        ) : (
+                                          <i className="fa-solid fa-download text-xs"></i>
+                                        )}
+                                      </button>
+                                  </div>
                                   <p>{scene.audio}</p>
                                 </div>
                               </td>
