@@ -9,29 +9,12 @@ import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/package
 import { useToast } from '../context/ToastContext';
 
 export const useGenerator = () => {
+  // UI State
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<GeneratedPackage | null>(null);
   const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo'>('script');
   
-  const toast = useToast();
-
-  // Asset Generation Hook
-  const { 
-    generatingImage, 
-    generatingSceneVisual, 
-    generateThumbnailAsset, 
-    generateSceneAsset 
-  } = useAssetGenerator();
-
-  // Audio Hook
-  const { 
-    playingIndex, 
-    downloadingIndex, 
-    playAudio, 
-    downloadAudio, 
-    resetAudioState,
-    invalidateCache 
-  } = useAudio();
+  // Data State
+  const [result, setResult] = useState<GeneratedPackage | null>(null);
 
   // Form State
   const [topic, setTopic] = useState('');
@@ -42,7 +25,13 @@ export const useGenerator = () => {
   );
 
   const activeChannelConfig = CHANNELS[selectedChannel];
+  const toast = useToast();
 
+  // Sub-hooks
+  const assetGen = useAssetGenerator();
+  const audioGen = useAudio();
+
+  // Actions
   const handleGenerate = useCallback(async () => {
     if (!topic) {
       toast.error("Please enter a topic before generating.");
@@ -51,7 +40,7 @@ export const useGenerator = () => {
     
     setLoading(true);
     setResult(null);
-    resetAudioState();
+    audioGen.resetAudioState();
     setActiveTab('script');
     
     try {
@@ -79,14 +68,14 @@ export const useGenerator = () => {
     } finally {
       setLoading(false);
     }
-  }, [topic, selectedChannel, mood, duration, activeChannelConfig, resetAudioState, toast]);
+  }, [topic, selectedChannel, mood, duration, activeChannelConfig, audioGen, toast]);
 
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!result) return;
     
     // Invalidate audio cache if audio text changes
     if (field === 'audio') {
-      invalidateCache(index);
+      audioGen.invalidateCache(index);
     }
 
     setResult(prev => {
@@ -101,35 +90,35 @@ export const useGenerator = () => {
         script: updatedScript
       };
     });
-  }, [result, invalidateCache]);
+  }, [result, audioGen]);
 
   const handleGenerateThumbnail = useCallback(async (prompt: string, index: number) => {
     if (!result) return;
     
-    const base64Image = await generateThumbnailAsset(prompt, index);
+    const base64Image = await assetGen.generateThumbnailAsset(prompt, index);
     if (!base64Image) return; // Hook handles error toast
 
     setResult(prev => prev ? updatePackageThumbnail(prev, index, base64Image) : null);
     toast.success("Thumbnail asset rendered successfully.");
-  }, [result, generateThumbnailAsset, toast]);
+  }, [result, assetGen, toast]);
 
   const handleGenerateSceneVisual = useCallback(async (visualPrompt: string, index: number) => {
     if (!result) return;
     
-    const base64Image = await generateSceneAsset(visualPrompt, index, activeChannelConfig);
+    const base64Image = await assetGen.generateSceneAsset(visualPrompt, index, activeChannelConfig);
     if (!base64Image) return; // Hook handles error toast
 
     setResult(prev => prev ? updatePackageSceneVisual(prev, index, base64Image) : null);
     toast.success("Scene visual rendered successfully.");
-  }, [result, generateSceneAsset, activeChannelConfig, toast]);
+  }, [result, assetGen, activeChannelConfig, toast]);
 
   const handlePlayAudio = useCallback((text: string, index: number) => {
-    playAudio(text, activeChannelConfig.voice, index);
-  }, [activeChannelConfig.voice, playAudio]);
+    audioGen.playAudio(text, activeChannelConfig.voice, index);
+  }, [activeChannelConfig.voice, audioGen]);
 
   const handleDownloadAudio = useCallback((text: string, index: number) => {
-    downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
-  }, [activeChannelConfig.voice, downloadAudio, selectedChannel]);
+    audioGen.downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
+  }, [activeChannelConfig.voice, audioGen, selectedChannel]);
 
   const downloadPackage = useCallback(() => {
     if (!result) return;
@@ -143,33 +132,41 @@ export const useGenerator = () => {
     toast.info("Project JSON downloaded.");
   }, [result, selectedChannel, toast]);
 
+  // Structured Return
   return {
-    // State
-    loading,
-    result,
-    activeTab,
-    setActiveTab,
-    generatingImage,
-    generatingSceneVisual,
-    playingScene: playingIndex,
-    downloadingAudio: downloadingIndex,
-    topic,
-    setTopic,
-    selectedChannel,
-    setSelectedChannel,
-    mood,
-    setMood,
-    duration,
-    setDuration,
-    activeChannelConfig,
+    // 1. Inputs (Form)
+    formState: {
+      topic, setTopic,
+      selectedChannel, setSelectedChannel,
+      mood, setMood,
+      duration, setDuration,
+      activeChannelConfig
+    },
+
+    // 2. UI State
+    uiState: {
+      loading,
+      activeTab, setActiveTab,
+      generatingImage: assetGen.generatingImage,
+      generatingSceneVisual: assetGen.generatingSceneVisual,
+      playingScene: audioGen.playingIndex,
+      downloadingAudio: audioGen.downloadingIndex
+    },
+
+    // 3. Data
+    dataState: {
+      result
+    },
     
-    // Handlers
-    handleGenerate,
-    handleUpdateScript,
-    handleGenerateThumbnail,
-    handleGenerateSceneVisual,
-    handlePlayAudio,
-    handleDownloadAudio,
-    downloadPackage
+    // 4. Actions
+    actions: {
+      handleGenerate,
+      handleUpdateScript,
+      handleGenerateThumbnail,
+      handleGenerateSceneVisual,
+      handlePlayAudio,
+      handleDownloadAudio,
+      downloadPackage
+    }
   };
 };

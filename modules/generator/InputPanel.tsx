@@ -1,29 +1,37 @@
 import React from 'react';
 import { MOODS } from '../../constants';
-import { ChannelId, GenerationRequest } from '../../types';
+import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
 import { GlassSelect } from '../../components/GlassSelect';
 import { ChannelSelector } from './ChannelSelector';
 
 interface InputPanelProps {
-  topic: string;
-  setTopic: (val: string) => void;
-  selectedChannel: ChannelId;
-  setSelectedChannel: (id: ChannelId) => void;
-  mood: string;
-  setMood: (val: string) => void;
-  duration: GenerationRequest['duration'];
-  setDuration: (val: GenerationRequest['duration']) => void;
+  formState: {
+    topic: string;
+    setTopic: (val: string) => void;
+    selectedChannel: ChannelId;
+    setSelectedChannel: (id: ChannelId) => void;
+    mood: string;
+    setMood: (val: string) => void;
+    duration: GenerationRequest['duration'];
+    setDuration: (val: GenerationRequest['duration']) => void;
+    activeChannelConfig: ChannelConfig;
+  };
   loading: boolean;
-  handleGenerate: () => void;
+  onGenerate: () => void;
 }
 
 export const InputPanel: React.FC<InputPanelProps> = ({
-  topic, setTopic,
-  selectedChannel, setSelectedChannel,
-  mood, setMood,
-  duration, setDuration,
-  loading, handleGenerate
+  formState,
+  loading, 
+  onGenerate
 }) => {
+  const { 
+    topic, setTopic, 
+    selectedChannel, setSelectedChannel, 
+    mood, setMood, 
+    duration, setDuration 
+  } = formState;
+
   return (
     <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-black/50">
       <div className="p-6 border-b border-white/5 bg-white/[0.02]">
@@ -75,7 +83,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
       <div className="p-6 border-t border-white/5 bg-black/20">
         <button
-          onClick={handleGenerate}
+          onClick={onGenerate}
           disabled={loading || !topic}
           className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center space-x-3
             ${loading || !topic 

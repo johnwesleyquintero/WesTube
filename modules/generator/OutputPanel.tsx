@@ -6,28 +6,38 @@ import { AssetsTab } from './tabs/AssetsTab';
 import { SeoTab } from './tabs/SeoTab';
 
 interface OutputPanelProps {
-  loading: boolean;
-  result: GeneratedPackage | null;
-  activeTab: 'script' | 'assets' | 'seo';
-  setActiveTab: (tab: 'script' | 'assets' | 'seo') => void;
-  activeChannelConfig: ChannelConfig;
-  generatingImage: number | null;
-  generatingSceneVisual?: number | null;
-  playingScene: number | null;
-  downloadingAudio: number | null;
-  downloadPackage: () => void;
-  handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
-  handleGenerateThumbnail: (prompt: string, idx: number) => void;
-  handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
-  handlePlayAudio: (text: string, idx: number) => void;
-  handleDownloadAudio: (text: string, idx: number) => void;
+  uiState: {
+    loading: boolean;
+    activeTab: 'script' | 'assets' | 'seo';
+    setActiveTab: (tab: 'script' | 'assets' | 'seo') => void;
+    generatingImage: number | null;
+    generatingSceneVisual: number | null;
+    playingScene: number | null;
+    downloadingAudio: number | null;
+  };
+  dataState: {
+    result: GeneratedPackage | null;
+  };
+  actions: {
+    downloadPackage: () => void;
+    handleUpdateScript: (idx: number, field: 'visual' | 'audio', val: string) => void;
+    handleGenerateThumbnail: (prompt: string, idx: number) => void;
+    handleGenerateSceneVisual: (prompt: string, idx: number) => void;
+    handlePlayAudio: (text: string, idx: number) => void;
+    handleDownloadAudio: (text: string, idx: number) => void;
+  };
+  formState: {
+    activeChannelConfig: ChannelConfig;
+  };
 }
 
-export const OutputPanel: React.FC<OutputPanelProps> = ({
-  loading, result, activeTab, setActiveTab, activeChannelConfig,
-  generatingImage, generatingSceneVisual, playingScene, downloadingAudio, downloadPackage, 
-  handleUpdateScript, handleGenerateThumbnail, handleGenerateSceneVisual, handlePlayAudio, handleDownloadAudio
+export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
+  uiState, dataState, actions, formState
 }) => {
+  const { result } = dataState;
+  const { activeChannelConfig } = formState;
+  const { loading, activeTab, setActiveTab } = uiState;
+
   return (
     <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden relative shadow-2xl shadow-black/50">
       {!result && !loading && (
@@ -73,7 +83,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
                 </div>
 
               <button 
-                onClick={downloadPackage}
+                onClick={actions.downloadPackage}
                 className="text-xs bg-wes-800 hover:bg-wes-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-white/10"
                 title="Download JSON Project"
               >
@@ -88,21 +98,21 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
             {activeTab === 'script' && (
               <ScriptTab 
                 result={result}
-                handleUpdateScript={handleUpdateScript}
-                handlePlayAudio={handlePlayAudio}
-                handleDownloadAudio={handleDownloadAudio}
-                handleGenerateSceneVisual={handleGenerateSceneVisual}
-                generatingSceneVisual={generatingSceneVisual}
-                playingScene={playingScene}
-                downloadingAudio={downloadingAudio}
+                handleUpdateScript={actions.handleUpdateScript}
+                handlePlayAudio={actions.handlePlayAudio}
+                handleDownloadAudio={actions.handleDownloadAudio}
+                handleGenerateSceneVisual={actions.handleGenerateSceneVisual}
+                generatingSceneVisual={uiState.generatingSceneVisual}
+                playingScene={uiState.playingScene}
+                downloadingAudio={uiState.downloadingAudio}
               />
             )}
 
             {activeTab === 'assets' && (
               <AssetsTab 
                 result={result}
-                handleGenerateThumbnail={handleGenerateThumbnail}
-                generatingImage={generatingImage}
+                handleGenerateThumbnail={actions.handleGenerateThumbnail}
+                generatingImage={uiState.generatingImage}
               />
             )}
 
@@ -115,4 +125,4 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({
       )}
     </div>
   );
-};
+});

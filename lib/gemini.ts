@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
@@ -10,6 +11,41 @@ const getClient = (): GoogleGenAI => {
     throw new Error("API Key is missing. Please set it in Settings.");
   }
   return new GoogleGenAI({ apiKey });
+};
+
+// Extracted Schema Definition for cleaner logic flow
+const VIDEO_PACKAGE_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    title: { type: Type.STRING, description: "Clickable, SEO-optimized YouTube title" },
+    hook: { type: Type.STRING, description: "The first 15 seconds hook script text" },
+    description: { type: Type.STRING, description: "YouTube video description with keywords" },
+    tags: { 
+      type: Type.ARRAY, 
+      items: { type: Type.STRING },
+      description: "15 SEO tags"
+    },
+    brandingNote: { type: Type.STRING, description: "Specific branding instruction" },
+    script: {
+      type: Type.ARRAY,
+      description: "Array of script scenes",
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          timestamp: { type: Type.STRING, description: "Time range e.g., '00:00 - 00:15'" },
+          visual: { type: Type.STRING, description: "Visual description for this scene." },
+          audio: { type: Type.STRING, description: "Narration line or SFX." }
+        }
+      }
+    },
+    thumbnailPrompts: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "3 prompt variations for thumbnail generation"
+    },
+    musicPrompt: { type: Type.STRING, description: "Prompt for music generation tools" },
+    imageGenPrompt: { type: Type.STRING, description: "General aesthetic prompt for background assets" }
+  }
 };
 
 export const generateVideoPackage = async (
@@ -39,39 +75,7 @@ export const generateVideoPackage = async (
       maxOutputTokens: maxOutputTokens,
       // @ts-ignore - Explicitly disabling thinking for speed
       thinkingConfig: { thinkingBudget }, 
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING, description: "Clickable, SEO-optimized YouTube title" },
-          hook: { type: Type.STRING, description: "The first 15 seconds hook script text" },
-          description: { type: Type.STRING, description: "YouTube video description with keywords" },
-          tags: { 
-            type: Type.ARRAY, 
-            items: { type: Type.STRING },
-            description: "15 SEO tags"
-          },
-          brandingNote: { type: Type.STRING, description: "Specific branding instruction" },
-          script: {
-            type: Type.ARRAY,
-            description: "Array of script scenes",
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                timestamp: { type: Type.STRING, description: "Time range e.g., '00:00 - 00:15'" },
-                visual: { type: Type.STRING, description: "Visual description for this scene." },
-                audio: { type: Type.STRING, description: "Narration line or SFX." }
-              }
-            }
-          },
-          thumbnailPrompts: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-            description: "3 prompt variations for thumbnail generation"
-          },
-          musicPrompt: { type: Type.STRING, description: "Prompt for music generation tools" },
-          imageGenPrompt: { type: Type.STRING, description: "General aesthetic prompt for background assets" }
-        }
-      }
+      responseSchema: VIDEO_PACKAGE_SCHEMA
     }
   });
 

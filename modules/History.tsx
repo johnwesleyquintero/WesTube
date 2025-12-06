@@ -27,7 +27,8 @@ export const History: React.FC = () => {
     downloadingIndex, 
     playAudio, 
     downloadAudio,
-    resetAudioState
+    resetAudioState,
+    invalidateCache
   } = useAudio();
 
   const refreshHistory = async () => {
@@ -115,6 +116,39 @@ export const History: React.FC = () => {
     setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
   };
 
+  const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
+    if (!selectedItem) return;
+    
+    if (field === 'audio') {
+      invalidateCache(index);
+    }
+
+    const updatedScript = [...selectedItem.script];
+    updatedScript[index] = {
+      ...updatedScript[index],
+      [field]: value
+    };
+    
+    const updatedItem = {
+      ...selectedItem,
+      script: updatedScript
+    };
+
+    setSelectedItem(updatedItem);
+    setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+  }, [selectedItem, invalidateCache]);
+
+  const handleDownloadPackage = useCallback(() => {
+    if (!selectedItem) return;
+    const blob = new Blob([JSON.stringify(selectedItem, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wes-history-${selectedItem.id}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [selectedItem]);
+
   return (
     <div className="h-full flex flex-col md:flex-row overflow-hidden gap-6">
       
@@ -171,28 +205,29 @@ export const History: React.FC = () => {
              
              {/* Reusing OutputPanel in Live Mode */}
              <OutputPanel 
-                loading={false}
-                result={selectedItem}
-                activeTab={viewerTab}
-                setActiveTab={setViewerTab}
-                activeChannelConfig={getActiveChannelConfig()}
-                generatingImage={generatingImage}
-                generatingSceneVisual={generatingSceneVisual}
-                playingScene={playingIndex}
-                downloadingAudio={downloadingIndex}
-                downloadPackage={() => {
-                  const blob = new Blob([JSON.stringify(selectedItem, null, 2)], { type: 'application/json' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `wes-history-${selectedItem.id}.json`;
-                  a.click();
-                  URL.revokeObjectURL(url);
+                uiState={{
+                  loading: false,
+                  activeTab: viewerTab,
+                  setActiveTab: setViewerTab,
+                  generatingImage: generatingImage,
+                  generatingSceneVisual: generatingSceneVisual,
+                  playingScene: playingIndex,
+                  downloadingAudio: downloadingIndex
                 }}
-                handleGenerateThumbnail={handleGenerateThumbnail}
-                handleGenerateSceneVisual={handleGenerateSceneVisual}
-                handlePlayAudio={handlePlayAudio}
-                handleDownloadAudio={handleDownloadAudio}
+                dataState={{
+                  result: selectedItem
+                }}
+                formState={{
+                  activeChannelConfig: getActiveChannelConfig()
+                }}
+                actions={{
+                  downloadPackage: handleDownloadPackage,
+                  handleUpdateScript: handleUpdateScript,
+                  handleGenerateThumbnail: handleGenerateThumbnail,
+                  handleGenerateSceneVisual: handleGenerateSceneVisual,
+                  handlePlayAudio: handlePlayAudio,
+                  handleDownloadAudio: handleDownloadAudio
+                }}
              />
            </div>
          ) : (

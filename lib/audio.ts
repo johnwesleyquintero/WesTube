@@ -1,7 +1,10 @@
+
 /**
  * Handles decoding and playback of Raw PCM audio data from Gemini API.
  * Gemini TTS returns raw PCM 16-bit mono audio at 24kHz.
  */
+
+import { base64ToBytes, writeStringToDataView } from "./utils";
 
 let audioContext: AudioContext | null = null;
 
@@ -30,13 +33,9 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
     await ctx.resume();
   }
 
-  // 1. Decode Base64 string to Binary String
-  const binaryString = atob(base64String);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
+  // 1. Decode Base64 string to Bytes using utility
+  const bytes = base64ToBytes(base64String);
+  const len = bytes.length;
 
   // 2. Convert Raw PCM (16-bit integers) to AudioBuffer (Float32)
   // Ensure we have an even number of bytes for Int16Array
@@ -68,23 +67,20 @@ export const playRawAudio = async (base64String: string, sampleRate = 24000): Pr
  * Converts Base64 Raw PCM (16-bit, Mono, 24kHz) to a standard WAV file Blob.
  */
 export const createWavBlob = (base64String: string, sampleRate = 24000): Blob => {
-  const binaryString = atob(base64String);
-  const len = binaryString.length;
-  // Ensure alignment for processing (though for blob we just dump bytes)
-  // For WAV header, we should ideally use the aligned length if we were processing samples,
-  // but here we just wrap the raw bytes. The player might ignore the last byte if odd.
+  const bytes = base64ToBytes(base64String);
+  const len = bytes.length;
   
   const buffer = new ArrayBuffer(44 + len);
   const view = new DataView(buffer);
 
   // RIFF identifier
-  writeString(view, 0, 'RIFF');
+  writeStringToDataView(view, 0, 'RIFF');
   // file length
   view.setUint32(4, 36 + len, true);
   // RIFF type
-  writeString(view, 8, 'WAVE');
+  writeStringToDataView(view, 8, 'WAVE');
   // format chunk identifier
-  writeString(view, 12, 'fmt ');
+  writeStringToDataView(view, 12, 'fmt ');
   // format chunk length
   view.setUint32(16, 16, true);
   // sample format (raw)
@@ -100,24 +96,12 @@ export const createWavBlob = (base64String: string, sampleRate = 24000): Blob =>
   // bits per sample
   view.setUint16(34, 16, true);
   // data chunk identifier
-  writeString(view, 36, 'data');
+  writeStringToDataView(view, 36, 'data');
   // data chunk length
   view.setUint32(40, len, true);
 
-  // write the PCM samples
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  
   // Copy PCM data into the buffer after the header
   new Uint8Array(buffer, 44).set(bytes);
 
   return new Blob([buffer], { type: 'audio/wav' });
-};
-
-const writeString = (view: DataView, offset: number, string: string) => {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i));
-  }
 };

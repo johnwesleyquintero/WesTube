@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
 import { ToastContainer } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
+import { ConstructionView } from './components/ConstructionView';
 
 // Lazy load heavy modules for performance
 const Generator = React.lazy(() => import('./modules/Generator').then(module => ({ default: module.Generator })));
@@ -38,17 +39,10 @@ const AppContent = () => {
         return <History />;
       default:
         return (
-          <div className="h-full flex flex-col items-center justify-center text-slate-500 glass-panel rounded-2xl border-dashed">
-            <i className="fa-solid fa-person-digging text-4xl mb-4 text-wes-700"></i>
-            <h2 className="text-xl font-bold text-slate-400">Under Construction</h2>
-            <p className="mt-2 text-sm">The module "{activeView}" is coming in v2.3</p>
-            <button 
-              onClick={() => setActiveView('dashboard')}
-              className="mt-6 px-4 py-2 bg-wes-800 hover:bg-wes-700 text-white rounded text-sm transition-colors border border-white/5"
-            >
-              Return to Dashboard
-            </button>
-          </div>
+          <ConstructionView 
+            moduleName={activeView} 
+            onReturn={() => setActiveView('dashboard')} 
+          />
         );
     }
   };
