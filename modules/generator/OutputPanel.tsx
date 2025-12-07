@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { GeneratedPackage, ChannelConfig } from '../../types';
 import { Loader } from '../../components/Loader';
@@ -14,6 +13,8 @@ interface OutputPanelProps {
     setActiveTab: (tab: 'script' | 'assets' | 'seo' | 'video') => void;
     generatingImage: number | null;
     generatingSceneVisual: number | null;
+    editingImage?: number | null;
+    editingSceneVisual?: number | null;
     playingScene: number | null;
     downloadingAudio: number | null;
   };
@@ -24,7 +25,9 @@ interface OutputPanelProps {
     downloadPackage: () => void;
     handleUpdateScript: (idx: number, field: 'visual' | 'audio', val: string) => void;
     handleGenerateThumbnail: (prompt: string, idx: number) => void;
+    handleEditThumbnail: (base64: string, prompt: string, idx: number) => void;
     handleGenerateSceneVisual: (prompt: string, idx: number) => void;
+    handleEditSceneVisual: (base64: string, prompt: string, idx: number) => void;
     handlePlayAudio: (text: string, idx: number) => void;
     handleDownloadAudio: (text: string, idx: number) => void;
     handleVideoGenerated?: (key: string, url: string) => void;
@@ -105,7 +108,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
                 handlePlayAudio={actions.handlePlayAudio}
                 handleDownloadAudio={actions.handleDownloadAudio}
                 handleGenerateSceneVisual={actions.handleGenerateSceneVisual}
+                handleEditSceneVisual={actions.handleEditSceneVisual}
                 generatingSceneVisual={uiState.generatingSceneVisual}
+                editingSceneVisual={uiState.editingSceneVisual}
                 playingScene={uiState.playingScene}
                 downloadingAudio={uiState.downloadingAudio}
               />
@@ -115,7 +120,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
               <AssetsTab 
                 result={result}
                 handleGenerateThumbnail={actions.handleGenerateThumbnail}
+                handleEditThumbnail={actions.handleEditThumbnail}
                 generatingImage={uiState.generatingImage}
+                editingImage={uiState.editingImage}
               />
             )}
 

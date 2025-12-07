@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { generateThumbnail } from '../lib/gemini';
+import { generateThumbnail, editGeneratedImage } from '../lib/gemini';
 import { enhanceVisualPrompt } from '../lib/prompts';
 import { ChannelConfig } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -7,6 +7,9 @@ import { useToast } from '../context/ToastContext';
 export const useAssetGenerator = () => {
   const [generatingImage, setGeneratingImage] = useState<number | null>(null);
   const [generatingSceneVisual, setGeneratingSceneVisual] = useState<number | null>(null);
+  const [editingImage, setEditingImage] = useState<number | null>(null); // For Thumbnails
+  const [editingSceneVisual, setEditingSceneVisual] = useState<number | null>(null); // For Storyboard
+  
   const toast = useToast();
 
   const generateThumbnailAsset = async (prompt: string, index: number): Promise<string | null> => {
@@ -20,6 +23,21 @@ export const useAssetGenerator = () => {
       return null;
     } finally {
       setGeneratingImage(null);
+    }
+  };
+
+  const editThumbnailAsset = async (base64Image: string, instruction: string, index: number): Promise<string | null> => {
+    setEditingImage(index);
+    try {
+      const newBase64 = await editGeneratedImage(base64Image, instruction);
+      toast.success("Thumbnail refined successfully.");
+      return newBase64;
+    } catch (error) {
+      console.error("Image editing failed", error);
+      toast.error("Failed to refine image.");
+      return null;
+    } finally {
+      setEditingImage(null);
     }
   };
 
@@ -39,10 +57,29 @@ export const useAssetGenerator = () => {
     }
   };
 
+  const editSceneAsset = async (base64Image: string, instruction: string, index: number): Promise<string | null> => {
+    setEditingSceneVisual(index);
+    try {
+       const newBase64 = await editGeneratedImage(base64Image, instruction);
+       toast.success("Scene visual refined successfully.");
+       return newBase64;
+    } catch (error) {
+       console.error("Scene editing failed", error);
+       toast.error("Failed to refine scene.");
+       return null;
+    } finally {
+      setEditingSceneVisual(null);
+    }
+  };
+
   return {
     generatingImage,
     generatingSceneVisual,
+    editingImage,
+    editingSceneVisual,
     generateThumbnailAsset,
-    generateSceneAsset
+    editThumbnailAsset,
+    generateSceneAsset,
+    editSceneAsset
   };
 };

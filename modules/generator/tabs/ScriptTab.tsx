@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { GeneratedPackage } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
@@ -11,7 +10,9 @@ interface ScriptTabProps {
   handlePlayAudio: (text: string, idx: number) => void;
   handleDownloadAudio: (text: string, idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
+  handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
+  editingSceneVisual?: number | null;
   playingScene: number | null;
   downloadingAudio: number | null;
 }
@@ -22,7 +23,9 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   handlePlayAudio,
   handleDownloadAudio,
   handleGenerateSceneVisual,
+  handleEditSceneVisual,
   generatingSceneVisual,
+  editingSceneVisual,
   playingScene,
   downloadingAudio
 }) => {
@@ -156,7 +159,9 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
           result={result}
           handleUpdateScript={handleUpdateScript}
           handleGenerateSceneVisual={handleGenerateSceneVisual}
+          handleEditSceneVisual={handleEditSceneVisual}
           generatingSceneVisual={generatingSceneVisual}
+          editingSceneVisual={editingSceneVisual}
           batchProcessing={batchProcessing}
           handlePlayAudio={handlePlayAudio}
           playingScene={playingScene}

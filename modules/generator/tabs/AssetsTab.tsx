@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GeneratedPackage } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
 
 interface AssetsTabProps {
   result: GeneratedPackage;
   handleGenerateThumbnail: (prompt: string, idx: number) => void;
+  handleEditThumbnail?: (base64: string, prompt: string, idx: number) => void;
   generatingImage: number | null;
+  editingImage?: number | null;
 }
 
-export const AssetsTab: React.FC<AssetsTabProps> = ({ result, handleGenerateThumbnail, generatingImage }) => {
+export const AssetsTab: React.FC<AssetsTabProps> = ({ 
+  result, 
+  handleGenerateThumbnail, 
+  handleEditThumbnail,
+  generatingImage,
+  editingImage 
+}) => {
+  const [activeEditIndex, setActiveEditIndex] = useState<number | null>(null);
+  const [editPrompt, setEditPrompt] = useState('');
+
+  const submitEdit = (index: number, base64: string) => {
+    if (handleEditThumbnail && editPrompt.trim()) {
+      handleEditThumbnail(base64, editPrompt, index);
+      setActiveEditIndex(null);
+      setEditPrompt('');
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fadeIn">
       
@@ -33,7 +52,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ result, handleGenerateThum
                   </div>
                   <button 
                     onClick={() => handleGenerateThumbnail(prompt, i)}
-                    disabled={generatingImage === i}
+                    disabled={generatingImage === i || editingImage === i}
                     className="self-start px-5 py-2.5 bg-wes-pop/10 hover:bg-wes-pop/20 text-wes-pop border border-wes-pop/20 hover:border-wes-pop/40 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]"
                   >
                     {generatingImage === i ? (
@@ -41,7 +60,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ result, handleGenerateThum
                     ) : (
                       <i className="fa-solid fa-wand-magic-sparkles mr-2"></i>
                     )}
-                    Render Asset
+                    {result.generatedImages?.[i] ? 'Regenerate Base' : 'Render Asset'}
                   </button>
                 </div>
                 
@@ -51,18 +70,68 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({ result, handleGenerateThum
                       <img 
                         src={result.generatedImages[i]} 
                         alt={`Thumbnail ${i+1}`} 
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover transition-opacity ${editingImage === i ? 'opacity-50 blur-sm' : ''}`}
                       />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                        <a 
-                          href={result.generatedImages[i]} 
-                          download={`wes-thumbnail-${i}.png`}
-                          className="px-4 py-2 bg-white text-black rounded-full text-xs font-bold hover:scale-105 transition-transform"
-                          title="Download Image"
-                        >
-                          <i className="fa-solid fa-download mr-1"></i> Save
-                        </a>
-                      </div>
+                      
+                      {/* Editing Overlay */}
+                      {editingImage === i && (
+                         <div className="absolute inset-0 flex items-center justify-center z-20">
+                            <div className="bg-black/80 px-4 py-2 rounded-lg flex items-center gap-2 border border-wes-pop/50">
+                               <i className="fa-solid fa-circle-notch fa-spin text-wes-pop"></i>
+                               <span className="text-xs font-bold text-white">Refining...</span>
+                            </div>
+                         </div>
+                      )}
+
+                      {/* Controls Overlay */}
+                      {!activeEditIndex && activeEditIndex !== i && (
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-2 backdrop-blur-sm">
+                          <a 
+                            href={result.generatedImages[i]} 
+                            download={`wes-thumbnail-${i}.png`}
+                            className="px-3 py-1.5 bg-white text-black rounded text-[10px] font-bold hover:scale-105 transition-transform flex items-center"
+                            title="Download Image"
+                          >
+                            <i className="fa-solid fa-download mr-1"></i> Save
+                          </a>
+                          {handleEditThumbnail && (
+                             <button
+                               onClick={() => setActiveEditIndex(i)}
+                               className="px-3 py-1.5 bg-wes-pop text-white rounded text-[10px] font-bold hover:scale-105 transition-transform flex items-center shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                             >
+                                <i className="fa-solid fa-wand-magic mr-1"></i> Refine
+                             </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Edit Input Mode */}
+                      {activeEditIndex === i && !editingImage && (
+                        <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col p-4 animate-fadeIn">
+                           <label className="text-[10px] font-bold text-wes-pop uppercase mb-2">Refinement Instruction</label>
+                           <textarea
+                             autoFocus
+                             value={editPrompt}
+                             onChange={(e) => setEditPrompt(e.target.value)}
+                             placeholder="e.g., Make it darker, add neon..."
+                             className="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-xs text-white resize-none mb-2 focus:border-wes-pop outline-none"
+                           />
+                           <div className="flex gap-2">
+                              <button 
+                                onClick={() => setActiveEditIndex(null)}
+                                className="flex-1 py-1.5 bg-white/10 hover:bg-white/20 text-xs rounded text-slate-300"
+                              >
+                                Cancel
+                              </button>
+                              <button 
+                                onClick={() => submitEdit(i, result.generatedImages![i])}
+                                className="flex-1 py-1.5 bg-wes-pop hover:bg-wes-pop/80 text-xs rounded text-white font-bold"
+                              >
+                                Apply
+                              </button>
+                           </div>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <div className="text-slate-600 flex flex-col items-center">

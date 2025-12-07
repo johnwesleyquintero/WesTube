@@ -1,5 +1,3 @@
-
-
 import { useState, useCallback } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
@@ -106,6 +104,15 @@ export const useGenerator = () => {
     toast.success("Thumbnail asset rendered successfully.");
   }, [result, assetGen, toast]);
 
+  const handleEditThumbnail = useCallback(async (base64: string, prompt: string, index: number) => {
+    if (!result) return;
+
+    const newBase64 = await assetGen.editThumbnailAsset(base64, prompt, index);
+    if (!newBase64) return;
+
+    setResult(prev => prev ? updatePackageThumbnail(prev, index, newBase64) : null);
+  }, [result, assetGen]);
+
   const handleGenerateSceneVisual = useCallback(async (visualPrompt: string, index: number) => {
     if (!result) return;
     
@@ -115,6 +122,15 @@ export const useGenerator = () => {
     setResult(prev => prev ? updatePackageSceneVisual(prev, index, base64Image) : null);
     toast.success("Scene visual rendered successfully.");
   }, [result, assetGen, activeChannelConfig, toast]);
+
+  const handleEditSceneVisual = useCallback(async (base64: string, prompt: string, index: number) => {
+    if (!result) return;
+
+    const newBase64 = await assetGen.editSceneAsset(base64, prompt, index);
+    if (!newBase64) return;
+
+    setResult(prev => prev ? updatePackageSceneVisual(prev, index, newBase64) : null);
+  }, [result, assetGen]);
 
   const handleVideoGenerated = useCallback((key: string, url: string) => {
     setResult(prev => {
@@ -167,6 +183,8 @@ export const useGenerator = () => {
       activeTab, setActiveTab,
       generatingImage: assetGen.generatingImage,
       generatingSceneVisual: assetGen.generatingSceneVisual,
+      editingImage: assetGen.editingImage,
+      editingSceneVisual: assetGen.editingSceneVisual,
       playingScene: audioGen.playingIndex,
       downloadingAudio: audioGen.downloadingIndex
     },
@@ -181,7 +199,9 @@ export const useGenerator = () => {
       handleGenerate,
       handleUpdateScript,
       handleGenerateThumbnail,
+      handleEditThumbnail,
       handleGenerateSceneVisual,
+      handleEditSceneVisual,
       handleVideoGenerated,
       handlePlayAudio,
       handleDownloadAudio,

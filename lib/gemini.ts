@@ -186,6 +186,40 @@ export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '1
   throw new Error("No image generated.");
 };
 
+export const editGeneratedImage = async (base64Image: string, editInstruction: string): Promise<string> => {
+  const ai = getClient();
+
+  // Strip prefix if present to get pure base64 data
+  const data = base64Image.replace(/^data:image\/(png|jpeg|webp);base64,/, "");
+  // Simple mime detection
+  const mimeType = base64Image.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)?.[0] || 'image/png';
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash-image',
+    contents: {
+      parts: [
+        {
+          inlineData: {
+            data: data,
+            mimeType: mimeType
+          },
+        },
+        {
+          text: editInstruction + " --maintain consistent style, high quality"
+        },
+      ],
+    },
+  });
+
+  for (const part of response.candidates?.[0]?.content?.parts || []) {
+    if (part.inlineData && part.inlineData.data) {
+      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+    }
+  }
+
+  throw new Error("No edited image generated.");
+}
+
 export const generateSpeech = async (text: string, voiceName: string): Promise<string> => {
   if (!text || !text.trim()) {
     throw new Error("Text for speech generation cannot be empty.");

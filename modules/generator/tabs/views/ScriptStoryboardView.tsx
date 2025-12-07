@@ -1,12 +1,13 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { GeneratedPackage } from '../../../../types';
 
 interface ScriptStoryboardViewProps {
   result: GeneratedPackage;
   handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
+  handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
+  editingSceneVisual?: number | null;
   batchProcessing: boolean;
   handlePlayAudio: (text: string, idx: number) => void;
   playingScene: number | null;
@@ -17,12 +18,25 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
   result,
   handleUpdateScript,
   handleGenerateSceneVisual,
+  handleEditSceneVisual,
   generatingSceneVisual,
+  editingSceneVisual,
   batchProcessing,
   handlePlayAudio,
   playingScene,
   handleDownloadAudio
 }) => {
+  const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
+  const [editPrompt, setEditPrompt] = useState('');
+
+  const submitEdit = (idx: number, base64: string) => {
+    if (handleEditSceneVisual && editPrompt.trim()) {
+      handleEditSceneVisual(base64, editPrompt, idx);
+      setEditModeIndex(null);
+      setEditPrompt('');
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
       {result.script.map((scene, idx) => (
@@ -31,22 +45,80 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
             <div className="relative aspect-video bg-black/40 border-b border-white/5 group">
               {scene.generatedVisual ? (
                 <>
-                  <img src={scene.generatedVisual} alt={`Scene ${idx}`} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                      <a href={scene.generatedVisual} download={`scene-${idx}.png`} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all transform hover:scale-110">
-                        <i className="fa-solid fa-download"></i>
-                      </a>
-                      {handleGenerateSceneVisual && (
-                        <button 
-                          onClick={() => handleGenerateSceneVisual(scene.visual, idx)}
-                          disabled={generatingSceneVisual === idx || batchProcessing}
-                          className="w-10 h-10 rounded-full bg-wes-accent/80 hover:bg-wes-accent text-white flex items-center justify-center backdrop-blur-md transition-all transform hover:scale-110"
-                          title="Regenerate"
-                        >
-                          <i className="fa-solid fa-rotate-right"></i>
-                        </button>
-                      )}
-                  </div>
+                  <img 
+                    src={scene.generatedVisual} 
+                    alt={`Scene ${idx}`} 
+                    className={`w-full h-full object-cover transition-all ${editingSceneVisual === idx ? 'opacity-40 blur-sm' : ''}`}
+                  />
+                  
+                  {/* Edit Loading State */}
+                  {editingSceneVisual === idx && (
+                     <div className="absolute inset-0 flex items-center justify-center z-20">
+                         <div className="bg-black/80 px-3 py-1.5 rounded-full border border-wes-accent/50 flex items-center gap-2">
+                             <i className="fa-solid fa-circle-notch fa-spin text-wes-accent"></i>
+                             <span className="text-[10px] font-bold text-white">Refining...</span>
+                         </div>
+                     </div>
+                  )}
+
+                  {/* Controls (Hidden if editing) */}
+                  {editModeIndex !== idx && (
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                        <a href={scene.generatedVisual} download={`scene-${idx}.png`} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all transform hover:scale-110" title="Download">
+                          <i className="fa-solid fa-download"></i>
+                        </a>
+                        
+                        {handleEditSceneVisual && (
+                           <button 
+                             onClick={() => setEditModeIndex(idx)}
+                             disabled={generatingSceneVisual === idx || batchProcessing || editingSceneVisual === idx}
+                             className="w-10 h-10 rounded-full bg-wes-accent/80 hover:bg-wes-accent text-white flex items-center justify-center backdrop-blur-md transition-all transform hover:scale-110 shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+                             title="Refine with AI"
+                           >
+                             <i className="fa-solid fa-wand-magic"></i>
+                           </button>
+                        )}
+
+                        {handleGenerateSceneVisual && (
+                          <button 
+                            onClick={() => handleGenerateSceneVisual(scene.visual, idx)}
+                            disabled={generatingSceneVisual === idx || batchProcessing}
+                            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all transform hover:scale-110"
+                            title="Regenerate Completely"
+                          >
+                            <i className="fa-solid fa-rotate-right"></i>
+                          </button>
+                        )}
+                    </div>
+                  )}
+
+                  {/* Edit Input Overlay */}
+                  {editModeIndex === idx && !editingSceneVisual && (
+                     <div className="absolute inset-0 bg-black/90 backdrop-blur-md p-3 flex flex-col animate-fadeIn z-30">
+                        <label className="text-[10px] font-bold text-wes-accent uppercase mb-1">Modify Scene</label>
+                        <textarea 
+                           autoFocus
+                           value={editPrompt}
+                           onChange={(e) => setEditPrompt(e.target.value)}
+                           className="flex-1 bg-white/5 border border-white/10 rounded p-2 text-xs text-white resize-none outline-none focus:border-wes-accent mb-2"
+                           placeholder="e.g. Add rain..."
+                        />
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setEditModeIndex(null)}
+                                className="flex-1 py-1 bg-white/10 hover:bg-white/20 text-[10px] rounded text-slate-300"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => submitEdit(idx, scene.generatedVisual!)}
+                                className="flex-1 py-1 bg-wes-accent hover:bg-wes-accent/80 text-[10px] rounded text-white font-bold"
+                            >
+                                Refine
+                            </button>
+                        </div>
+                     </div>
+                  )}
                 </>
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-3">
@@ -67,7 +139,7 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
                 </div>
               )}
               
-              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">
+              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-mono px-2 py-0.5 rounded border border-white/10 z-10">
                 Scene {idx + 1} • {scene.timestamp}
               </div>
             </div>
