@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { MOODS } from '../../constants';
 import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
@@ -14,6 +16,8 @@ interface InputPanelProps {
     setMood: (val: string) => void;
     duration: GenerationRequest['duration'];
     setDuration: (val: GenerationRequest['duration']) => void;
+    useResearch: boolean;
+    setUseResearch: (val: boolean) => void;
     activeChannelConfig: ChannelConfig;
   };
   loading: boolean;
@@ -29,7 +33,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
     topic, setTopic, 
     selectedChannel, setSelectedChannel, 
     mood, setMood, 
-    duration, setDuration 
+    duration, setDuration,
+    useResearch, setUseResearch
   } = formState;
 
   return (
@@ -63,6 +68,26 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           />
         </div>
 
+        {/* Research Toggle */}
+        <div className="glass-panel p-4 rounded-xl border border-white/5 bg-wes-900/40">
+           <div className="flex items-center justify-between">
+              <div>
+                <label className="text-[10px] font-bold text-wes-pop uppercase tracking-widest flex items-center gap-2">
+                  <i className="fa-brands fa-google"></i>
+                  Deep Research
+                </label>
+                <p className="text-xs text-slate-500 mt-1">Ground content in live web data.</p>
+              </div>
+              
+              <button 
+                onClick={() => setUseResearch(!useResearch)}
+                className={`w-12 h-6 rounded-full transition-all duration-300 relative ${useResearch ? 'bg-wes-pop' : 'bg-wes-800 border border-white/10'}`}
+              >
+                <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all duration-300 shadow-md ${useResearch ? 'left-7' : 'left-1'}`}></div>
+              </button>
+           </div>
+        </div>
+
         {/* Mood & Duration */}
         <div className="grid grid-cols-2 gap-4">
           <GlassSelect 
@@ -94,7 +119,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           {loading ? (
             <>
               <i className="fa-solid fa-circle-notch fa-spin text-sm"></i>
-              <span>Initializing Neural Net...</span>
+              <span>{useResearch ? "Researching & Generating..." : "Initializing Neural Net..."}</span>
             </>
           ) : (
             <>

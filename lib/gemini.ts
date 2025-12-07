@@ -1,12 +1,11 @@
 
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
 import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } from "./prompts";
 
 // Helper to get Client instance
-// For Veo, we typically need to ensure the key is fresh if using window.aistudio, 
-// but we will stick to the standard env flow unless the UI overrides it.
 const getClient = (): GoogleGenAI => {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -46,36 +45,93 @@ const VIDEO_PACKAGE_SCHEMA = {
       description: "3 prompt variations for thumbnail generation"
     },
     musicPrompt: { type: Type.STRING, description: "Prompt for music generation tools" },
-    imageGenPrompt: { type: Type.STRING, description: "General aesthetic prompt for background assets" }
+    imageGenPrompt: { type: Type.STRING, description: "General aesthetic prompt for background assets" },
+    // We allow the model to summarize what it found if research was injected
+    researchSummary: { type: Type.STRING, description: "A brief summary of the key facts/research used." }
   }
 };
 
+/**
+ * Phase 1: Research Agent
+ * Uses the googleSearch tool to gather live context. 
+ * Does NOT use JSON schema, as per SDK limitations with Tools + Schema.
+ */
+const performDeepResearch = async (topic: string): Promise<{ summary: string, links: string[] }> => {
+  const ai = getClient();
+  const model = "gemini-2.5-flash"; // Flash is fast and good for search
+
+  const researchPrompt = `
+    Research the following topic for a YouTube video: "${topic}".
+    Find key facts, recent news, or interesting details. 
+    Summarize the findings in 3-4 bullet points.
+  `;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: researchPrompt,
+    config: {
+      tools: [{ googleSearch: {} }],
+      // Note: No responseMimeType or responseSchema allowed here
+    }
+  });
+
+  const summary = response.text || "No research data found.";
+  
+  // Extract URLs from groundingChunks
+  const links: string[] = [];
+  const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+  
+  chunks.forEach((chunk: any) => {
+    if (chunk.web && chunk.web.uri) {
+      links.push(chunk.web.uri);
+    }
+  });
+
+  // Remove duplicates
+  const uniqueLinks = Array.from(new Set(links));
+
+  return { summary, links: uniqueLinks };
+};
+
+/**
+ * Phase 2: The Architect
+ * Generates the JSON package, optionally using the research from Phase 1.
+ */
 export const generateVideoPackage = async (
   request: GenerationRequest, 
   channelConfig: ChannelConfig
 ): Promise<GeneratedPackage> => {
   
   const ai = getClient();
-  // Using gemini-2.5-flash for balance of speed and capability on free tier
   const model = "gemini-2.5-flash";
 
-  const systemInstruction = constructSystemInstruction(channelConfig);
-  const prompt = constructUserPrompt(request);
+  let finalPrompt = constructUserPrompt(request);
+  let researchData = { summary: "", links: [] as string[] };
 
-  // Optimized for Free Tier / Fast Dev:
-  // We disable the thinking budget (set to 0) to minimize token usage and latency.
-  // The 2.5-flash model is capable enough to generate the JSON schema without explicit thinking steps for this use case.
+  // 1. Conditional Research Phase
+  if (request.useResearch) {
+    try {
+      researchData = await performDeepResearch(request.topic);
+      finalPrompt += `\n\n[IMPORTANT - REAL-TIME RESEARCH DATA]:\nUse the following gathered facts to inform the script and SEO:\n${researchData.summary}\n`;
+    } catch (e) {
+      console.warn("Research phase failed, falling back to base knowledge.", e);
+    }
+  }
+
+  const systemInstruction = constructSystemInstruction(channelConfig);
+
+  // Optimized for Free Tier / Fast Dev
   const thinkingBudget = 0; 
   const maxOutputTokens = 8192; 
 
   const response = await ai.models.generateContent({
     model,
-    contents: prompt,
+    contents: finalPrompt,
     config: {
       systemInstruction,
       responseMimeType: "application/json",
       maxOutputTokens: maxOutputTokens,
-      // @ts-ignore - Explicitly disabling thinking for speed
+      // @ts-ignore
       thinkingConfig: { thinkingBudget }, 
       responseSchema: VIDEO_PACKAGE_SCHEMA
     }
@@ -88,9 +144,15 @@ export const generateVideoPackage = async (
   try {
     const cleanedText = cleanJsonString(response.text);
     const data = JSON.parse(cleanedText) as GeneratedPackage;
+    
+    // Merge the research links back into the package manually, 
+    // as the JSON model might not have hallucinated the exact URLs correctly.
     return {
       ...data,
-      channelId: request.channelId
+      channelId: request.channelId,
+      sources: researchData.links,
+      // If the model didn't fill it, use the raw summary
+      researchSummary: data.researchSummary || researchData.summary 
     };
   } catch (e) {
     console.error("Failed to parse JSON", response.text);
@@ -101,7 +163,6 @@ export const generateVideoPackage = async (
 export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '16:9'): Promise<string> => {
   const ai = getClient();
   
-  // Note: We are appending stylistic keywords here, but this could also move to prompts.ts if it gets complex
   const finalPrompt = prompt + " --high quality, youtube thumbnail style, 4k, hyper detailed";
 
   const response = await ai.models.generateContent({
@@ -118,7 +179,6 @@ export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '1
     }
   });
 
-  // Extract image
   for (const part of response.candidates?.[0]?.content?.parts || []) {
     if (part.inlineData && part.inlineData.data) {
       return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
@@ -137,7 +197,6 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
-    // Use the strict array format for TTS contents
     contents: [
       {
         parts: [
@@ -146,7 +205,6 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
       }
     ],
     config: {
-      // Use string literal 'AUDIO' to ensure compatibility if Modality enum is undefined in some builds
       responseModalities: ['AUDIO' as any],
       speechConfig: {
         voiceConfig: {
@@ -163,13 +221,7 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
   return base64Audio;
 };
 
-/**
- * Generates a video using Veo (veo-3.1-fast-generate-preview).
- * Includes polling logic as the operation is asynchronous.
- */
 export const generateVeoVideo = async (prompt: string, aspectRatio: '16:9' | '9:16' = '16:9'): Promise<string> => {
-  // Always create a new instance to ensure we pick up the latest API key from process.env 
-  // (which might have been updated by window.aistudio.openSelectKey)
   const apiKey = process.env.API_KEY || getApiKey();
   const ai = new GoogleGenAI({ apiKey });
 
@@ -183,9 +235,8 @@ export const generateVeoVideo = async (prompt: string, aspectRatio: '16:9' | '9:
     }
   });
 
-  // Polling loop
   while (!operation.done) {
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Poll every 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 5000));
     operation = await ai.operations.getVideosOperation({operation: operation});
   }
 
@@ -195,7 +246,6 @@ export const generateVeoVideo = async (prompt: string, aspectRatio: '16:9' | '9:
     throw new Error("Video generation completed but no URI returned.");
   }
 
-  // The response.body contains the MP4 bytes. You must append an API key when fetching from the download link.
   const videoResponse = await fetch(`${downloadLink}&key=${apiKey}`);
   
   if (!videoResponse.ok) {

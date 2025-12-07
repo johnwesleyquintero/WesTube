@@ -43,6 +43,9 @@ export interface GeneratedPackage {
   musicPrompt: string;
   imageGenPrompt: string;
   brandingNote: string;
+  // New Research Fields
+  researchSummary?: string;
+  sources?: string[];
 }
 
 export interface GenerationRequest {
@@ -50,6 +53,7 @@ export interface GenerationRequest {
   channelId: ChannelId;
   mood: string;
   duration: 'Short (<60s)' | 'Medium (5-8m)' | 'Long (15m+)';
+  useResearch: boolean;
 }
 
 // Toast System Types

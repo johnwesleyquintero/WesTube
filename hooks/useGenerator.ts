@@ -1,4 +1,5 @@
 
+
 import { useState, useCallback } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
@@ -24,6 +25,7 @@ export const useGenerator = () => {
   const [duration, setDuration] = useState<GenerationRequest['duration']>(() => 
     (localStorage.getItem('wes_default_duration') as GenerationRequest['duration']) || 'Medium (5-8m)'
   );
+  const [useResearch, setUseResearch] = useState(false);
 
   const activeChannelConfig = CHANNELS[selectedChannel];
   const toast = useToast();
@@ -49,7 +51,8 @@ export const useGenerator = () => {
         topic,
         channelId: selectedChannel,
         mood,
-        duration
+        duration,
+        useResearch
       }, activeChannelConfig);
       
       const packageWithMeta = {
@@ -62,14 +65,14 @@ export const useGenerator = () => {
       await saveHistoryItem(packageWithMeta);
       
       setResult(packageWithMeta);
-      toast.success("Package generated and saved to cloud.");
+      toast.success(useResearch ? "Researched & generated package." : "Package generated and saved.");
     } catch (error) {
       console.error(error);
       toast.error("Error generating content. Please check API Key configuration.");
     } finally {
       setLoading(false);
     }
-  }, [topic, selectedChannel, mood, duration, activeChannelConfig, audioGen, toast]);
+  }, [topic, selectedChannel, mood, duration, useResearch, activeChannelConfig, audioGen, toast]);
 
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!result) return;
@@ -154,6 +157,7 @@ export const useGenerator = () => {
       selectedChannel, setSelectedChannel,
       mood, setMood,
       duration, setDuration,
+      useResearch, setUseResearch,
       activeChannelConfig
     },
 
