@@ -52,7 +52,7 @@ export interface GenerationRequest {
   topic: string;
   channelId: ChannelId;
   mood: string;
-  duration: 'Short (<60s)' | 'Medium (5-8m)' | 'Long (15m+)';
+  duration: 'Short (<60s)' | 'Medium (5-8m)' | 'Long (15m+)' | 'Extra Long (1h+)';
   useResearch: boolean;
 }
 

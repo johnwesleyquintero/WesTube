@@ -1,4 +1,5 @@
 
+
 import { ChannelId, ChannelConfig } from './types';
 
 export const CHANNELS: Record<ChannelId, ChannelConfig> = {
@@ -62,6 +63,13 @@ export const MOODS = [
   "Mystery/Suspense",
   "Academic/Educational",
   "Sarcastic/Witty"
+];
+
+export const DURATIONS = [
+  "Short (<60s)",
+  "Medium (5-8m)",
+  "Long (15m+)",
+  "Extra Long (1h+)"
 ];
 
 export const NAV_ITEMS = [

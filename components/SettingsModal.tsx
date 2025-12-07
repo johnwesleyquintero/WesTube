@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { MOODS } from '../constants';
+import { MOODS, DURATIONS } from '../constants';
 import { GlassSelect } from './GlassSelect';
 
 interface SettingsModalProps {
@@ -119,7 +120,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                  <div className="grid grid-cols-2 gap-4">
                    <GlassSelect 
                      label="Default Duration"
-                     options={["Short (<60s)", "Medium (5-8m)", "Long (15m+)"]}
+                     options={DURATIONS}
                      value={defaultDuration}
                      onChange={(e) => setDefaultDuration(e.target.value)}
                    />

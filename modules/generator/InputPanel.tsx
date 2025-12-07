@@ -1,7 +1,8 @@
 
 
+
 import React from 'react';
-import { MOODS } from '../../constants';
+import { MOODS, DURATIONS } from '../../constants';
 import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
 import { GlassSelect } from '../../components/GlassSelect';
 import { ChannelSelector } from './ChannelSelector';
@@ -98,7 +99,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           />
           <GlassSelect 
             label="Duration"
-            options={["Short (<60s)", "Medium (5-8m)", "Long (15m+)"]}
+            options={DURATIONS}
             value={duration}
             onChange={(e) => setDuration(e.target.value as any)}
           />
