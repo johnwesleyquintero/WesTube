@@ -75,8 +75,6 @@ export const DURATIONS = [
 export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fa-gauge-high' },
   { id: 'brainstorm', label: 'Neural Link', icon: 'fa-bolt' },
-  { id: 'scripts', label: 'Script Engine', icon: 'fa-file-lines' },
-  { id: 'assets', label: 'Asset Lab', icon: 'fa-photo-film' },
-  { id: 'seo', label: 'SEO Mastery', icon: 'fa-magnifying-glass-chart' },
+  { id: 'video', label: 'Motion Lab', icon: 'fa-film' },
   { id: 'history', label: 'Production History', icon: 'fa-clock-rotate-left' },
 ];

@@ -12,14 +12,18 @@ export const History: React.FC = () => {
   const [history, setHistory] = useState<GeneratedPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GeneratedPackage | null>(null);
-  const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo'>('script');
+  const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo' | 'video'>('script');
 
   // Shared Logic Hooks
   const { 
     generatingImage, 
     generatingSceneVisual, 
+    editingImage,
+    editingSceneVisual,
     generateThumbnailAsset, 
-    generateSceneAsset 
+    editThumbnailAsset,
+    generateSceneAsset,
+    editSceneAsset
   } = useAssetGenerator();
 
   const { 
@@ -103,6 +107,19 @@ export const History: React.FC = () => {
     setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
   };
 
+  const handleEditThumbnail = async (base64: string, prompt: string, index: number) => {
+    if (!selectedItem) return;
+
+    const newBase64 = await editThumbnailAsset(base64, prompt, index);
+    if (!newBase64) return;
+    
+    const updatedItem = updatePackageThumbnail(selectedItem, index, newBase64);
+    
+    setSelectedItem(updatedItem);
+    // Persist to local list view
+    setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+  };
+
   const handleGenerateSceneVisual = async (visualPrompt: string, index: number) => {
     if (!selectedItem) return;
     
@@ -110,6 +127,19 @@ export const History: React.FC = () => {
     if (!base64Image) return;
 
     const updatedItem = updatePackageSceneVisual(selectedItem, index, base64Image);
+    
+    setSelectedItem(updatedItem);
+    // Persist to local list view
+    setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+  };
+
+  const handleEditSceneVisual = async (base64: string, prompt: string, index: number) => {
+    if (!selectedItem) return;
+    
+    const newBase64 = await editSceneAsset(base64, prompt, index);
+    if (!newBase64) return;
+
+    const updatedItem = updatePackageSceneVisual(selectedItem, index, newBase64);
     
     setSelectedItem(updatedItem);
     // Persist to local list view
@@ -137,6 +167,19 @@ export const History: React.FC = () => {
     setSelectedItem(updatedItem);
     setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
   }, [selectedItem, invalidateCache]);
+
+  const handleVideoGenerated = (key: string, url: string) => {
+     if (!selectedItem) return;
+     const updatedItem = {
+         ...selectedItem,
+         generatedVideos: {
+             ...(selectedItem.generatedVideos || {}),
+             [key]: url
+         }
+     };
+     setSelectedItem(updatedItem);
+     setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+  };
 
   const handleDownloadPackage = useCallback(() => {
     if (!selectedItem) return;
@@ -211,6 +254,8 @@ export const History: React.FC = () => {
                   setActiveTab: setViewerTab,
                   generatingImage: generatingImage,
                   generatingSceneVisual: generatingSceneVisual,
+                  editingImage: editingImage,
+                  editingSceneVisual: editingSceneVisual,
                   playingScene: playingIndex,
                   downloadingAudio: downloadingIndex
                 }}
@@ -224,9 +269,12 @@ export const History: React.FC = () => {
                   downloadPackage: handleDownloadPackage,
                   handleUpdateScript: handleUpdateScript,
                   handleGenerateThumbnail: handleGenerateThumbnail,
+                  handleEditThumbnail: handleEditThumbnail,
                   handleGenerateSceneVisual: handleGenerateSceneVisual,
+                  handleEditSceneVisual: handleEditSceneVisual,
                   handlePlayAudio: handlePlayAudio,
-                  handleDownloadAudio: handleDownloadAudio
+                  handleDownloadAudio: handleDownloadAudio,
+                  handleVideoGenerated: handleVideoGenerated
                 }}
              />
            </div>

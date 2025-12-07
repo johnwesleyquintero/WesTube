@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { GeneratedPackage } from '../../../types';
+import { GeneratedPackage, ChannelConfig, ChannelId } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
 import { ScriptTableView } from './views/ScriptTableView';
 import { ScriptStoryboardView } from './views/ScriptStoryboardView';
+import { DirectorPreview } from './DirectorPreview';
+import { CHANNELS } from '../../../constants';
 
 interface ScriptTabProps {
   result: GeneratedPackage;
   handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
-  handlePlayAudio: (text: string, idx: number) => void;
+  handlePlayAudio: (text: string, idx: number) => any; // Allow promise return
   handleDownloadAudio: (text: string, idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
@@ -31,6 +33,15 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
   const [batchProcessing, setBatchProcessing] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
+  // Helper to resolve the correct voice for preview
+  const activeVoice = result.channelId ? CHANNELS[result.channelId].voice : 'Zephyr';
+
+  // Wrapper to force promise return for the director preview if the hook doesn't explicitly return one (it does, but TS might complain)
+  const safePlayAudio = async (text: string, idx: number) => {
+    return handlePlayAudio(text, idx);
+  };
 
   const downloadScriptTxt = () => {
     let text = `TITLE: ${result.title}\nHOOK: ${result.hook}\n\n`;
@@ -71,6 +82,17 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
 
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
+      
+      {/* Full Screen Preview Mode */}
+      {isPreviewMode && (
+        <DirectorPreview 
+          result={result}
+          playAudio={safePlayAudio}
+          onClose={() => setIsPreviewMode(false)}
+          voiceName={activeVoice}
+        />
+      )}
+
       {/* Hook & Branding Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
@@ -97,6 +119,18 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
+             
+             {/* Director Mode Button */}
+             <button
+                onClick={() => setIsPreviewMode(true)}
+                className="px-4 py-1.5 bg-wes-success/10 hover:bg-wes-success/20 text-wes-success border border-wes-success/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+             >
+                <i className="fa-solid fa-play"></i>
+                <span className="hidden sm:inline">Watch Animatic</span>
+             </button>
+
+             <div className="w-px h-6 bg-white/10 mx-2"></div>
+
              {/* View Toggle */}
              <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
                 <button 

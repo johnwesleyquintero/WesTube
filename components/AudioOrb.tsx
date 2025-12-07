@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 interface AudioOrbProps {
@@ -9,7 +8,7 @@ interface AudioOrbProps {
 
 export const AudioOrb: React.FC<AudioOrbProps> = ({ isActive, volume, className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;

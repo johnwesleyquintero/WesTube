@@ -1,4 +1,3 @@
-
 import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -8,6 +7,7 @@ import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
 import { SplashScreen } from './components/SplashScreen';
 import { ConstructionView } from './components/ConstructionView';
+import { Dashboard } from './modules/Dashboard';
 
 // Lazy load heavy modules for performance
 const Generator = React.lazy(() => import('./modules/Generator').then(module => ({ default: module.Generator })));
@@ -30,7 +30,7 @@ const AppContent = () => {
   const renderContent = () => {
     switch (activeView) {
       case 'dashboard':
-        return <Generator initialTab="script" />;
+        return <Dashboard onNavigate={setActiveView} />;
       case 'brainstorm':
         // Pass navigation prop to allow Brainstorm to redirect to Dashboard
         return <Brainstorm onNavigate={setActiveView} />;
@@ -38,6 +38,8 @@ const AppContent = () => {
         return <Generator initialTab="script" />;
       case 'assets':
         return <Generator initialTab="assets" />;
+      case 'video':
+        return <Generator initialTab="video" />;
       case 'seo':
         return <Generator initialTab="seo" />;
       case 'history':

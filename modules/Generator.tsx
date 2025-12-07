@@ -1,4 +1,5 @@
 
+
 import React, { useEffect } from 'react';
 import { useGenerator } from '../hooks/useGenerator';
 import { InputPanel } from './generator/InputPanel';
@@ -13,7 +14,7 @@ export const Generator: React.FC<GeneratorProps> = ({ initialTab }) => {
 
   // Sync sidebar navigation with internal tabs
   useEffect(() => {
-    if (initialTab && ['script', 'assets', 'seo'].includes(initialTab)) {
+    if (initialTab && ['script', 'assets', 'seo', 'video'].includes(initialTab)) {
       uiState.setActiveTab(initialTab as any);
     }
   }, [initialTab, uiState]);
