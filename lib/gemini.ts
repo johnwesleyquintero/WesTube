@@ -1,5 +1,3 @@
-
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
@@ -221,19 +219,48 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
   return base64Audio;
 };
 
-export const generateVeoVideo = async (prompt: string, aspectRatio: '16:9' | '9:16' = '16:9'): Promise<string> => {
+export const generateVeoVideo = async (
+  prompt: string, 
+  aspectRatio: '16:9' | '9:16' = '16:9',
+  imageContext?: string // Optional Base64 Data URI
+): Promise<string> => {
   const apiKey = process.env.API_KEY || getApiKey();
   const ai = new GoogleGenAI({ apiKey });
 
-  let operation = await ai.models.generateVideos({
-    model: 'veo-3.1-fast-generate-preview',
-    prompt: prompt,
-    config: {
-      numberOfVideos: 1,
-      resolution: '720p',
-      aspectRatio: aspectRatio
-    }
-  });
+  // Prepare call parameters
+  const model = 'veo-3.1-fast-generate-preview';
+  const config = {
+    numberOfVideos: 1,
+    resolution: '720p', // Veo fast preview
+    aspectRatio: aspectRatio
+  };
+
+  let operation;
+
+  if (imageContext) {
+    // IMAGE-TO-VIDEO MODE
+    // Strip the "data:image/png;base64," prefix
+    const [header, base64Data] = imageContext.split(',');
+    const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
+    const cleanBase64 = base64Data || imageContext;
+
+    operation = await ai.models.generateVideos({
+      model,
+      prompt: prompt, // Prompt is still required/helpful for Veo image-to-video
+      image: {
+        imageBytes: cleanBase64,
+        mimeType: mimeType
+      },
+      config
+    });
+  } else {
+    // TEXT-TO-VIDEO MODE
+    operation = await ai.models.generateVideos({
+      model,
+      prompt: prompt,
+      config
+    });
+  }
 
   while (!operation.done) {
     await new Promise(resolve => setTimeout(resolve, 5000));

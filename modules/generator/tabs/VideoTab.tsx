@@ -15,9 +15,9 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<'16:9' | '9:16'>('16:9');
   const { isGenerating, progress, generateVideo } = useVideoGenerator();
 
-  const handleGenerate = async (prompt: string, key: string) => {
+  const handleGenerate = async (prompt: string, key: string, imageContext?: string) => {
     if (!prompt.trim()) return;
-    const url = await generateVideo(prompt, selectedAspectRatio);
+    const url = await generateVideo(prompt, selectedAspectRatio, imageContext);
     if (url) {
       onVideoGenerated(key, url);
     }
@@ -35,7 +35,7 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
               </span>
               Veo Motion Lab
             </h3>
-            <p className="text-xs text-slate-500 mt-1 ml-11">Powered by Veo 3.1 • 720p HD Generation</p>
+            <p className="text-xs text-slate-500 mt-1 ml-11">Powered by Veo 3.1 • Image-to-Video Capable</p>
          </div>
          
          <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
@@ -85,28 +85,25 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
             </button>
          </div>
          {savedVideos[`custom-${Date.now()}`] && (
-            <div className="mt-4">
-               {/* This handles immediate feedback for the custom one just generated if we tracked the key properly, 
-                   but usually we map below. For now, generated videos appear in the library below. */}
-            </div>
+            <div className="mt-4"></div>
          )}
       </div>
 
       {/* Script Scene Integration */}
       <div className="space-y-4">
          <h4 className="text-sm font-bold text-white border-b border-white/5 pb-2">Scenes from Script</h4>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {result.script.map((scene, idx) => (
-               <div key={idx} className="bg-wes-900/40 border border-white/5 rounded-xl p-4 hover:border-white/10 transition-colors">
+               <div key={idx} className="bg-wes-900/40 border border-white/5 rounded-xl p-4 hover:border-white/10 transition-colors flex flex-col h-full">
                   <div className="flex justify-between items-start mb-2">
                      <span className="text-[10px] font-mono text-wes-accent bg-wes-accent/10 px-2 py-0.5 rounded">
                         {scene.timestamp}
                      </span>
                   </div>
-                  <p className="text-xs text-slate-300 mb-4 line-clamp-3">{scene.visual}</p>
+                  <p className="text-xs text-slate-300 mb-4 line-clamp-3 flex-1">{scene.visual}</p>
                   
                   {savedVideos[`scene-${idx}`] ? (
-                     <div className="relative rounded-lg overflow-hidden aspect-video bg-black">
+                     <div className="relative rounded-lg overflow-hidden aspect-video bg-black mt-auto">
                         <video 
                            src={savedVideos[`scene-${idx}`]} 
                            controls 
@@ -121,13 +118,40 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
                         </a>
                      </div>
                   ) : (
-                     <button 
-                        onClick={() => handleGenerate(scene.visual, `scene-${idx}`)}
-                        disabled={isGenerating}
-                        className="w-full py-2 bg-wes-800 hover:bg-wes-700 text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-white/5"
-                     >
-                        Generate B-Roll
-                     </button>
+                     <div className="mt-auto space-y-3">
+                        {/* If we have a generated static visual, show it as context */}
+                        {scene.generatedVisual && (
+                           <div className="relative rounded-lg overflow-hidden aspect-video border border-white/10 group">
+                              <img 
+                                 src={scene.generatedVisual} 
+                                 alt="Static Source" 
+                                 className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                 <span className="bg-black/60 backdrop-blur-sm text-[10px] px-2 py-1 rounded text-white border border-white/10">Source Asset</span>
+                              </div>
+                           </div>
+                        )}
+
+                        {scene.generatedVisual ? (
+                           <button 
+                              onClick={() => handleGenerate(scene.visual, `scene-${idx}`, scene.generatedVisual)}
+                              disabled={isGenerating}
+                              className="w-full py-2.5 bg-gradient-to-r from-wes-pop to-wes-accent hover:from-wes-pop/80 hover:to-wes-accent/80 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] flex items-center justify-center gap-2"
+                           >
+                              <i className="fa-solid fa-wand-magic-sparkles"></i>
+                              Animate Asset
+                           </button>
+                        ) : (
+                           <button 
+                              onClick={() => handleGenerate(scene.visual, `scene-${idx}`)}
+                              disabled={isGenerating}
+                              className="w-full py-2.5 bg-wes-800 hover:bg-wes-700 text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-white/5"
+                           >
+                              Generate from Text
+                           </button>
+                        )}
+                     </div>
                   )}
                </div>
             ))}

@@ -7,14 +7,17 @@ export const useVideoGenerator = () => {
   const [progress, setProgress] = useState<string>(''); // For status messages
   const toast = useToast();
 
-  const generateVideo = useCallback(async (prompt: string, aspectRatio: '16:9' | '9:16'): Promise<string | null> => {
+  const generateVideo = useCallback(async (
+    prompt: string, 
+    aspectRatio: '16:9' | '9:16', 
+    imageBase64?: string
+  ): Promise<string | null> => {
     setIsGenerating(true);
-    setProgress('Initializing Veo Model...');
+    setProgress(imageBase64 ? 'Animating Scene (Image-to-Video)...' : 'Initializing Veo Model (Text-to-Video)...');
     
     try {
       // 1. Check for Paid API Key (Required for Veo)
       // Accessing window.aistudio via type assertion to avoid "Subsequent property declarations" conflict
-      // if it is already defined as AIStudio in other definition files.
       const aistudio = (window as any).aistudio;
       
       if (aistudio) {
@@ -27,9 +30,12 @@ export const useVideoGenerator = () => {
       }
 
       // 2. Start Generation
-      setProgress('Generating video (this may take a minute)...');
+      setProgress(imageBase64 
+        ? 'Animating existing visual asset (this may take a minute)...' 
+        : 'Generating video from text (this may take a minute)...'
+      );
       
-      const videoUrl = await generateVeoVideo(prompt, aspectRatio);
+      const videoUrl = await generateVeoVideo(prompt, aspectRatio, imageBase64);
       
       toast.success("Video generated successfully.");
       return videoUrl;
