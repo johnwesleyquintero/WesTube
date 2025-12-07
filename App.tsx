@@ -1,10 +1,10 @@
+
 import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { LandingPage } from './pages/LandingPage';
 import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
-import { ToastContainer } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
 import { ConstructionView } from './components/ConstructionView';
 
@@ -54,7 +54,6 @@ const AppContent = () => {
       setActiveView={setActiveView} 
       signOut={signOut}
     >
-      <ToastContainer />
       <Suspense fallback={
         <div className="h-full w-full flex items-center justify-center">
           <Loader />

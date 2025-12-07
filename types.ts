@@ -1,4 +1,5 @@
 
+
 export enum ChannelId {
   PHILOSOPHY = 'philosophy',
   TECH = 'tech',
@@ -49,4 +50,13 @@ export interface GenerationRequest {
   channelId: ChannelId;
   mood: string;
   duration: 'Short (<60s)' | 'Medium (5-8m)' | 'Long (15m+)';
+}
+
+// Toast System Types
+export type ToastType = 'success' | 'error' | 'info';
+
+export interface ToastMessage {
+  id: string;
+  message: string;
+  type: ToastType;
 }

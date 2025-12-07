@@ -1,12 +1,7 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
-
-export type ToastType = 'success' | 'error' | 'info';
-
-export interface ToastMessage {
-  id: string;
-  message: string;
-  type: ToastType;
-}
+import { ToastMessage, ToastType } from '../types';
+import { ToastContainer } from '../components/Toast';
 
 interface ToastContextType {
   toasts: ToastMessage[];
@@ -35,6 +30,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
       {children}
     </ToastContext.Provider>
   );
@@ -51,6 +47,6 @@ export const useToast = () => {
     error: (msg: string) => context.addToast(msg, 'error'),
     info: (msg: string) => context.addToast(msg, 'info'),
     remove: context.removeToast,
-    toasts: context.toasts // Exposed for the container
+    toasts: context.toasts // Exposed just in case, though usually internal
   };
 };

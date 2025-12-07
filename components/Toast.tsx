@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useToast, ToastMessage } from '../context/ToastContext';
+import { ToastMessage } from '../types';
 
 const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {
   const icons = {
@@ -37,14 +38,17 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
   );
 };
 
-export const ToastContainer: React.FC = () => {
-  const { toasts, remove } = useToast();
+interface ToastContainerProps {
+  toasts: ToastMessage[];
+  onRemove: (id: string) => void;
+}
 
+export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   return (
     <div className="fixed top-4 right-4 z-[100] flex flex-col items-end pointer-events-none">
       <div className="pointer-events-auto">
         {toasts.map((toast) => (
-          <ToastItem key={toast.id} toast={toast} onRemove={remove} />
+          <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
         ))}
       </div>
     </div>
