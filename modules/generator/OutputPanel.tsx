@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GeneratedPackage, ChannelConfig } from '../../types';
 import { Loader } from '../../components/Loader';
 import { ScriptTab } from './tabs/ScriptTab';
 import { AssetsTab } from './tabs/AssetsTab';
 import { SeoTab } from './tabs/SeoTab';
 import { VideoTab } from './tabs/VideoTab';
+import { exportProductionKit } from '../../lib/export';
+import { useToast } from '../../context/ToastContext';
 
 interface OutputPanelProps {
   uiState: {
@@ -43,6 +45,23 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
   const { result } = dataState;
   const { activeChannelConfig } = formState;
   const { loading, activeTab, setActiveTab } = uiState;
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState('');
+  const toast = useToast();
+
+  const handleExportKit = async () => {
+    if (!result) return;
+    setIsExporting(true);
+    try {
+      await exportProductionKit(result, (msg) => setExportStatus(msg));
+      toast.success("Production Kit Exported Successfully.");
+    } catch (e) {
+      toast.error("Failed to export production kit.");
+    } finally {
+      setIsExporting(false);
+      setExportStatus('');
+    }
+  };
 
   return (
     <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden relative shadow-2xl shadow-black/50">
@@ -88,12 +107,29 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
                   ))}
                 </div>
 
+              {/* Export Production Kit Button */}
               <button 
-                onClick={actions.downloadPackage}
-                className="text-xs bg-wes-800 hover:bg-wes-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-white/10"
-                title="Download JSON Project"
+                onClick={handleExportKit}
+                disabled={isExporting}
+                className={`
+                  flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-all border
+                  ${isExporting 
+                    ? 'bg-wes-800 text-slate-400 border-wes-700 cursor-wait' 
+                    : 'bg-gradient-to-r from-wes-success/80 to-emerald-600 text-white border-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:scale-105'}
+                `}
+                title="Export Script, Metadata, and Assets as ZIP"
               >
-                <i className="fa-solid fa-file-code"></i>
+                {isExporting ? (
+                  <>
+                    <i className="fa-solid fa-circle-notch fa-spin"></i>
+                    <span className="hidden xl:inline">{exportStatus || 'Building...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-file-zipper"></i>
+                    <span className="hidden xl:inline">Export Kit</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
