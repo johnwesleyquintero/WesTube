@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { generateThumbnail, editGeneratedImage } from '../lib/gemini';
 import { enhanceVisualPrompt } from '../lib/prompts';
@@ -12,10 +14,11 @@ export const useAssetGenerator = () => {
   
   const toast = useToast();
 
-  const generateThumbnailAsset = async (prompt: string, index: number): Promise<string | null> => {
+  const generateThumbnailAsset = async (prompt: string, index: number, style?: string, tone?: string): Promise<string | null> => {
     setGeneratingImage(index);
     try {
-      const base64Image = await generateThumbnail(prompt);
+      const finalPrompt = enhanceVisualPrompt(prompt, tone || 'Cinematic', style);
+      const base64Image = await generateThumbnail(finalPrompt);
       return base64Image;
     } catch (error) {
       console.error("Image generation failed", error);
@@ -41,11 +44,16 @@ export const useAssetGenerator = () => {
     }
   };
 
-  const generateSceneAsset = async (visualPrompt: string, index: number, channelConfig: ChannelConfig): Promise<string | null> => {
+  const generateSceneAsset = async (
+      visualPrompt: string, 
+      index: number, 
+      channelConfig: ChannelConfig,
+      styleOverride?: string
+    ): Promise<string | null> => {
     setGeneratingSceneVisual(index);
     try {
-      // Use the centralized prompt enhancer
-      const enhancedPrompt = enhanceVisualPrompt(visualPrompt, channelConfig.tone);
+      // Use the centralized prompt enhancer with style override
+      const enhancedPrompt = enhanceVisualPrompt(visualPrompt, channelConfig.tone, styleOverride);
       const base64Image = await generateThumbnail(enhancedPrompt);
       return base64Image;
     } catch (error) {

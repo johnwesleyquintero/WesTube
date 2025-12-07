@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage, LocationScoutData } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
@@ -181,14 +182,16 @@ export const generateVideoPackage = async (
     const cleanedText = cleanJsonString(response.text);
     const data = JSON.parse(cleanedText) as GeneratedPackage;
     
-    // Merge the research links back into the package manually, 
-    // as the JSON model might not have hallucinated the exact URLs correctly.
+    // Merge the research links and overrides back into the package
     return {
       ...data,
       channelId: request.channelId,
       sources: researchData.links,
       // If the model didn't fill it, use the raw summary
-      researchSummary: data.researchSummary || researchData.summary 
+      researchSummary: data.researchSummary || researchData.summary,
+      // Persist Overrides
+      visualStyle: request.visualStyle,
+      voice: request.voice
     };
   } catch (e) {
     console.error("Failed to parse JSON", response.text);
@@ -232,7 +235,8 @@ export const refineScriptSegment = async (
 export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '16:9'): Promise<string> => {
   const ai = getClient();
   
-  const finalPrompt = prompt + " --high quality, youtube thumbnail style, 4k, hyper detailed";
+  // Note: prompt already enhanced before calling this function
+  const finalPrompt = prompt; 
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',

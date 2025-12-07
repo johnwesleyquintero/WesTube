@@ -1,6 +1,7 @@
 
+
 import React from 'react';
-import { MOODS, DURATIONS } from '../../constants';
+import { MOODS, DURATIONS, VISUAL_STYLES, VOICES } from '../../constants';
 import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
 import { GlassSelect } from '../../components/GlassSelect';
 import { ChannelSelector } from './ChannelSelector';
@@ -17,6 +18,10 @@ interface InputPanelProps {
     setDuration: (val: GenerationRequest['duration']) => void;
     useResearch: boolean;
     setUseResearch: (val: boolean) => void;
+    visualStyle: string;
+    setVisualStyle: (val: string) => void;
+    voice: string;
+    setVoice: (val: string) => void;
     activeChannelConfig: ChannelConfig;
     hasContext?: boolean;
   };
@@ -35,6 +40,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
     mood, setMood, 
     duration, setDuration,
     useResearch, setUseResearch,
+    visualStyle, setVisualStyle,
+    voice, setVoice,
     hasContext
   } = formState;
 
@@ -94,6 +101,29 @@ export const InputPanel: React.FC<InputPanelProps> = ({
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all duration-300 shadow-md ${useResearch ? 'left-7' : 'left-1'}`}></div>
               </button>
            </div>
+        </div>
+
+        {/* Director's Overrides */}
+        <div className="space-y-4 pt-2 border-t border-white/5">
+             <div className="flex items-center gap-2 mb-2">
+                 <i className="fa-solid fa-sliders text-slate-500 text-xs"></i>
+                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Director's Overrides</h3>
+             </div>
+             
+             <div className="grid grid-cols-2 gap-4">
+                <GlassSelect 
+                  label="Visual Aesthetic"
+                  options={VISUAL_STYLES}
+                  value={visualStyle}
+                  onChange={(e) => setVisualStyle(e.target.value)}
+                />
+                <GlassSelect 
+                  label="Narrator Voice"
+                  options={VOICES}
+                  value={voice}
+                  onChange={(e) => setVoice(e.target.value)}
+                />
+             </div>
         </div>
 
         {/* Mood & Duration */}

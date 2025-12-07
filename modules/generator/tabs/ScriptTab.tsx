@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { GeneratedPackage, ChannelConfig, ChannelId } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
@@ -39,8 +41,10 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
-  // Helper to resolve the correct voice for preview
-  const activeVoice = result.channelId ? CHANNELS[result.channelId].voice : 'Zephyr';
+  // Helper to resolve the correct voice for preview: Check Override -> Default
+  const activeVoice = result.voice && result.voice !== 'default'
+    ? result.voice 
+    : (result.channelId ? CHANNELS[result.channelId].voice : 'Zephyr');
 
   // Wrapper to force promise return for the director preview if the hook doesn't explicitly return one (it does, but TS might complain)
   const safePlayAudio = async (text: string, idx: number) => {
@@ -109,6 +113,11 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
         <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
             <h3 className="text-[10px] font-bold text-wes-pop uppercase tracking-widest mb-3">Branding Directive</h3>
             <p className="text-sm text-slate-300 leading-relaxed">{result.brandingNote}</p>
+            {result.visualStyle && (
+               <div className="mt-3 inline-block px-2 py-1 rounded bg-white/10 text-[10px] text-slate-300 border border-white/10">
+                  Style: {result.visualStyle}
+               </div>
+            )}
         </div>
       </div>
 

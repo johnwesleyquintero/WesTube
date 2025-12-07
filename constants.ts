@@ -72,6 +72,27 @@ export const DURATIONS = [
   "Extra Long (1h+)"
 ];
 
+export const VISUAL_STYLES = [
+  "Channel Default",
+  "Cinematic Realism",
+  "Cyberpunk / Neon",
+  "Minimalist / Flat",
+  "Watercolor / Artistic",
+  "Retro / VHS / 80s",
+  "Dark / Gothic / Noir",
+  "3D Render (Pixar Style)",
+  "Line Art / Sketch"
+];
+
+export const VOICES = [
+  { label: "Channel Default", value: "default" },
+  { label: "Zephyr (Fast/Modern)", value: "Zephyr" },
+  { label: "Fenrir (Deep/Authoritative)", value: "Fenrir" },
+  { label: "Puck (Energetic/Clear)", value: "Puck" },
+  { label: "Kore (Balanced/Smooth)", value: "Kore" },
+  { label: "Charon (Deep/Narrative)", value: "Charon" }
+];
+
 export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: 'fa-gauge-high' },
   { id: 'brainstorm', label: 'Neural Link', icon: 'fa-bolt' },

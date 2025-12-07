@@ -1,4 +1,5 @@
 
+
 import { ChannelConfig, GenerationRequest } from "../types";
 
 /**
@@ -25,17 +26,25 @@ export const constructSystemInstruction = (channelConfig: ChannelConfig): string
  * Constructs the User Prompt based on the input request.
  */
 export const constructUserPrompt = (request: GenerationRequest): string => {
-  return `
+  let prompt = `
     Generate a video package for:
     Topic: "${request.topic}"
     Mood: "${request.mood}"
     Duration: ${request.duration}
   `;
+
+  if (request.visualStyle && request.visualStyle !== 'Channel Default') {
+    prompt += `\nStrict Visual Aesthetic Requirement: ${request.visualStyle}`;
+  }
+
+  return prompt;
 };
 
 /**
  * Enhances a visual prompt with channel-specific cinematic directives.
+ * Accepts optional style override.
  */
-export const enhanceVisualPrompt = (basePrompt: string, tone: string): string => {
-  return `Cinematic shot, ${tone} style: ${basePrompt} --high quality, youtube thumbnail style, 4k, hyper detailed`;
+export const enhanceVisualPrompt = (basePrompt: string, tone: string, styleOverride?: string): string => {
+  const aesthetic = (styleOverride && styleOverride !== 'Channel Default') ? styleOverride : `${tone} style`;
+  return `Cinematic shot, ${aesthetic}: ${basePrompt} --high quality, youtube thumbnail style, 4k, hyper detailed`;
 };

@@ -60,6 +60,9 @@ export interface GeneratedPackage {
   sources?: string[];
   // Location Scouting
   locations?: LocationScoutData;
+  // v2.3 Director Overrides
+  voice?: string;
+  visualStyle?: string;
 }
 
 export interface GenerationRequest {
@@ -68,6 +71,8 @@ export interface GenerationRequest {
   mood: string;
   duration: 'Short (<60s)' | 'Medium (5-8m)' | 'Long (15m+)' | 'Extra Long (1h+)';
   useResearch: boolean;
+  visualStyle?: string;
+  voice?: string;
 }
 
 // Toast System Types

@@ -1,5 +1,7 @@
+
+
 import { useState, useCallback, useEffect } from 'react';
-import { CHANNELS, MOODS } from '../constants';
+import { CHANNELS, MOODS, VISUAL_STYLES, VOICES } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
 import { generateVideoPackage, refineScriptSegment, scoutLocations } from '../lib/gemini';
 import { saveHistoryItem } from '../lib/history';
@@ -34,6 +36,10 @@ export const useGenerator = () => {
     (localStorage.getItem('wes_default_duration') as GenerationRequest['duration']) || 'Medium (5-8m)'
   );
   const [useResearch, setUseResearch] = useState(false);
+  
+  // Director's Overrides
+  const [visualStyle, setVisualStyle] = useState(VISUAL_STYLES[0]);
+  const [voice, setVoice] = useState(VOICES[0].value);
 
   // Hydrate from Project Context (Neural Link Bridge)
   useEffect(() => {
@@ -65,12 +71,15 @@ export const useGenerator = () => {
     setActiveTab('script');
     
     try {
+      // Pass Overrides in Request
       const data = await generateVideoPackage({
         topic,
         channelId: selectedChannel,
         mood,
         duration,
-        useResearch
+        useResearch,
+        visualStyle,
+        voice: voice === 'default' ? undefined : voice
       }, activeChannelConfig);
       
       const packageWithMeta = {
@@ -94,7 +103,7 @@ export const useGenerator = () => {
     } finally {
       setLoading(false);
     }
-  }, [topic, selectedChannel, mood, duration, useResearch, activeChannelConfig, audioGen, toast, projectData, clearProjectData]);
+  }, [topic, selectedChannel, mood, duration, useResearch, visualStyle, voice, activeChannelConfig, audioGen, toast, projectData, clearProjectData]);
 
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!result) return;
@@ -143,12 +152,12 @@ export const useGenerator = () => {
   const handleGenerateThumbnail = useCallback(async (prompt: string, index: number) => {
     if (!result) return;
     
-    const base64Image = await assetGen.generateThumbnailAsset(prompt, index);
+    const base64Image = await assetGen.generateThumbnailAsset(prompt, index, result.visualStyle, activeChannelConfig.tone);
     if (!base64Image) return; // Hook handles error toast
 
     setResult(prev => prev ? updatePackageThumbnail(prev, index, base64Image) : null);
     toast.success("Thumbnail asset rendered successfully.");
-  }, [result, assetGen, toast]);
+  }, [result, assetGen, activeChannelConfig, toast]);
 
   const handleEditThumbnail = useCallback(async (base64: string, prompt: string, index: number) => {
     if (!result) return;
@@ -162,7 +171,12 @@ export const useGenerator = () => {
   const handleGenerateSceneVisual = useCallback(async (visualPrompt: string, index: number) => {
     if (!result) return;
     
-    const base64Image = await assetGen.generateSceneAsset(visualPrompt, index, activeChannelConfig);
+    const base64Image = await assetGen.generateSceneAsset(
+      visualPrompt, 
+      index, 
+      activeChannelConfig, 
+      result.visualStyle // Pass the visual style from the result package
+    );
     if (!base64Image) return; // Hook handles error toast
 
     setResult(prev => prev ? updatePackageSceneVisual(prev, index, base64Image) : null);
@@ -192,12 +206,21 @@ export const useGenerator = () => {
   }, []);
 
   const handlePlayAudio = useCallback((text: string, index: number) => {
-    audioGen.playAudio(text, activeChannelConfig.voice, index);
-  }, [activeChannelConfig.voice, audioGen]);
+    // Determine which voice to use: Package override > Channel Default
+    const targetVoice = result?.voice && result.voice !== 'default' 
+      ? result.voice 
+      : activeChannelConfig.voice;
+
+    audioGen.playAudio(text, targetVoice, index);
+  }, [result, activeChannelConfig, audioGen]);
 
   const handleDownloadAudio = useCallback((text: string, index: number) => {
-    audioGen.downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
-  }, [activeChannelConfig.voice, audioGen, selectedChannel]);
+    const targetVoice = result?.voice && result.voice !== 'default' 
+      ? result.voice 
+      : activeChannelConfig.voice;
+      
+    audioGen.downloadAudio(text, targetVoice, index, `wes-narrator-${selectedChannel}`);
+  }, [result, activeChannelConfig, audioGen, selectedChannel]);
 
   const handleScoutLocations = useCallback(async () => {
     if (!result) return;
@@ -235,6 +258,8 @@ export const useGenerator = () => {
       mood, setMood,
       duration, setDuration,
       useResearch, setUseResearch,
+      visualStyle, setVisualStyle,
+      voice, setVoice,
       activeChannelConfig,
       hasContext: !!projectData.topic // Expose for UI
     },
