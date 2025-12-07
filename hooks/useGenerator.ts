@@ -1,8 +1,7 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
-import { generateVideoPackage } from '../lib/gemini';
+import { generateVideoPackage, refineScriptSegment } from '../lib/gemini';
 import { saveHistoryItem } from '../lib/history';
 import { useAudio } from './useAudio';
 import { useAssetGenerator } from './useAssetGenerator';
@@ -15,6 +14,9 @@ export const useGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo' | 'video'>('script');
   
+  // Refinement State
+  const [refiningScene, setRefiningScene] = useState<{index: number, field: 'visual' | 'audio'} | null>(null);
+
   // Data State
   const [result, setResult] = useState<GeneratedPackage | null>(null);
 
@@ -113,6 +115,28 @@ export const useGenerator = () => {
     });
   }, [result, audioGen]);
 
+  const handleRefineScript = useCallback(async (index: number, field: 'visual' | 'audio', instruction: string) => {
+    if (!result) return;
+    setRefiningScene({ index, field });
+    
+    try {
+      const refinedText = await refineScriptSegment(
+        result.script[index][field], 
+        instruction, 
+        field, 
+        activeChannelConfig.tone
+      );
+      
+      handleUpdateScript(index, field, refinedText);
+      toast.success("Script segment refined.");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to refine text.");
+    } finally {
+      setRefiningScene(null);
+    }
+  }, [result, activeChannelConfig, handleUpdateScript, toast]);
+
   const handleGenerateThumbnail = useCallback(async (prompt: string, index: number) => {
     if (!result) return;
     
@@ -205,6 +229,7 @@ export const useGenerator = () => {
       generatingSceneVisual: assetGen.generatingSceneVisual,
       editingImage: assetGen.editingImage,
       editingSceneVisual: assetGen.editingSceneVisual,
+      refiningScene,
       playingScene: audioGen.playingIndex,
       downloadingAudio: audioGen.downloadingIndex
     },
@@ -218,6 +243,7 @@ export const useGenerator = () => {
     actions: {
       handleGenerate,
       handleUpdateScript,
+      handleRefineScript,
       handleGenerateThumbnail,
       handleEditThumbnail,
       handleGenerateSceneVisual,

@@ -9,12 +9,14 @@ import { CHANNELS } from '../../../constants';
 interface ScriptTabProps {
   result: GeneratedPackage;
   handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
+  handleRefineScript?: (idx: number, field: 'visual' | 'audio', instruction: string) => void;
   handlePlayAudio: (text: string, idx: number) => any; // Allow promise return
   handleDownloadAudio: (text: string, idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
   editingSceneVisual?: number | null;
+  refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
   playingScene: number | null;
   downloadingAudio: number | null;
 }
@@ -22,12 +24,14 @@ interface ScriptTabProps {
 export const ScriptTab: React.FC<ScriptTabProps> = ({
   result,
   handleUpdateScript,
+  handleRefineScript,
   handlePlayAudio,
   handleDownloadAudio,
   handleGenerateSceneVisual,
   handleEditSceneVisual,
   generatingSceneVisual,
   editingSceneVisual,
+  refiningScene,
   playingScene,
   downloadingAudio
 }) => {
@@ -180,6 +184,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
         <ScriptTableView 
           result={result}
           handleUpdateScript={handleUpdateScript}
+          handleRefineScript={handleRefineScript}
           handleGenerateSceneVisual={handleGenerateSceneVisual}
           generatingSceneVisual={generatingSceneVisual}
           batchProcessing={batchProcessing}
@@ -187,11 +192,13 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
           playingScene={playingScene}
           handleDownloadAudio={handleDownloadAudio}
           downloadingAudio={downloadingAudio}
+          refiningScene={refiningScene}
         />
       ) : (
         <ScriptStoryboardView 
           result={result}
           handleUpdateScript={handleUpdateScript}
+          handleRefineScript={handleRefineScript}
           handleGenerateSceneVisual={handleGenerateSceneVisual}
           handleEditSceneVisual={handleEditSceneVisual}
           generatingSceneVisual={generatingSceneVisual}
@@ -200,6 +207,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
           handlePlayAudio={handlePlayAudio}
           playingScene={playingScene}
           handleDownloadAudio={handleDownloadAudio}
+          refiningScene={refiningScene}
         />
       )}
     </div>

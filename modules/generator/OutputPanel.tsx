@@ -17,6 +17,7 @@ interface OutputPanelProps {
     generatingSceneVisual: number | null;
     editingImage?: number | null;
     editingSceneVisual?: number | null;
+    refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
     playingScene: number | null;
     downloadingAudio: number | null;
   };
@@ -26,6 +27,7 @@ interface OutputPanelProps {
   actions: {
     downloadPackage: () => void;
     handleUpdateScript: (idx: number, field: 'visual' | 'audio', val: string) => void;
+    handleRefineScript?: (idx: number, field: 'visual' | 'audio', instruction: string) => void;
     handleGenerateThumbnail: (prompt: string, idx: number) => void;
     handleEditThumbnail: (base64: string, prompt: string, idx: number) => void;
     handleGenerateSceneVisual: (prompt: string, idx: number) => void;
@@ -141,12 +143,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
               <ScriptTab 
                 result={result}
                 handleUpdateScript={actions.handleUpdateScript}
+                handleRefineScript={actions.handleRefineScript}
                 handlePlayAudio={actions.handlePlayAudio}
                 handleDownloadAudio={actions.handleDownloadAudio}
                 handleGenerateSceneVisual={actions.handleGenerateSceneVisual}
                 handleEditSceneVisual={actions.handleEditSceneVisual}
                 generatingSceneVisual={uiState.generatingSceneVisual}
                 editingSceneVisual={uiState.editingSceneVisual}
+                refiningScene={uiState.refiningScene}
                 playingScene={uiState.playingScene}
                 downloadingAudio={uiState.downloadingAudio}
               />

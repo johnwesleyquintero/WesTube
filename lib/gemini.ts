@@ -159,6 +159,39 @@ export const generateVideoPackage = async (
   }
 };
 
+/**
+ * Phase 3: The Editor (Granular Refinement)
+ */
+export const refineScriptSegment = async (
+  originalText: string, 
+  instruction: string, 
+  type: 'visual' | 'audio',
+  tone: string
+): Promise<string> => {
+  const ai = getClient();
+  const model = "gemini-2.5-flash"; // Flash is perfect for fast edits
+  
+  const prompt = `
+    You are a professional video script editor. 
+    Your task is to rewrite the following ${type} script segment.
+    
+    Target Tone: ${tone}
+    User Instruction: "${instruction}"
+    
+    Original Text:
+    "${originalText}"
+    
+    Output ONLY the refined text. Do not output markdown, quotes, or conversational filler.
+  `;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+  });
+
+  return response.text?.trim() || originalText;
+};
+
 export const generateThumbnail = async (prompt: string, aspectRatio: '16:9' = '16:9'): Promise<string> => {
   const ai = getClient();
   

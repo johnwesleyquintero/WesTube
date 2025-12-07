@@ -4,6 +4,7 @@ import { GeneratedPackage } from '../../../../types';
 interface ScriptStoryboardViewProps {
   result: GeneratedPackage;
   handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
+  handleRefineScript?: (idx: number, field: 'visual' | 'audio', instruction: string) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
@@ -12,11 +13,13 @@ interface ScriptStoryboardViewProps {
   handlePlayAudio: (text: string, idx: number) => void;
   playingScene: number | null;
   handleDownloadAudio: (text: string, idx: number) => void;
+  refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
 }
 
 export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
   result,
   handleUpdateScript,
+  handleRefineScript,
   handleGenerateSceneVisual,
   handleEditSceneVisual,
   generatingSceneVisual,
@@ -24,10 +27,14 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
   batchProcessing,
   handlePlayAudio,
   playingScene,
-  handleDownloadAudio
+  handleDownloadAudio,
+  refiningScene
 }) => {
   const [editModeIndex, setEditModeIndex] = useState<number | null>(null);
   const [editPrompt, setEditPrompt] = useState('');
+  
+  // New state for Text Refinement Overlay
+  const [refinementInput, setRefinementInput] = useState<{index: number, field: 'visual' | 'audio', text: string} | null>(null);
 
   const submitEdit = (idx: number, base64: string) => {
     if (handleEditSceneVisual && editPrompt.trim()) {
@@ -37,9 +44,24 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
     }
   };
 
+  const startRefinement = (index: number, field: 'visual' | 'audio') => {
+    setRefinementInput({ index, field, text: '' });
+  };
+
+  const submitRefinement = () => {
+    if (refinementInput && handleRefineScript) {
+      handleRefineScript(refinementInput.index, refinementInput.field, refinementInput.text);
+      setRefinementInput(null);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeIn">
-      {result.script.map((scene, idx) => (
+      {result.script.map((scene, idx) => {
+          const isRefiningVisual = refiningScene?.index === idx && refiningScene?.field === 'visual';
+          const isRefiningAudio = refiningScene?.index === idx && refiningScene?.field === 'audio';
+
+          return (
           <div key={idx} className="glass-panel rounded-xl overflow-hidden flex flex-col border border-white/5 hover:border-white/10 transition-colors shadow-lg">
             {/* Top: Visual Area */}
             <div className="relative aspect-video bg-black/40 border-b border-white/5 group">
@@ -145,27 +167,87 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
             </div>
 
             {/* Bottom: Script Area */}
-            <div className="p-4 flex flex-col gap-3 flex-1 bg-gradient-to-b from-wes-900/50 to-transparent">
+            <div className="p-4 flex flex-col gap-3 flex-1 bg-gradient-to-b from-wes-900/50 to-transparent relative">
+              
+              {/* Text Refinement Overlay */}
+              {refinementInput?.index === idx && (
+                 <div className="absolute inset-0 z-40 bg-wes-950/95 p-4 flex flex-col animate-fadeIn">
+                     <label className="text-[10px] font-bold text-wes-accent uppercase mb-2">
+                        Modify {refinementInput.field === 'visual' ? 'Visual' : 'Audio'} Script
+                     </label>
+                     <textarea 
+                        autoFocus
+                        value={refinementInput.text}
+                        onChange={(e) => setRefinementInput(prev => prev ? {...prev, text: e.target.value} : null)}
+                        className="flex-1 bg-white/5 border border-wes-accent/30 rounded p-2 text-xs text-white resize-none outline-none focus:border-wes-accent mb-3"
+                        placeholder="Instruction: e.g. 'Make it funnier'..."
+                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && submitRefinement()}
+                     />
+                     <div className="flex gap-2 mt-auto">
+                        <button 
+                          onClick={() => setRefinementInput(null)} 
+                          className="flex-1 py-2 bg-white/10 text-xs rounded hover:bg-white/20"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={submitRefinement} 
+                          className="flex-1 py-2 bg-wes-accent text-white text-xs font-bold rounded hover:bg-wes-accent/80"
+                        >
+                          Apply Change
+                        </button>
+                     </div>
+                 </div>
+              )}
+
               {/* Visual Prompt (Mini) */}
-              <div className="relative">
+              <div className="relative group/edit">
                 <i className="fa-solid fa-eye absolute top-2.5 left-2 text-wes-accent/50 text-[10px]"></i>
                 <textarea 
                     value={scene.visual}
                     onChange={(e) => handleUpdateScript?.(idx, 'visual', e.target.value)}
-                    className="w-full bg-black/20 text-slate-400 text-xs p-2 pl-6 rounded border border-transparent focus:border-wes-accent/30 focus:bg-black/40 outline-none resize-none min-h-[60px]"
+                    disabled={isRefiningVisual}
+                    className={`w-full bg-black/20 text-slate-400 text-xs p-2 pl-6 rounded border border-transparent focus:border-wes-accent/30 focus:bg-black/40 outline-none resize-none min-h-[60px] ${isRefiningVisual ? 'opacity-50 blur-sm' : ''}`}
                     placeholder="Visual direction..."
                 />
+                {handleRefineScript && !isRefiningVisual && (
+                    <button 
+                      onClick={() => startRefinement(idx, 'visual')}
+                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-black/40 rounded"
+                    >
+                      <i className="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+                    </button>
+                )}
+                {isRefiningVisual && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <i className="fa-solid fa-circle-notch fa-spin text-wes-accent"></i>
+                  </div>
+                )}
               </div>
 
               {/* Audio Script */}
-              <div className="flex-1 relative">
+              <div className="flex-1 relative group/edit">
                 <i className="fa-solid fa-microphone absolute top-2.5 left-2 text-wes-pop/50 text-[10px]"></i>
                 <textarea 
                     value={scene.audio}
                     onChange={(e) => handleUpdateScript?.(idx, 'audio', e.target.value)}
-                    className="w-full h-full bg-transparent text-slate-200 text-sm p-2 pl-6 rounded border border-transparent focus:border-white/10 outline-none resize-none leading-relaxed"
+                    disabled={isRefiningAudio}
+                    className={`w-full h-full bg-transparent text-slate-200 text-sm p-2 pl-6 rounded border border-transparent focus:border-white/10 outline-none resize-none leading-relaxed ${isRefiningAudio ? 'opacity-50 blur-sm' : ''}`}
                     placeholder="Narration..."
                 />
+                {handleRefineScript && !isRefiningAudio && (
+                    <button 
+                      onClick={() => startRefinement(idx, 'audio')}
+                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-black/40 rounded"
+                    >
+                      <i className="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+                    </button>
+                )}
+                 {isRefiningAudio && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <i className="fa-solid fa-circle-notch fa-spin text-wes-accent"></i>
+                  </div>
+                )}
               </div>
 
               {/* Audio Controls */}
@@ -190,7 +272,8 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
               </div>
             </div>
           </div>
-      ))}
+          );
+      })}
     </div>
   );
 };
