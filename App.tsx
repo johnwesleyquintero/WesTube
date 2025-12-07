@@ -1,8 +1,8 @@
 
-
 import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ProjectProvider } from './context/ProjectContext';
 import { LandingPage } from './pages/LandingPage';
 import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
@@ -32,7 +32,8 @@ const AppContent = () => {
       case 'dashboard':
         return <Generator initialTab="script" />;
       case 'brainstorm':
-        return <Brainstorm />;
+        // Pass navigation prop to allow Brainstorm to redirect to Dashboard
+        return <Brainstorm onNavigate={setActiveView} />;
       case 'scripts':
         return <Generator initialTab="script" />;
       case 'assets':
@@ -73,7 +74,9 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <AppContent />
+        <ProjectProvider>
+          <AppContent />
+        </ProjectProvider>
       </ToastProvider>
     </AuthProvider>
   );

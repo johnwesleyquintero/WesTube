@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { MOODS, DURATIONS } from '../../constants';
 import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
@@ -20,6 +18,7 @@ interface InputPanelProps {
     useResearch: boolean;
     setUseResearch: (val: boolean) => void;
     activeChannelConfig: ChannelConfig;
+    hasContext?: boolean;
   };
   loading: boolean;
   onGenerate: () => void;
@@ -35,7 +34,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
     selectedChannel, setSelectedChannel, 
     mood, setMood, 
     duration, setDuration,
-    useResearch, setUseResearch
+    useResearch, setUseResearch,
+    hasContext
   } = formState;
 
   return (
@@ -60,12 +60,19 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
         {/* Topic Input */}
         <div className="space-y-3">
-          <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">Concept / Topic</label>
+          <div className="flex justify-between items-center">
+            <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">Concept / Topic</label>
+            {hasContext && (
+               <span className="text-[10px] font-bold text-wes-success animate-pulse flex items-center gap-1">
+                 <i className="fa-solid fa-link"></i> Neural Link Active
+               </span>
+            )}
+          </div>
           <textarea
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Describe your video concept..."
-            className="w-full h-32 glass-input rounded-xl p-4 text-sm text-white placeholder-slate-600 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all"
+            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-white placeholder-slate-600 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
           />
         </div>
 

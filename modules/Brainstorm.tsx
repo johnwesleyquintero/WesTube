@@ -6,8 +6,14 @@ import { CHANNELS } from '../constants';
 import { ChannelSelector } from './generator/ChannelSelector';
 import { AudioOrb } from '../components/AudioOrb';
 import { CopyButton } from '../components/CopyButton';
+import { useProject } from '../context/ProjectContext';
+import { useToast } from '../context/ToastContext';
 
-export const Brainstorm: React.FC = () => {
+interface BrainstormProps {
+  onNavigate?: (view: string) => void;
+}
+
+export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
   const [selectedChannel, setSelectedChannel] = useState<ChannelId>(ChannelId.TECH);
   const { 
     connect, 
@@ -19,6 +25,9 @@ export const Brainstorm: React.FC = () => {
     transcripts, 
     error 
   } = useLiveConnection(selectedChannel);
+  
+  const { setProjectData } = useProject();
+  const toast = useToast();
 
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +37,28 @@ export const Brainstorm: React.FC = () => {
   }, [transcripts]);
 
   const activeChannelConfig = CHANNELS[selectedChannel];
+
+  const handleSynthesize = () => {
+    if (transcripts.length === 0) return;
+
+    // Combine transcript into a context block
+    const fullTranscript = transcripts.map(t => `${t.role.toUpperCase()}: ${t.text}`).join('\n');
+    const topicSummary = `Actionable Item from Neural Link Session (${new Date().toLocaleDateString()}):\n\n${fullTranscript}`;
+
+    // Inject into Project Context
+    setProjectData({
+      topic: topicSummary,
+      channelId: selectedChannel,
+      brainstormContext: fullTranscript
+    });
+
+    toast.success("Neural data linked to Generator.");
+
+    // Navigate to Dashboard/Generator
+    if (onNavigate) {
+      onNavigate('dashboard');
+    }
+  };
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 h-full overflow-hidden animate-fadeIn">
@@ -114,10 +145,22 @@ export const Brainstorm: React.FC = () => {
 
          {/* Transcript Log */}
          <div className="flex-1 glass-panel rounded-2xl p-6 flex flex-col overflow-hidden bg-black/20">
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-               <i className="fa-solid fa-align-left text-wes-pop"></i>
-               Neural Log
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                 <i className="fa-solid fa-align-left text-wes-pop"></i>
+                 Neural Log
+              </h3>
+              {/* Synthesize Button - The Neural Bridge */}
+              {transcripts.length > 0 && onNavigate && (
+                 <button 
+                   onClick={handleSynthesize}
+                   className="text-[10px] bg-wes-success/10 text-wes-success hover:bg-wes-success/20 border border-wes-success/20 px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all flex items-center gap-2 animate-fadeIn"
+                 >
+                   <i className="fa-solid fa-wand-magic-sparkles"></i>
+                   Synthesize Package
+                 </button>
+              )}
+            </div>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
                {transcripts.length === 0 ? (

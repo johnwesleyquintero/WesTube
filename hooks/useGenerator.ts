@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+
+import { useState, useCallback, useEffect } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
 import { generateVideoPackage } from '../lib/gemini';
@@ -7,6 +8,7 @@ import { useAudio } from './useAudio';
 import { useAssetGenerator } from './useAssetGenerator';
 import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/packageManipulation';
 import { useToast } from '../context/ToastContext';
+import { useProject } from '../context/ProjectContext';
 
 export const useGenerator = () => {
   // UI State
@@ -16,6 +18,9 @@ export const useGenerator = () => {
   // Data State
   const [result, setResult] = useState<GeneratedPackage | null>(null);
 
+  // Context Bridge
+  const { projectData, clearProjectData } = useProject();
+
   // Form State
   const [topic, setTopic] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelId>(ChannelId.TECH);
@@ -24,6 +29,16 @@ export const useGenerator = () => {
     (localStorage.getItem('wes_default_duration') as GenerationRequest['duration']) || 'Medium (5-8m)'
   );
   const [useResearch, setUseResearch] = useState(false);
+
+  // Hydrate from Project Context (Neural Link Bridge)
+  useEffect(() => {
+    if (projectData.topic) {
+      setTopic(projectData.topic);
+    }
+    if (projectData.channelId) {
+      setSelectedChannel(projectData.channelId);
+    }
+  }, [projectData]);
 
   const activeChannelConfig = CHANNELS[selectedChannel];
   const toast = useToast();
@@ -64,13 +79,17 @@ export const useGenerator = () => {
       
       setResult(packageWithMeta);
       toast.success(useResearch ? "Researched & generated package." : "Package generated and saved.");
+      
+      // Clear the context after successful generation so we don't stick to it
+      if (projectData.topic) clearProjectData();
+
     } catch (error) {
       console.error(error);
       toast.error("Error generating content. Please check API Key configuration.");
     } finally {
       setLoading(false);
     }
-  }, [topic, selectedChannel, mood, duration, useResearch, activeChannelConfig, audioGen, toast]);
+  }, [topic, selectedChannel, mood, duration, useResearch, activeChannelConfig, audioGen, toast, projectData, clearProjectData]);
 
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!result) return;
@@ -174,7 +193,8 @@ export const useGenerator = () => {
       mood, setMood,
       duration, setDuration,
       useResearch, setUseResearch,
-      activeChannelConfig
+      activeChannelConfig,
+      hasContext: !!projectData.topic // Expose for UI
     },
 
     // 2. UI State
