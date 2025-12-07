@@ -1,4 +1,5 @@
 
+
 import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -11,6 +12,7 @@ import { ConstructionView } from './components/ConstructionView';
 // Lazy load heavy modules for performance
 const Generator = React.lazy(() => import('./modules/Generator').then(module => ({ default: module.Generator })));
 const History = React.lazy(() => import('./modules/History').then(module => ({ default: module.History })));
+const Brainstorm = React.lazy(() => import('./modules/Brainstorm').then(module => ({ default: module.Brainstorm })));
 
 // Inner component to handle routing *after* auth context is available
 const AppContent = () => {
@@ -29,6 +31,8 @@ const AppContent = () => {
     switch (activeView) {
       case 'dashboard':
         return <Generator initialTab="script" />;
+      case 'brainstorm':
+        return <Brainstorm />;
       case 'scripts':
         return <Generator initialTab="script" />;
       case 'assets':
