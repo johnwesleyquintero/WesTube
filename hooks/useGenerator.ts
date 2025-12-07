@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
@@ -11,7 +12,7 @@ import { useToast } from '../context/ToastContext';
 export const useGenerator = () => {
   // UI State
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo'>('script');
+  const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo' | 'video'>('script');
   
   // Data State
   const [result, setResult] = useState<GeneratedPackage | null>(null);
@@ -112,6 +113,19 @@ export const useGenerator = () => {
     toast.success("Scene visual rendered successfully.");
   }, [result, assetGen, activeChannelConfig, toast]);
 
+  const handleVideoGenerated = useCallback((key: string, url: string) => {
+    setResult(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        generatedVideos: {
+          ...(prev.generatedVideos || {}),
+          [key]: url
+        }
+      };
+    });
+  }, []);
+
   const handlePlayAudio = useCallback((text: string, index: number) => {
     audioGen.playAudio(text, activeChannelConfig.voice, index);
   }, [activeChannelConfig.voice, audioGen]);
@@ -164,6 +178,7 @@ export const useGenerator = () => {
       handleUpdateScript,
       handleGenerateThumbnail,
       handleGenerateSceneVisual,
+      handleVideoGenerated,
       handlePlayAudio,
       handleDownloadAudio,
       downloadPackage

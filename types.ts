@@ -37,6 +37,8 @@ export interface GeneratedPackage {
   thumbnailPrompts: string[];
   // Base64 strings of generated images, mapped by index to prompts
   generatedImages?: Record<number, string>;
+  // Video URIs mapped by index (or 'custom' key)
+  generatedVideos?: Record<string, string>;
   musicPrompt: string;
   imageGenPrompt: string;
   brandingNote: string;

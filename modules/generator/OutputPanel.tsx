@@ -1,15 +1,17 @@
+
 import React from 'react';
 import { GeneratedPackage, ChannelConfig } from '../../types';
 import { Loader } from '../../components/Loader';
 import { ScriptTab } from './tabs/ScriptTab';
 import { AssetsTab } from './tabs/AssetsTab';
 import { SeoTab } from './tabs/SeoTab';
+import { VideoTab } from './tabs/VideoTab';
 
 interface OutputPanelProps {
   uiState: {
     loading: boolean;
-    activeTab: 'script' | 'assets' | 'seo';
-    setActiveTab: (tab: 'script' | 'assets' | 'seo') => void;
+    activeTab: 'script' | 'assets' | 'seo' | 'video';
+    setActiveTab: (tab: 'script' | 'assets' | 'seo' | 'video') => void;
     generatingImage: number | null;
     generatingSceneVisual: number | null;
     playingScene: number | null;
@@ -25,6 +27,7 @@ interface OutputPanelProps {
     handleGenerateSceneVisual: (prompt: string, idx: number) => void;
     handlePlayAudio: (text: string, idx: number) => void;
     handleDownloadAudio: (text: string, idx: number) => void;
+    handleVideoGenerated?: (key: string, url: string) => void;
   };
   formState: {
     activeChannelConfig: ChannelConfig;
@@ -67,7 +70,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
             
             <div className="flex space-x-3">
                 <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
-                  {(['script', 'assets', 'seo'] as const).map((tab) => (
+                  {(['script', 'assets', 'seo', 'video'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -118,6 +121,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
 
             {activeTab === 'seo' && (
               <SeoTab result={result} />
+            )}
+
+            {activeTab === 'video' && (
+              <VideoTab 
+                result={result}
+                onVideoGenerated={actions.handleVideoGenerated || (() => {})}
+                savedVideos={result.generatedVideos || {}}
+              />
             )}
 
           </div>

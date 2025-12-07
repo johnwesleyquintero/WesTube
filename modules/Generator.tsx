@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useGenerator } from '../hooks/useGenerator';
 import { InputPanel } from './generator/InputPanel';

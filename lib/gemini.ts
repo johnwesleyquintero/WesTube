@@ -5,6 +5,8 @@ import { getApiKey, cleanJsonString } from "./utils";
 import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } from "./prompts";
 
 // Helper to get Client instance
+// For Veo, we typically need to ensure the key is fresh if using window.aistudio, 
+// but we will stick to the standard env flow unless the UI overrides it.
 const getClient = (): GoogleGenAI => {
   const apiKey = getApiKey();
   if (!apiKey) {
@@ -159,4 +161,47 @@ export const generateSpeech = async (text: string, voiceName: string): Promise<s
     throw new Error("No audio generated from API response.");
   }
   return base64Audio;
+};
+
+/**
+ * Generates a video using Veo (veo-3.1-fast-generate-preview).
+ * Includes polling logic as the operation is asynchronous.
+ */
+export const generateVeoVideo = async (prompt: string, aspectRatio: '16:9' | '9:16' = '16:9'): Promise<string> => {
+  // Always create a new instance to ensure we pick up the latest API key from process.env 
+  // (which might have been updated by window.aistudio.openSelectKey)
+  const apiKey = process.env.API_KEY || getApiKey();
+  const ai = new GoogleGenAI({ apiKey });
+
+  let operation = await ai.models.generateVideos({
+    model: 'veo-3.1-fast-generate-preview',
+    prompt: prompt,
+    config: {
+      numberOfVideos: 1,
+      resolution: '720p',
+      aspectRatio: aspectRatio
+    }
+  });
+
+  // Polling loop
+  while (!operation.done) {
+    await new Promise(resolve => setTimeout(resolve, 5000)); // Poll every 5 seconds
+    operation = await ai.operations.getVideosOperation({operation: operation});
+  }
+
+  const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
+  
+  if (!downloadLink) {
+    throw new Error("Video generation completed but no URI returned.");
+  }
+
+  // The response.body contains the MP4 bytes. You must append an API key when fetching from the download link.
+  const videoResponse = await fetch(`${downloadLink}&key=${apiKey}`);
+  
+  if (!videoResponse.ok) {
+     throw new Error(`Failed to fetch video data: ${videoResponse.statusText}`);
+  }
+
+  const blob = await videoResponse.blob();
+  return URL.createObjectURL(blob);
 };
