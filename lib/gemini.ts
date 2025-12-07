@@ -118,9 +118,10 @@ export const generateVideoPackage = async (
 
   const systemInstruction = constructSystemInstruction(channelConfig);
 
-  // Optimized for Free Tier / Fast Dev
-  const thinkingBudget = 0; 
-  const maxOutputTokens = 8192; 
+  // Optimized for Quality Reasoning
+  // We allocate tokens for "thinking" to allow the model to plan the script structure/pacing
+  const thinkingBudget = 2048; 
+  const maxOutputTokens = 8192 + thinkingBudget; 
 
   const response = await ai.models.generateContent({
     model,

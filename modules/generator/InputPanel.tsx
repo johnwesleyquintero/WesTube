@@ -126,8 +126,11 @@ export const InputPanel: React.FC<InputPanelProps> = ({
         >
           {loading ? (
             <>
-              <i className="fa-solid fa-circle-notch fa-spin text-sm"></i>
-              <span>{useResearch ? "Researching & Generating..." : "Initializing Neural Net..."}</span>
+              <i className="fa-solid fa-brain fa-pulse text-sm"></i>
+              <div className="flex flex-col items-start leading-none ml-2">
+                 <span>REASONING ACTIVE</span>
+                 <span className="text-[9px] opacity-60 font-normal normal-case mt-1">Planning structure...</span>
+              </div>
             </>
           ) : (
             <>
