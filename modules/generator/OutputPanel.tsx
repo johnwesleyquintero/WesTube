@@ -5,14 +5,15 @@ import { ScriptTab } from './tabs/ScriptTab';
 import { AssetsTab } from './tabs/AssetsTab';
 import { SeoTab } from './tabs/SeoTab';
 import { VideoTab } from './tabs/VideoTab';
+import { LocationTab } from './tabs/LocationTab';
 import { exportProductionKit } from '../../lib/export';
 import { useToast } from '../../context/ToastContext';
 
 interface OutputPanelProps {
   uiState: {
     loading: boolean;
-    activeTab: 'script' | 'assets' | 'seo' | 'video';
-    setActiveTab: (tab: 'script' | 'assets' | 'seo' | 'video') => void;
+    activeTab: 'script' | 'assets' | 'seo' | 'video' | 'locations';
+    setActiveTab: (tab: 'script' | 'assets' | 'seo' | 'video' | 'locations') => void;
     generatingImage: number | null;
     generatingSceneVisual: number | null;
     editingImage?: number | null;
@@ -20,6 +21,7 @@ interface OutputPanelProps {
     refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
     playingScene: number | null;
     downloadingAudio: number | null;
+    scouting: boolean;
   };
   dataState: {
     result: GeneratedPackage | null;
@@ -35,6 +37,7 @@ interface OutputPanelProps {
     handlePlayAudio: (text: string, idx: number) => void;
     handleDownloadAudio: (text: string, idx: number) => void;
     handleVideoGenerated?: (key: string, url: string) => void;
+    handleScoutLocations?: () => void;
   };
   formState: {
     activeChannelConfig: ChannelConfig;
@@ -86,15 +89,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
       {result && (
         <>
           {/* Header */}
-          <div className="p-4 border-b border-white/5 bg-white/[0.02] flex justify-between items-center shrink-0">
-            <div className="flex items-center space-x-3">
-                <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${activeChannelConfig.color.replace('text-', 'bg-').replace('400', '500')} ${activeChannelConfig.color.replace('text-', 'shadow-')}`}></div>
-                <h2 className="text-sm font-bold text-white truncate max-w-[200px] tracking-wide">{result.title}</h2>
+          <div className="p-4 border-b border-white/5 bg-white/[0.02] flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 shrink-0">
+            <div className="flex items-center space-x-3 min-w-0">
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 shadow-[0_0_8px] ${activeChannelConfig.color.replace('text-', 'bg-').replace('400', '500')} ${activeChannelConfig.color.replace('text-', 'shadow-')}`}></div>
+                <h2 className="text-sm font-bold text-white truncate tracking-wide">{result.title}</h2>
             </div>
             
-            <div className="flex space-x-3">
-                <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
-                  {(['script', 'assets', 'seo', 'video'] as const).map((tab) => (
+            <div className="flex space-x-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
+                <div className="flex bg-black/40 rounded-lg p-1 border border-white/5 whitespace-nowrap">
+                  {(['script', 'assets', 'seo', 'video', 'locations'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -114,7 +117,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
                 onClick={handleExportKit}
                 disabled={isExporting}
                 className={`
-                  flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-all border
+                  flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-all border whitespace-nowrap
                   ${isExporting 
                     ? 'bg-wes-800 text-slate-400 border-wes-700 cursor-wait' 
                     : 'bg-gradient-to-r from-wes-success/80 to-emerald-600 text-white border-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:scale-105'}
@@ -175,6 +178,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
                 result={result}
                 onVideoGenerated={actions.handleVideoGenerated || (() => {})}
                 savedVideos={result.generatedVideos || {}}
+              />
+            )}
+
+            {activeTab === 'locations' && (
+              <LocationTab 
+                result={result}
+                onScout={actions.handleScoutLocations || (() => {})}
+                isScouting={uiState.scouting}
               />
             )}
 

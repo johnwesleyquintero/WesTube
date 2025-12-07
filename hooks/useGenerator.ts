@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { CHANNELS, MOODS } from '../constants';
 import { ChannelId, GenerationRequest, GeneratedPackage } from '../types';
-import { generateVideoPackage, refineScriptSegment } from '../lib/gemini';
+import { generateVideoPackage, refineScriptSegment, scoutLocations } from '../lib/gemini';
 import { saveHistoryItem } from '../lib/history';
 import { useAudio } from './useAudio';
 import { useAssetGenerator } from './useAssetGenerator';
@@ -12,10 +12,13 @@ import { useProject } from '../context/ProjectContext';
 export const useGenerator = () => {
   // UI State
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo' | 'video'>('script');
+  const [activeTab, setActiveTab] = useState<'script' | 'assets' | 'seo' | 'video' | 'locations'>('script');
   
   // Refinement State
   const [refiningScene, setRefiningScene] = useState<{index: number, field: 'visual' | 'audio'} | null>(null);
+  
+  // Location Scout State
+  const [scouting, setScouting] = useState(false);
 
   // Data State
   const [result, setResult] = useState<GeneratedPackage | null>(null);
@@ -196,6 +199,21 @@ export const useGenerator = () => {
     audioGen.downloadAudio(text, activeChannelConfig.voice, index, `wes-narrator-${selectedChannel}`);
   }, [activeChannelConfig.voice, audioGen, selectedChannel]);
 
+  const handleScoutLocations = useCallback(async () => {
+    if (!result) return;
+    setScouting(true);
+    try {
+      const locationData = await scoutLocations(result.title, activeChannelConfig.persona);
+      setResult(prev => prev ? { ...prev, locations: locationData } : null);
+      toast.success("Locations scouted via Google Maps.");
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to scout locations.");
+    } finally {
+      setScouting(false);
+    }
+  }, [result, activeChannelConfig, toast]);
+
   const downloadPackage = useCallback(() => {
     if (!result) return;
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
@@ -231,7 +249,8 @@ export const useGenerator = () => {
       editingSceneVisual: assetGen.editingSceneVisual,
       refiningScene,
       playingScene: audioGen.playingIndex,
-      downloadingAudio: audioGen.downloadingIndex
+      downloadingAudio: audioGen.downloadingIndex,
+      scouting
     },
 
     // 3. Data
@@ -251,6 +270,7 @@ export const useGenerator = () => {
       handleVideoGenerated,
       handlePlayAudio,
       handleDownloadAudio,
+      handleScoutLocations,
       downloadPackage
     }
   };

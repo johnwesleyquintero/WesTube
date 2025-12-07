@@ -12,7 +12,7 @@ export const History: React.FC = () => {
   const [history, setHistory] = useState<GeneratedPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GeneratedPackage | null>(null);
-  const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo' | 'video'>('script');
+  const [viewerTab, setViewerTab] = useState<'script' | 'assets' | 'seo' | 'video' | 'locations'>('script');
 
   // Shared Logic Hooks
   const { 
@@ -30,7 +30,7 @@ export const History: React.FC = () => {
     playingIndex, 
     downloadingIndex, 
     playAudio, 
-    downloadAudio,
+    downloadAudio, 
     resetAudioState,
     invalidateCache
   } = useAudio();
@@ -257,7 +257,8 @@ export const History: React.FC = () => {
                   editingImage: editingImage,
                   editingSceneVisual: editingSceneVisual,
                   playingScene: playingIndex,
-                  downloadingAudio: downloadingIndex
+                  downloadingAudio: downloadingIndex,
+                  scouting: false
                 }}
                 dataState={{
                   result: selectedItem

@@ -26,6 +26,18 @@ export interface ScriptScene {
   generatedVisual?: string; // Base64 image string for the scene
 }
 
+export interface LocationScoutData {
+  analysis: string; // The AI's written report on why these locations matter
+  groundingChunks: Array<{
+    web?: { uri: string; title: string };
+    maps?: { 
+      uri: string; 
+      title: string; 
+      placeId?: string;
+    }
+  }>;
+}
+
 export interface GeneratedPackage {
   id?: string;
   createdAt?: string;
@@ -46,6 +58,8 @@ export interface GeneratedPackage {
   // New Research Fields
   researchSummary?: string;
   sources?: string[];
+  // Location Scouting
+  locations?: LocationScoutData;
 }
 
 export interface GenerationRequest {

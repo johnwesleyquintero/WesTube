@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-import { ChannelConfig, GenerationRequest, GeneratedPackage } from "../types";
+import { ChannelConfig, GenerationRequest, GeneratedPackage, LocationScoutData } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
 import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } from "./prompts";
 
@@ -89,6 +89,43 @@ const performDeepResearch = async (topic: string): Promise<{ summary: string, li
   const uniqueLinks = Array.from(new Set(links));
 
   return { summary, links: uniqueLinks };
+};
+
+/**
+ * Phase 1.5: Location Scout (Maps Grounding)
+ * Uses googleMaps tool to find real-world locations.
+ */
+export const scoutLocations = async (topic: string, channelPersona: string): Promise<LocationScoutData> => {
+  const ai = getClient();
+  const model = "gemini-2.5-flash";
+
+  const prompt = `
+    You are a Location Scout for a YouTube channel with the persona: "${channelPersona}".
+    The video topic is: "${topic}".
+    
+    Find 3-4 real-world locations that are relevant to this topic.
+    If the topic is abstract (e.g. "Productivity"), find metaphorical locations like famous libraries, co-working spaces, or HQs.
+    If the topic is historical, find relevant sites.
+    
+    Provide a brief, engaging analysis of why each location fits the video.
+  `;
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
+    config: {
+      tools: [{ googleMaps: {} }],
+      // DO NOT set responseMimeType or responseSchema when using tools
+    }
+  });
+
+  const analysis = response.text || "No location analysis generated.";
+  const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+
+  return {
+    analysis,
+    groundingChunks: chunks
+  };
 };
 
 /**
