@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +11,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script>
+      // Initialize Theme Immediately to prevent flash
+      const savedTheme = localStorage.getItem('wes_theme');
+      const sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (savedTheme === 'dark' || (!savedTheme && sysTheme === 'dark')) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -19,15 +29,23 @@
               mono: ['"JetBrains Mono"', 'monospace'],
             },
             colors: {
+              // We map specific colors to CSS variables to handle the swap automatically
               wes: {
-                950: '#020617', // Void
-                900: '#0B0F19', // Obsidian
-                800: '#151B2B', // Panel Base
-                700: '#232D42', // Borders/Separators
-                600: '#334155', // Muted Text
-                accent: '#6366f1', // Indigo (Primary)
-                pop: '#8b5cf6', // Violet (Secondary)
+                950: 'var(--wes-950)', // Void / Main BG
+                900: 'var(--wes-900)', // Obsidian / Panels
+                800: 'var(--wes-800)', // Panel Base / Secondary
+                700: 'var(--wes-700)', // Borders
+                600: 'var(--wes-600)', // Muted Text
+                accent: '#6366f1', // Indigo (Primary) - Keeps constant
+                pop: '#8b5cf6', // Violet (Secondary) - Keeps constant
                 success: '#10b981',
+              },
+              // Remap slate-300/400 to variables to invert text contrast in light mode
+              slate: {
+                200: 'var(--text-highlight)',
+                300: 'var(--text-main)',
+                400: 'var(--text-muted)',
+                500: 'var(--text-dim)',
               }
             },
             animation: {
@@ -41,55 +59,104 @@
               }
             },
             backgroundImage: {
-              'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-              'glass': 'linear-gradient(145deg, rgba(21, 27, 43, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%)',
+              'glass': 'var(--glass-bg)',
             }
           }
         }
       }
     </script>
     <style>
+      :root {
+        /* LIGHT MODE (Photonic) DEFINITIONS */
+        --wes-950: #f1f5f9; /* Slate-100 */
+        --wes-900: #ffffff; /* White */
+        --wes-800: #e2e8f0; /* Slate-200 */
+        --wes-700: #cbd5e1; /* Slate-300 (Borders) */
+        --wes-600: #64748b;
+        
+        /* Text Contrast Inversion */
+        --text-highlight: #0f172a; /* Slate-900 */
+        --text-main: #334155;      /* Slate-700 */
+        --text-muted: #64748b;     /* Slate-500 */
+        --text-dim: #94a3b8;       /* Slate-400 */
+
+        --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.95) 100%);
+        --glass-panel-bg: rgba(255, 255, 255, 0.75);
+        --glass-input-bg: rgba(255, 255, 255, 0.9);
+        --scroll-track: transparent;
+        --scroll-thumb: #cbd5e1;
+      }
+
+      .dark {
+        /* DARK MODE (Void) DEFINITIONS - Original Values */
+        --wes-950: #020617;
+        --wes-900: #0B0F19;
+        --wes-800: #151B2B;
+        --wes-700: #232D42;
+        --wes-600: #334155;
+
+        /* Text Standard */
+        --text-highlight: #e2e8f0; /* Slate-200 */
+        --text-main: #cbd5e1;      /* Slate-300 */
+        --text-muted: #94a3b8;     /* Slate-400 */
+        --text-dim: #64748b;       /* Slate-500 */
+
+        --glass-bg: linear-gradient(145deg, rgba(21, 27, 43, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%);
+        --glass-panel-bg: rgba(21, 27, 43, 0.6);
+        --glass-input-bg: rgba(2, 6, 23, 0.4);
+        --scroll-track: transparent;
+        --scroll-thumb: #334155;
+      }
+
+      /* Base Body Transition */
+      body {
+        background-color: var(--wes-950);
+        color: var(--text-main);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      /* Only apply background image in dark mode or subtle pattern in light mode */
+      body {
+         background-image: 
+          radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%), 
+          radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+         background-attachment: fixed;
+      }
+
       /* Modern Scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: transparent; 
+        background: var(--scroll-track); 
       }
       ::-webkit-scrollbar-thumb {
-        background: #334155; 
+        background: var(--scroll-thumb); 
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #6366f1; 
       }
 
-      /* Glassmorphism Utilities */
+      /* Glassmorphism Utilities - Mapped to Variables */
       .glass-panel {
-        background: rgba(21, 27, 43, 0.6);
+        background: var(--glass-panel-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--wes-700);
+        transition: background 0.3s ease, border-color 0.3s ease;
       }
       
       .glass-input {
-        background: rgba(2, 6, 23, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: var(--glass-input-bg);
+        border: 1px solid var(--wes-700);
         transition: all 0.3s ease;
+        color: var(--text-main);
       }
       .glass-input:focus {
         border-color: #6366f1;
         box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
-        background: rgba(2, 6, 23, 0.7);
-      }
-
-      body {
-        background-color: #020617;
-        background-image: 
-          radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%), 
-          radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
-        background-attachment: fixed;
       }
     </style>
   <script type="importmap">
@@ -106,7 +173,7 @@
 }
 </script>
 </head>
-  <body class="text-slate-300 antialiased overflow-hidden selection:bg-wes-accent selection:text-white">
+  <body class="antialiased overflow-hidden selection:bg-wes-accent selection:text-white">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>

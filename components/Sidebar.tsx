@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { NAV_ITEMS } from '../constants';
+import { useTheme } from '../context/ThemeContext';
 
 interface SidebarProps {
   activeView: string;
@@ -11,18 +11,19 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onOpenSettings }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <aside 
       className={`
-        glass-panel border-r-0 border-r border-white/5 flex flex-col h-screen transition-all duration-300 relative z-20
+        glass-panel border-r-0 border-r border-wes-700 flex flex-col h-screen transition-all duration-300 relative z-20
         ${isCollapsed ? 'md:w-20' : 'md:w-64'} w-64
       `}
     >
       {/* Desktop Collapse Toggle Button */}
       <button 
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="hidden md:flex absolute -right-3 top-9 z-50 w-6 h-6 bg-wes-900 border border-wes-700 rounded-full items-center justify-center text-slate-400 hover:text-white hover:border-wes-accent transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+        className="hidden md:flex absolute -right-3 top-9 z-50 w-6 h-6 bg-wes-900 border border-wes-700 rounded-full items-center justify-center text-slate-400 hover:text-wes-accent hover:border-wes-accent transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)]"
         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
       >
         <i className={`fa-solid fa-chevron-${isCollapsed ? 'right' : 'left'} text-[10px]`}></i>
@@ -53,8 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
                 className={`
                   w-full flex items-center py-3 text-sm font-medium transition-all duration-200 group relative rounded-lg
                   ${activeView === item.id 
-                    ? 'text-white bg-wes-accent/10 border border-wes-accent/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]' 
-                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    ? 'text-wes-accent bg-wes-accent/10 border border-wes-accent/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-wes-800 border border-transparent'
                   }
                   ${isCollapsed ? 'justify-center px-0' : 'px-4'}
                 `}
@@ -82,15 +83,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/5 bg-black/20">
+      <div className="p-4 border-t border-wes-700 bg-wes-900/50">
         {!isCollapsed ? (
           <div className="animate-fadeIn">
-            <div className="bg-wes-950/50 border border-white/5 rounded-lg p-3 text-xs text-slate-400">
+            {/* Token Usage Bar */}
+            <div className="bg-wes-950 border border-wes-700 rounded-lg p-3 text-xs text-slate-400">
               <div className="flex justify-between items-center mb-2">
                 <span className="font-mono text-[10px] uppercase">Token Usage</span>
                 <span className="text-wes-success text-[10px] uppercase">Optimal</span>
               </div>
-              <div className="w-full bg-wes-900 rounded-full h-1">
+              <div className="w-full bg-wes-800 rounded-full h-1">
                 <div className="bg-gradient-to-r from-wes-accent to-wes-pop h-1 rounded-full w-1/4 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
               </div>
             </div>
@@ -100,18 +102,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
                 <div className="w-2 h-2 rounded-full bg-green-500 mr-2 shadow-[0_0_5px_rgba(34,197,94,0.6)]"></div>
                 <span className="font-medium text-slate-300">WesAI Online</span>
               </div>
-              <button 
-                onClick={onOpenSettings}
-                className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-wes-accent transition-colors"
-                title="Settings"
-              >
-                <i className="fa-solid fa-gear"></i>
-              </button>
+              
+              <div className="flex items-center gap-1">
+                 {/* Theme Toggle */}
+                 <button 
+                    onClick={toggleTheme}
+                    className="w-8 h-8 rounded-lg hover:bg-wes-800 flex items-center justify-center text-slate-400 hover:text-wes-accent transition-colors"
+                    title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                  >
+                    <i className={`fa-solid ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+                  </button>
+                  <button 
+                    onClick={onOpenSettings}
+                    className="w-8 h-8 rounded-lg hover:bg-wes-800 flex items-center justify-center text-slate-400 hover:text-wes-accent transition-colors"
+                    title="Settings"
+                  >
+                    <i className="fa-solid fa-gear"></i>
+                  </button>
+              </div>
             </div>
           </div>
         ) : (
            <div className="flex flex-col items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-wes-success shadow-[0_0_8px_rgba(16,185,129,0.8)]" title="Tokens Healthy"></div>
+              <button 
+                onClick={toggleTheme}
+                className="text-slate-600 hover:text-wes-accent transition-colors"
+                title="Toggle Theme"
+              >
+                <i className={`fa-solid ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`}></i>
+              </button>
               <button 
                 onClick={onOpenSettings}
                 className="text-slate-600 hover:text-wes-accent transition-colors"

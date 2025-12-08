@@ -2,6 +2,7 @@ import React, { useState, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ProjectProvider } from './context/ProjectContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { LandingPage } from './pages/LandingPage';
 import { Layout } from './components/Layout';
 import { Loader } from './components/Loader';
@@ -74,12 +75,14 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <ProjectProvider>
-          <AppContent />
-        </ProjectProvider>
-      </ToastProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <ProjectProvider>
+            <AppContent />
+          </ProjectProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
