@@ -3,11 +3,11 @@
 // Shared utility functions for WesTube Engine
 
 /**
- * Retrieves the API Key from Local Storage or Environment variables.
- * Prioritizes Local Storage to allow user overrides.
+ * Retrieves the API Key from Environment variables.
+ * strictly adheres to security guidelines.
  */
 export const getApiKey = (): string => {
-  return localStorage.getItem('wes_gemini_api_key') || process.env.API_KEY || '';
+  return process.env.API_KEY || '';
 };
 
 /**

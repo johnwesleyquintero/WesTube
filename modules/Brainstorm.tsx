@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLiveConnection } from '../hooks/useLiveConnection';
 import { ChannelId } from '../types';
@@ -8,6 +7,7 @@ import { AudioOrb } from '../components/AudioOrb';
 import { CopyButton } from '../components/CopyButton';
 import { useProject } from '../context/ProjectContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface BrainstormProps {
   onNavigate?: (view: string) => void;
@@ -28,6 +28,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
   
   const { setProjectData } = useProject();
   const toast = useToast();
+  const { theme } = useTheme(); // Access Theme Context
 
   const transcriptEndRef = useRef<HTMLDivElement>(null);
 
@@ -84,7 +85,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
 
            {/* The Orb */}
            <div className="relative z-10 mb-12">
-              <AudioOrb isActive={isConnected} volume={volume} />
+              <AudioOrb isActive={isConnected} volume={volume} theme={theme} />
               <div className="text-center mt-6">
                  <h2 className="text-2xl font-bold text-slate-200 tracking-tight flex items-center justify-center gap-3">
                    {activeChannelConfig.persona}

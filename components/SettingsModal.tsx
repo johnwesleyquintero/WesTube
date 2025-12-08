@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { MOODS, DURATIONS } from '../constants';
 import { GlassSelect } from './GlassSelect';
@@ -16,23 +17,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [activeTab, setActiveTab] = useState<Tab>('config');
   const [defaultDuration, setDefaultDuration] = useState('Medium (5-8m)');
   const [defaultMood, setDefaultMood] = useState(MOODS[0]);
-  const [apiKey, setApiKey] = useState('');
 
   // Load from local storage on mount
   useEffect(() => {
     const savedDuration = localStorage.getItem('wes_default_duration');
     const savedMood = localStorage.getItem('wes_default_mood');
-    const savedKey = localStorage.getItem('wes_gemini_api_key');
 
     if (savedDuration) setDefaultDuration(savedDuration);
     if (savedMood) setDefaultMood(savedMood);
-    if (savedKey) setApiKey(savedKey);
   }, []);
 
   const handleSave = () => {
     localStorage.setItem('wes_default_duration', defaultDuration);
     localStorage.setItem('wes_default_mood', defaultMood);
-    localStorage.setItem('wes_gemini_api_key', apiKey);
     onClose();
     // Force a reload to apply changes cleanly across the app
     window.location.reload(); 
@@ -86,30 +83,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           {/* TAB: CONFIGURATION */}
           {activeTab === 'config' && (
             <div className="p-6 space-y-8">
-              {/* API Key Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                   <label className="text-xs font-bold text-wes-accent uppercase tracking-wider">API Connection</label>
-                   <span className="text-[10px] bg-wes-accent/10 text-wes-accent px-2 py-0.5 rounded border border-wes-accent/20">Required</span>
-                </div>
-                <div className="relative">
-                  <i className="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                  <input 
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter Google Gemini API Key"
-                    className="w-full bg-wes-900 border border-wes-700 rounded-lg py-3 pl-10 pr-3 text-sm text-slate-200 focus:border-wes-accent outline-none placeholder-slate-600 transition-colors shadow-inner"
-                  />
-                </div>
-                <p className="text-[10px] text-slate-500 leading-relaxed bg-wes-800 p-3 rounded border border-wes-700/50">
-                  <i className="fa-solid fa-shield-halved mr-1.5 text-wes-success"></i>
-                  Security Note: Your API key is stored locally in your browser. Obtain one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-wes-accent hover:underline decoration-dashed">Google AI Studio</a>.
-                </p>
-              </div>
-
-              <div className="h-px bg-wes-800"></div>
-
+              
               {/* Defaults */}
               <div className="space-y-4">
                  <h3 className="text-sm font-bold text-slate-200 flex items-center">

@@ -103,6 +103,7 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
                  isActive={isPlaying} 
                  volume={simulatedVolume} 
                  className="w-64 h-64 md:w-96 md:h-96 opacity-90 mix-blend-screen"
+                 theme="dark" // Always force dark theme in cinema mode
               />
               {!currentScene.generatedVisual && (
                   <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/20 text-4xl font-bold font-mono pointer-events-none">

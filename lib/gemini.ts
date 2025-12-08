@@ -1,4 +1,5 @@
 
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { ChannelConfig, GenerationRequest, GeneratedPackage, LocationScoutData } from "../types";
 import { getApiKey, cleanJsonString } from "./utils";
@@ -8,7 +9,7 @@ import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } 
 const getClient = (): GoogleGenAI => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("API Key is missing. Please set it in Settings.");
+    throw new Error("API Key is missing. Please ensure process.env.API_KEY is configured.");
   }
   return new GoogleGenAI({ apiKey });
 };

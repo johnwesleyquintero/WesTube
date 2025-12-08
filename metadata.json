@@ -1,5 +1,7 @@
 {
   "name": "WesTube Engine v2.0",
   "description": "A multi-channel YouTube content production network powered by Gemini 2.5. Generates scripts, SEO, and asset prompts for 5 distinct channel personas.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

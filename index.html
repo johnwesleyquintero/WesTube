@@ -76,23 +76,23 @@
         /* LIGHT MODE (Photonic) - The "Paper" aesthetic */
         
         /* 1. Surfaces */
-        --wes-950: #f0f4f8; /* Ultra Light Blue-Grey Background */
+        --wes-950: #f1f5f9; /* Slate-100 - Clean Paper Background */
         --wes-900: #ffffff; /* Pure White Panels */
-        --wes-800: #e2e8f0; /* Light Grey inputs/surfaces */
-        --wes-700: #cbd5e1; /* Borders */
+        --wes-800: #e2e8f0; /* Slate-200 Light Grey inputs/surfaces */
+        --wes-700: #cbd5e1; /* Slate-300 Borders */
         --wes-600: #94a3b8;
         
-        /* 2. Brand Colors */
-        --wes-accent: #4f46e5; /* Indigo-600 (Darker for contrast on white) */
-        --wes-pop: #7c3aed;    /* Violet-600 */
+        /* 2. Brand Colors - Tuned for AA/AAA Compliance on Light BG */
+        --wes-accent: #4338ca; /* Indigo-700 (High Contrast) */
+        --wes-pop: #7c3aed;    /* Violet-600 (Accessible on White) */
 
         /* 3. Semantic Text Inversion (Dark text for Light Backgrounds) */
-        --slate-50:  #020617; /* Was dark, now darkest */
+        --slate-50:  #020617; 
         --slate-100: #0f172a;
-        --slate-200: #1e293b; /* Primary Heading (Almost Black) */
-        --slate-300: #334155; /* Body Copy (Dark Grey) */
-        --slate-400: #475569; /* Muted Text */
-        --slate-500: #64748b; /* Dim Text */
+        --slate-200: #1e293b; /* Slate-800 - Primary Heading (Almost Black) */
+        --slate-300: #334155; /* Slate-700 - Body Copy (Dark Grey) */
+        --slate-400: #475569; /* Slate-600 - Muted Text (Readable) */
+        --slate-500: #64748b; /* Slate-500 - Dim Text */
         --slate-600: #94a3b8;
         --slate-700: #cbd5e1;
         --slate-800: #e2e8f0;
@@ -100,8 +100,8 @@
         --slate-950: #ffffff;
 
         /* 4. Glass & Depth */
-        --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(240,244,248,0.9) 100%);
-        --glass-panel-bg: rgba(255, 255, 255, 0.75);
+        --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.95) 100%);
+        --glass-panel-bg: rgba(255, 255, 255, 0.85);
         --glass-input-bg: #ffffff;
         
         --scroll-track: #e2e8f0;
@@ -111,17 +111,17 @@
         --panel-shadow: 
           0 4px 6px -1px rgba(0, 0, 0, 0.05), 
           0 10px 15px -3px rgba(0, 0, 0, 0.05),
-          0 0 0 1px rgba(0,0,0,0.05); /* Subtle border ring */
+          0 0 0 1px rgba(0,0,0,0.06); 
       }
 
       .dark {
         /* DARK MODE (Void) */
         
         /* 1. Surfaces */
-        --wes-950: #020617;
-        --wes-900: #0B0F19;
-        --wes-800: #151B2B;
-        --wes-700: #232D42;
+        --wes-950: #020617; /* Slate-950 */
+        --wes-900: #0B0F19; /* Deep Navy/Black */
+        --wes-800: #151B2B; /* Panel Surface */
+        --wes-700: #232D42; /* Borders */
         --wes-600: #334155;
         
         /* 2. Brand Colors */
@@ -131,10 +131,10 @@
         /* 3. Semantic Text (Light text for Dark Backgrounds) */
         --slate-50:  #f8fafc;
         --slate-100: #f1f5f9;
-        --slate-200: #e2e8f0; /* Primary Heading (White-ish) */
-        --slate-300: #cbd5e1; /* Body Copy (Light Grey) */
-        --slate-400: #94a3b8; /* Muted Text */
-        --slate-500: #64748b; /* Dim Text */
+        --slate-200: #f1f5f9; /* Slate-100 - Primary Heading */
+        --slate-300: #cbd5e1; /* Slate-300 - Body Copy */
+        --slate-400: #94a3b8; /* Slate-400 - Muted Text */
+        --slate-500: #64748b; /* Slate-500 - Dim Text */
         --slate-600: #475569;
         --slate-700: #334155;
         --slate-800: #1e293b;
@@ -149,7 +149,7 @@
         --scroll-track: transparent;
         --scroll-thumb: #334155;
         
-        --panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+        --panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
       }
 
       /* Base Body Transition */
@@ -200,8 +200,14 @@
         color: var(--slate-200); /* Uses high contrast mapped color */
       }
       
-      /* Accessibility: High Contrast Focus Rings */
-      .glass-input:focus, button:focus-visible {
+      /* Accessibility: Global High Contrast Focus Rings */
+      /* Matches Tailwind 'focus-visible' utility pattern but enforces it globally */
+      :focus-visible {
+        outline: 2px solid var(--wes-accent);
+        outline-offset: 2px;
+      }
+
+      .glass-input:focus, button:focus-visible, a:focus-visible, select:focus-visible {
         border-color: var(--wes-accent);
         outline: 2px solid var(--wes-accent);
         outline-offset: 2px;
