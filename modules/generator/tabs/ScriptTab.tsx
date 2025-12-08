@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { GeneratedPackage, ChannelConfig, ChannelId } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
@@ -108,13 +106,13 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
             <h3 className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">The Hook (0-15s)</h3>
             <CopyButton text={result.hook} />
           </div>
-          <p className="text-lg text-white font-serif leading-relaxed italic border-l-2 border-wes-accent/50 pl-4">{result.hook}</p>
+          <p className="text-lg text-slate-200 font-serif leading-relaxed italic border-l-2 border-wes-accent/50 pl-4">{result.hook}</p>
         </div>
         <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
             <h3 className="text-[10px] font-bold text-wes-pop uppercase tracking-widest mb-3">Branding Directive</h3>
             <p className="text-sm text-slate-300 leading-relaxed">{result.brandingNote}</p>
             {result.visualStyle && (
-               <div className="mt-3 inline-block px-2 py-1 rounded bg-white/10 text-[10px] text-slate-300 border border-white/10">
+               <div className="mt-3 inline-block px-2 py-1 rounded bg-wes-800 text-[10px] text-slate-400 border border-wes-700">
                   Style: {result.visualStyle}
                </div>
             )}
@@ -122,13 +120,13 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center px-1 gap-4 border-b border-white/5 pb-4">
+      <div className="flex flex-col md:flex-row justify-between items-end md:items-center px-1 gap-4 border-b border-wes-700 pb-4">
           <div className="flex items-center gap-4">
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-200 tracking-tight flex items-center gap-2">
               <i className="fa-solid fa-clapperboard text-wes-pop"></i>
               Director's Board
             </h3>
-            <span className="text-xs text-slate-500 font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5">{result.script.length} Scenes</span>
+            <span className="text-xs text-slate-500 font-mono bg-wes-800 px-2 py-0.5 rounded border border-wes-700">{result.script.length} Scenes</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -142,10 +140,10 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                 <span className="hidden sm:inline">Watch Animatic</span>
              </button>
 
-             <div className="w-px h-6 bg-white/10 mx-2"></div>
+             <div className="w-px h-6 bg-wes-700 mx-2"></div>
 
              {/* View Toggle */}
-             <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
+             <div className="flex bg-wes-800 rounded-lg p-1 border border-wes-700">
                 <button 
                   onClick={() => setViewMode('table')}
                   className={`px-3 py-1.5 rounded flex items-center gap-2 text-xs transition-all ${viewMode === 'table' ? 'bg-wes-700 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}
@@ -181,7 +179,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
 
              <button 
                 onClick={downloadScriptTxt}
-                className="text-slate-400 hover:text-white px-3 py-1.5 hover:bg-white/5 rounded transition-colors"
+                className="text-slate-400 hover:text-slate-200 px-3 py-1.5 hover:bg-wes-800 rounded transition-colors"
                 title="Export Text"
               >
                 <i className="fa-solid fa-file-lines"></i>

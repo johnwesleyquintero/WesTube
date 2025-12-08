@@ -32,7 +32,7 @@ export const Logo: React.FC<LogoProps> = ({ className = "w-8 h-8", withText = fa
       />
     </svg>
     {withText && (
-      <span className="text-xl font-bold tracking-widest text-white">
+      <span className="text-xl font-bold tracking-widest text-slate-200">
         WES<span className="text-transparent bg-clip-text bg-gradient-to-r from-wes-accent to-wes-pop">TUBE</span>
       </span>
     )}

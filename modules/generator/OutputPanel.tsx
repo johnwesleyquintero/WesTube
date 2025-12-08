@@ -71,11 +71,11 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
   return (
     <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden relative shadow-2xl shadow-black/50">
       {!result && !loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-700 opacity-60">
-          <div className="w-24 h-24 rounded-full bg-wes-800/50 flex items-center justify-center mb-6 border border-white/5">
-             <i className="fa-solid fa-terminal text-4xl text-slate-600"></i>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 opacity-60">
+          <div className="w-24 h-24 rounded-full bg-wes-800 flex items-center justify-center mb-6 border border-wes-700">
+             <i className="fa-solid fa-terminal text-4xl text-slate-500"></i>
           </div>
-          <p className="text-xl font-medium text-slate-500 tracking-tight">System Ready</p>
+          <p className="text-xl font-medium text-slate-400 tracking-tight">System Ready</p>
           <p className="text-sm font-mono mt-2">Awaiting Input Stream...</p>
         </div>
       )}
@@ -89,14 +89,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
       {result && (
         <>
           {/* Header */}
-          <div className="p-4 border-b border-white/5 bg-white/[0.02] flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 shrink-0">
+          <div className="p-4 border-b border-wes-700 bg-wes-800/30 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 shrink-0">
             <div className="flex items-center space-x-3 min-w-0">
                 <div className={`w-2 h-2 rounded-full flex-shrink-0 shadow-[0_0_8px] ${activeChannelConfig.color.replace('text-', 'bg-').replace('400', '500')} ${activeChannelConfig.color.replace('text-', 'shadow-')}`}></div>
-                <h2 className="text-sm font-bold text-white truncate tracking-wide">{result.title}</h2>
+                <h2 className="text-sm font-bold text-slate-200 truncate tracking-wide">{result.title}</h2>
             </div>
             
             <div className="flex space-x-3 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
-                <div className="flex bg-black/40 rounded-lg p-1 border border-white/5 whitespace-nowrap">
+                <div className="flex bg-wes-800 rounded-lg p-1 border border-wes-700 whitespace-nowrap">
                   {(['script', 'assets', 'seo', 'video', 'locations'] as const).map((tab) => (
                     <button
                       key={tab}
@@ -104,7 +104,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
                       className={`px-4 py-1.5 text-[10px] uppercase font-bold tracking-wider rounded-md transition-all ${
                         activeTab === tab 
                         ? 'bg-wes-accent text-white shadow-[0_0_10px_rgba(99,102,241,0.4)]' 
-                        : 'text-slate-500 hover:text-white hover:bg-white/5'
+                        : 'text-slate-500 hover:text-slate-200 hover:bg-wes-700'
                       }`}
                     >
                       {tab}
@@ -140,7 +140,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = React.memo(({
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-wes-900/20">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-wes-800/10">
             
             {activeTab === 'script' && (
               <ScriptTab 

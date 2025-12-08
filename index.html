@@ -42,10 +42,10 @@
               },
               // Remap slate-300/400 to variables to invert text contrast in light mode
               slate: {
-                200: 'var(--text-highlight)',
-                300: 'var(--text-main)',
-                400: 'var(--text-muted)',
-                500: 'var(--text-dim)',
+                200: 'var(--text-highlight)', // High Contrast (White / Black)
+                300: 'var(--text-main)',      // Main Body (Light Grey / Dark Grey)
+                400: 'var(--text-muted)',     // Muted (Grey / Grey)
+                500: 'var(--text-dim)',       // Dim (Dark Grey / Light Grey)
               }
             },
             animation: {
@@ -68,27 +68,27 @@
     <style>
       :root {
         /* LIGHT MODE (Photonic) DEFINITIONS */
-        --wes-950: #f1f5f9; /* Slate-100 */
-        --wes-900: #ffffff; /* White */
-        --wes-800: #e2e8f0; /* Slate-200 */
-        --wes-700: #cbd5e1; /* Slate-300 (Borders) */
-        --wes-600: #64748b;
+        --wes-950: #f8fafc; /* Slate-50 - Background */
+        --wes-900: #ffffff; /* White - Panels */
+        --wes-800: #f1f5f9; /* Slate-100 - Secondary Surfaces */
+        --wes-700: #cbd5e1; /* Slate-300 - Borders */
+        --wes-600: #94a3b8; /* Slate-400 */
         
-        /* Text Contrast Inversion */
+        /* Text Contrast Inversion - High Legibility */
         --text-highlight: #0f172a; /* Slate-900 */
         --text-main: #334155;      /* Slate-700 */
         --text-muted: #64748b;     /* Slate-500 */
         --text-dim: #94a3b8;       /* Slate-400 */
 
-        --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.95) 100%);
-        --glass-panel-bg: rgba(255, 255, 255, 0.75);
-        --glass-input-bg: rgba(255, 255, 255, 0.9);
-        --scroll-track: transparent;
+        --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+        --glass-panel-bg: rgba(255, 255, 255, 0.85);
+        --glass-input-bg: #ffffff;
+        --scroll-track: #f1f5f9;
         --scroll-thumb: #cbd5e1;
       }
 
       .dark {
-        /* DARK MODE (Void) DEFINITIONS - Original Values */
+        /* DARK MODE (Void) DEFINITIONS */
         --wes-950: #020617;
         --wes-900: #0B0F19;
         --wes-800: #151B2B;
@@ -96,7 +96,7 @@
         --wes-600: #334155;
 
         /* Text Standard */
-        --text-highlight: #e2e8f0; /* Slate-200 */
+        --text-highlight: #f8fafc; /* Slate-50 */
         --text-main: #cbd5e1;      /* Slate-300 */
         --text-muted: #94a3b8;     /* Slate-400 */
         --text-dim: #64748b;       /* Slate-500 */
@@ -115,7 +115,7 @@
         transition: background-color 0.3s ease, color 0.3s ease;
       }
       
-      /* Only apply background image in dark mode or subtle pattern in light mode */
+      /* Subtle pattern overlay */
       body {
          background-image: 
           radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%), 
@@ -152,11 +152,15 @@
         background: var(--glass-input-bg);
         border: 1px solid var(--wes-700);
         transition: all 0.3s ease;
-        color: var(--text-main);
+        color: var(--text-highlight);
       }
       .glass-input:focus {
         border-color: #6366f1;
         box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+      }
+      
+      .glass-input::placeholder {
+        color: var(--text-dim);
       }
     </style>
   <script type="importmap">

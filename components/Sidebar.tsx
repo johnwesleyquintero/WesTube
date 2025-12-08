@@ -83,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-wes-700 bg-wes-900/50">
+      <div className="p-4 border-t border-wes-700 bg-wes-800/50">
         {!isCollapsed ? (
           <div className="animate-fadeIn">
             {/* Token Usage Bar */}
@@ -92,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, onO
                 <span className="font-mono text-[10px] uppercase">Token Usage</span>
                 <span className="text-wes-success text-[10px] uppercase">Optimal</span>
               </div>
-              <div className="w-full bg-wes-800 rounded-full h-1">
+              <div className="w-full bg-wes-800 rounded-full h-1 border border-wes-700">
                 <div className="bg-gradient-to-r from-wes-accent to-wes-pop h-1 rounded-full w-1/4 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
               </div>
             </div>

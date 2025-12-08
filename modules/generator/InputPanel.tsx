@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { MOODS, DURATIONS, VISUAL_STYLES, VOICES } from '../../constants';
 import { ChannelId, GenerationRequest, ChannelConfig } from '../../types';
@@ -47,8 +45,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
   return (
     <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-black/50">
-      <div className="p-6 border-b border-white/5 bg-white/[0.02]">
-        <h2 className="text-lg font-bold text-white flex items-center tracking-tight">
+      <div className="p-6 border-b border-wes-700 bg-wes-800/30">
+        <h2 className="text-lg font-bold text-slate-200 flex items-center tracking-tight">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-wes-accent/20 text-wes-accent mr-3 border border-wes-accent/20">
              <i className="fa-solid fa-satellite-dish text-sm"></i>
           </span>
@@ -79,12 +77,12 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Describe your video concept..."
-            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-white placeholder-slate-600 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
+            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-slate-200 placeholder-slate-500 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
           />
         </div>
 
         {/* Research Toggle */}
-        <div className="glass-panel p-4 rounded-xl border border-white/5 bg-wes-900/40">
+        <div className="glass-panel p-4 rounded-xl border border-wes-700 bg-wes-800/50">
            <div className="flex items-center justify-between">
               <div>
                 <label className="text-[10px] font-bold text-wes-pop uppercase tracking-widest flex items-center gap-2">
@@ -96,7 +94,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
               
               <button 
                 onClick={() => setUseResearch(!useResearch)}
-                className={`w-12 h-6 rounded-full transition-all duration-300 relative ${useResearch ? 'bg-wes-pop' : 'bg-wes-800 border border-white/10'}`}
+                className={`w-12 h-6 rounded-full transition-all duration-300 relative ${useResearch ? 'bg-wes-pop' : 'bg-wes-700 border border-wes-600'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all duration-300 shadow-md ${useResearch ? 'left-7' : 'left-1'}`}></div>
               </button>
@@ -104,7 +102,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
         </div>
 
         {/* Director's Overrides */}
-        <div className="space-y-4 pt-2 border-t border-white/5">
+        <div className="space-y-4 pt-2 border-t border-wes-700/50">
              <div className="flex items-center gap-2 mb-2">
                  <i className="fa-solid fa-sliders text-slate-500 text-xs"></i>
                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Director's Overrides</h3>
@@ -144,13 +142,13 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
       </div>
 
-      <div className="p-6 border-t border-white/5 bg-black/20">
+      <div className="p-6 border-t border-wes-700 bg-wes-800/80">
         <button
           onClick={onGenerate}
           disabled={loading || !topic}
           className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center space-x-3
             ${loading || !topic 
-              ? 'bg-wes-800/50 text-slate-600 border border-white/5 cursor-not-allowed' 
+              ? 'bg-wes-800 text-slate-500 border border-wes-700 cursor-not-allowed' 
               : 'bg-gradient-to-r from-wes-accent to-wes-pop text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-[1.02] border border-white/10'
             }`}
         >
