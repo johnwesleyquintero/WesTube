@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { GeneratedPackage, ScriptScene } from '../../../../types';
-import { AudioOrb } from '../../../../components/AudioOrb';
+import { GeneratedPackage, ScriptScene } from '../../../types';
+import { AudioOrb } from '../../../components/AudioOrb';
 
 interface DirectorPreviewProps {
   result: GeneratedPackage;
