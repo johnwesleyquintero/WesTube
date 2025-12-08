@@ -23,7 +23,7 @@ export const GlassSelect: React.FC<GlassSelectProps> = ({
       </label>
       <div className="relative">
         <select 
-          className="w-full glass-input rounded-xl p-3 text-sm text-white appearance-none cursor-pointer focus:outline-none focus:border-wes-accent transition-all"
+          className="w-full glass-input rounded-xl p-3 text-sm text-slate-200 appearance-none cursor-pointer focus:outline-none focus:border-wes-accent transition-all bg-transparent"
           {...props}
         >
           {options.map((opt, idx) => {
@@ -38,7 +38,7 @@ export const GlassSelect: React.FC<GlassSelectProps> = ({
             );
           })}
         </select>
-        <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none"></i>
+        <i className="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
       </div>
     </div>
   );

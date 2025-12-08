@@ -104,7 +104,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
         {/* Director's Overrides */}
         <div className="space-y-4 pt-2 border-t border-wes-700/50">
              <div className="flex items-center gap-2 mb-2">
-                 <i className="fa-solid fa-sliders text-slate-500 text-xs"></i>
+                 <i className="fa-solid fa-sliders text-slate-400 text-xs"></i>
                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Director's Overrides</h3>
              </div>
              
