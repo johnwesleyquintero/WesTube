@@ -67,7 +67,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
       <div className="w-full xl:w-2/3 flex flex-col gap-6">
         
         {/* Main Stage */}
-        <div className="flex-1 glass-panel rounded-2xl relative overflow-hidden flex flex-col items-center justify-center bg-black/40 shadow-2xl">
+        <div className="flex-1 glass-panel rounded-2xl relative overflow-hidden flex flex-col items-center justify-center bg-wes-950/40 shadow-2xl">
            
            {/* Background Ambiance */}
            <div className={`absolute inset-0 transition-opacity duration-1000 ${isConnected ? 'opacity-100' : 'opacity-20'}`}>
@@ -86,7 +86,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
            <div className="relative z-10 mb-12">
               <AudioOrb isActive={isConnected} volume={volume} />
               <div className="text-center mt-6">
-                 <h2 className="text-2xl font-bold text-white tracking-tight flex items-center justify-center gap-3">
+                 <h2 className="text-2xl font-bold text-slate-200 tracking-tight flex items-center justify-center gap-3">
                    {activeChannelConfig.persona}
                  </h2>
                  <p className="text-sm text-slate-400 font-mono mt-2 uppercase tracking-widest">
@@ -144,9 +144,9 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
          )}
 
          {/* Transcript Log */}
-         <div className="flex-1 glass-panel rounded-2xl p-6 flex flex-col overflow-hidden bg-black/20">
+         <div className="flex-1 glass-panel rounded-2xl p-6 flex flex-col overflow-hidden bg-wes-900/20">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
                  <i className="fa-solid fa-align-left text-wes-pop"></i>
                  Neural Log
               </h3>
@@ -164,7 +164,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
             
             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
                {transcripts.length === 0 ? (
-                  <div className="text-center text-slate-600 mt-20">
+                  <div className="text-center text-slate-500 mt-20">
                      <i className="fa-regular fa-comments text-3xl mb-3 opacity-30"></i>
                      <p className="text-xs">No data captured.</p>
                   </div>
@@ -175,11 +175,11 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
                            max-w-[90%] rounded-xl p-3 text-xs leading-relaxed
                            ${turn.role === 'user' 
                               ? 'bg-wes-accent/20 text-slate-200 border border-wes-accent/30 rounded-tr-none' 
-                              : 'bg-wes-800/60 text-slate-300 border border-white/5 rounded-tl-none'}
+                              : 'bg-wes-800 text-slate-300 border border-wes-700 rounded-tl-none'}
                         `}>
                            {turn.text}
                         </div>
-                        <span className="text-[10px] text-slate-600 mt-1 px-1">
+                        <span className="text-[10px] text-slate-500 mt-1 px-1">
                            {turn.role === 'user' ? 'You' : 'WesAI'} • {turn.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </span>
                      </div>
@@ -190,7 +190,7 @@ export const Brainstorm: React.FC<BrainstormProps> = ({ onNavigate }) => {
 
             {/* Export Action */}
             {transcripts.length > 0 && (
-               <div className="mt-4 pt-4 border-t border-white/5 flex justify-end">
+               <div className="mt-4 pt-4 border-t border-wes-700 flex justify-end">
                   <div className="flex items-center gap-2">
                      <span className="text-[10px] text-slate-500 uppercase font-bold">Copy Transcript</span>
                      <CopyButton text={transcripts.map(t => `${t.role.toUpperCase()}: ${t.text}`).join('\n')} />

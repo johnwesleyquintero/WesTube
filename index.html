@@ -36,12 +36,13 @@
                 800: 'var(--wes-800)', // Panel Base / Secondary
                 700: 'var(--wes-700)', // Borders
                 600: 'var(--wes-600)', // Muted Text
-                accent: '#6366f1', // Indigo (Primary) - Keeps constant
-                pop: '#8b5cf6', // Violet (Secondary) - Keeps constant
+                accent: 'var(--wes-accent)', // Dynamic Accent
+                pop: 'var(--wes-pop)', // Dynamic Pop
                 success: '#10b981',
               },
               // Remap slate-300/400 to variables to invert text contrast in light mode
               slate: {
+                100: 'var(--text-inverse)',   // Opposite of Highlight
                 200: 'var(--text-highlight)', // High Contrast (White / Black)
                 300: 'var(--text-main)',      // Main Body (Light Grey / Dark Grey)
                 400: 'var(--text-muted)',     // Muted (Grey / Grey)
@@ -67,24 +68,30 @@
     </script>
     <style>
       :root {
-        /* LIGHT MODE (Photonic) DEFINITIONS */
-        --wes-950: #f8fafc; /* Slate-50 - Background */
+        /* LIGHT MODE (Photonic) DEFINITIONS - Accessibility Tuned */
+        --wes-950: #f1f5f9; /* Slate-100 - Background */
         --wes-900: #ffffff; /* White - Panels */
-        --wes-800: #f1f5f9; /* Slate-100 - Secondary Surfaces */
+        --wes-800: #e2e8f0; /* Slate-200 - Secondary Surfaces */
         --wes-700: #cbd5e1; /* Slate-300 - Borders */
-        --wes-600: #94a3b8; /* Slate-400 */
+        --wes-600: #64748b; /* Slate-500 */
         
+        --wes-accent: #4f46e5; /* Indigo-600 (Darker for contrast) */
+        --wes-pop: #7c3aed;    /* Violet-600 */
+
         /* Text Contrast Inversion - High Legibility */
-        --text-highlight: #020617; /* Slate-950 - Strong Contrast */
+        --text-highlight: #0f172a; /* Slate-900 - Strongest Contrast */
         --text-main: #334155;      /* Slate-700 */
         --text-muted: #475569;     /* Slate-600 */
         --text-dim: #64748b;       /* Slate-500 */
+        --text-inverse: #ffffff;   /* Pure White (for buttons) */
 
-        --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-        --glass-panel-bg: rgba(255, 255, 255, 0.85);
+        --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.95) 100%);
+        --glass-panel-bg: rgba(255, 255, 255, 0.9);
         --glass-input-bg: #ffffff;
-        --scroll-track: #f1f5f9;
-        --scroll-thumb: #cbd5e1;
+        --scroll-track: #e2e8f0;
+        --scroll-thumb: #94a3b8;
+        
+        --panel-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       }
 
       .dark {
@@ -94,18 +101,24 @@
         --wes-800: #151B2B;
         --wes-700: #232D42;
         --wes-600: #334155;
+        
+        --wes-accent: #6366f1; /* Indigo-500 */
+        --wes-pop: #8b5cf6;    /* Violet-500 */
 
         /* Text Standard */
         --text-highlight: #f8fafc; /* Slate-50 */
         --text-main: #cbd5e1;      /* Slate-300 */
         --text-muted: #94a3b8;     /* Slate-400 */
         --text-dim: #64748b;       /* Slate-500 */
+        --text-inverse: #020617;   /* Slate-950 */
 
         --glass-bg: linear-gradient(145deg, rgba(21, 27, 43, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%);
         --glass-panel-bg: rgba(21, 27, 43, 0.6);
         --glass-input-bg: rgba(2, 6, 23, 0.4);
         --scroll-track: transparent;
         --scroll-thumb: #334155;
+        
+        --panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
       }
 
       /* Base Body Transition */
@@ -118,8 +131,8 @@
       /* Subtle pattern overlay */
       body {
          background-image: 
-          radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%), 
-          radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+          radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.05), transparent 25%), 
+          radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.05), transparent 25%);
          background-attachment: fixed;
       }
 
@@ -136,7 +149,7 @@
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #6366f1; 
+        background: var(--wes-accent); 
       }
 
       /* Glassmorphism Utilities - Mapped to Variables */
@@ -145,7 +158,8 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border: 1px solid var(--wes-700);
-        transition: background 0.3s ease, border-color 0.3s ease;
+        box-shadow: var(--panel-shadow);
+        transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       }
       
       .glass-input {
@@ -155,8 +169,8 @@
         color: var(--text-highlight);
       }
       .glass-input:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+        border-color: var(--wes-accent);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
       }
       
       .glass-input::placeholder {

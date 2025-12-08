@@ -15,7 +15,7 @@ export const SeoTab: React.FC<SeoTabProps> = ({ result }) => {
       {/* Research & Sources Section (Only if available) */}
       {(result.sources && result.sources.length > 0) || result.researchSummary ? (
          <div className="glass-panel p-6 rounded-xl border border-wes-pop/20 shadow-[0_0_20px_rgba(139,92,246,0.05)]">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+            <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
               <span className="w-8 h-8 rounded-lg bg-wes-pop/10 flex items-center justify-center mr-3 border border-wes-pop/20 text-wes-pop">
                 <i className="fa-solid fa-globe"></i>
               </span>
@@ -25,7 +25,7 @@ export const SeoTab: React.FC<SeoTabProps> = ({ result }) => {
             {result.researchSummary && (
               <div className="mb-4">
                 <p className="text-xs font-bold text-wes-pop uppercase tracking-widest mb-2">Research Summary</p>
-                <div className="text-sm text-slate-300 leading-relaxed bg-black/20 p-3 rounded-lg border border-white/5">
+                <div className="text-sm text-slate-300 leading-relaxed bg-wes-900/40 p-3 rounded-lg border border-wes-700">
                   {result.researchSummary}
                 </div>
               </div>
@@ -60,7 +60,7 @@ export const SeoTab: React.FC<SeoTabProps> = ({ result }) => {
             <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">Optimized Title</label>
             <CopyButton text={result.title} />
           </div>
-          <div className="text-2xl text-white font-bold select-all bg-black/20 p-4 rounded-lg border border-white/10 leading-snug">
+          <div className="text-2xl text-slate-200 font-bold select-all bg-wes-800 p-4 rounded-lg border border-wes-700 leading-snug">
             {result.title}
           </div>
         </div>
@@ -72,7 +72,7 @@ export const SeoTab: React.FC<SeoTabProps> = ({ result }) => {
           </div>
           <textarea 
             readOnly 
-            className="w-full h-48 bg-black/20 p-4 rounded-lg border border-white/10 text-sm text-slate-300 font-mono resize-none focus:outline-none custom-scrollbar"
+            className="w-full h-48 bg-wes-800 p-4 rounded-lg border border-wes-700 text-sm text-slate-300 font-mono resize-none focus:outline-none custom-scrollbar"
             value={result.description}
           />
         </div>
@@ -81,7 +81,7 @@ export const SeoTab: React.FC<SeoTabProps> = ({ result }) => {
           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-3">Keywords / Tags</label>
           <div className="flex flex-wrap gap-2">
             {result.tags.map(tag => (
-              <span key={tag} className="text-xs bg-wes-800/50 text-slate-300 px-3 py-1.5 rounded-full border border-white/10 select-all cursor-pointer hover:bg-wes-accent/20 hover:text-white hover:border-wes-accent/40 transition-all">
+              <span key={tag} className="text-xs bg-wes-800 text-slate-300 px-3 py-1.5 rounded-full border border-wes-700 select-all cursor-pointer hover:bg-wes-accent/20 hover:text-white hover:border-wes-accent/40 transition-all">
                 #{tag}
               </span>
             ))}

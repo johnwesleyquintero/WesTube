@@ -45,13 +45,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         {/* Header & Tabs */}
         <div className="flex flex-col border-b border-wes-700 bg-wes-900/50">
           <div className="p-4 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-white flex items-center">
+            <h2 className="text-lg font-bold text-slate-200 flex items-center">
               <span className="w-8 h-8 rounded-lg bg-wes-accent/10 flex items-center justify-center mr-3 border border-wes-accent/20 text-wes-accent">
                 <i className="fa-solid fa-sliders"></i>
               </span>
               Settings & Documentation
             </h2>
-            <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">
               <i className="fa-solid fa-xmark text-xl"></i>
             </button>
           </div>
@@ -61,7 +61,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               onClick={() => setActiveTab('config')}
               className={`pb-3 text-sm font-bold uppercase tracking-wider border-b-2 transition-all ${
                 activeTab === 'config' 
-                  ? 'border-wes-accent text-white' 
+                  ? 'border-wes-accent text-slate-200' 
                   : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -71,7 +71,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               onClick={() => setActiveTab('manual')}
               className={`pb-3 text-sm font-bold uppercase tracking-wider border-b-2 transition-all ${
                 activeTab === 'manual' 
-                  ? 'border-wes-pop text-white' 
+                  ? 'border-wes-pop text-slate-200' 
                   : 'border-transparent text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -99,10 +99,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter Google Gemini API Key"
-                    className="w-full bg-wes-900 border border-wes-700 rounded-lg py-3 pl-10 pr-3 text-sm text-white focus:border-wes-accent outline-none placeholder-slate-600 transition-colors shadow-inner"
+                    className="w-full bg-wes-900 border border-wes-700 rounded-lg py-3 pl-10 pr-3 text-sm text-slate-200 focus:border-wes-accent outline-none placeholder-slate-600 transition-colors shadow-inner"
                   />
                 </div>
-                <p className="text-[10px] text-slate-500 leading-relaxed bg-wes-900/50 p-3 rounded border border-white/5">
+                <p className="text-[10px] text-slate-500 leading-relaxed bg-wes-800 p-3 rounded border border-wes-700/50">
                   <i className="fa-solid fa-shield-halved mr-1.5 text-wes-success"></i>
                   Security Note: Your API key is stored locally in your browser. Obtain one from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-wes-accent hover:underline decoration-dashed">Google AI Studio</a>.
                 </p>
@@ -112,7 +112,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
               {/* Defaults */}
               <div className="space-y-4">
-                 <h3 className="text-sm font-bold text-white flex items-center">
+                 <h3 className="text-sm font-bold text-slate-200 flex items-center">
                     <i className="fa-solid fa-layer-group mr-2 text-slate-400"></i>
                     Production Defaults
                  </h3>
@@ -140,7 +140,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <div className="p-6 space-y-8 text-sm text-slate-300">
               {/* Introduction */}
               <div className="bg-wes-900/40 p-4 rounded-lg border border-wes-700">
-                <h3 className="text-white font-bold mb-2 flex items-center">
+                <h3 className="text-slate-200 font-bold mb-2 flex items-center">
                   <i className="fa-solid fa-microchip text-wes-pop mr-2"></i>
                   System Overview
                 </h3>
@@ -148,7 +148,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   WesTube Engine v2.0 is a multi-channel content production system. It utilizes <strong>Google Gemini 2.5 Flash</strong> to transform a single topic into a complete production package (Script, SEO, Asset Prompts) tailored to specific channel personas.
                 </p>
               </div>
-              {/* Rest of manual skipped for brevity as logic didn't change */}
             </div>
           )}
 
@@ -159,7 +158,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           <div className="p-4 border-t border-wes-700 bg-wes-900/80 flex justify-end gap-3">
             <button 
               onClick={onClose}
-              className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors font-medium"
+              className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors font-medium"
             >
               Cancel
             </button>
@@ -177,7 +176,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
            <div className="p-4 border-t border-wes-700 bg-wes-900/80 flex justify-end">
              <button 
               onClick={onClose}
-              className="px-6 py-2 bg-wes-800 hover:bg-wes-700 text-white text-sm font-bold rounded-lg border border-white/10 transition-colors"
+              className="px-6 py-2 bg-wes-800 hover:bg-wes-700 text-slate-200 text-sm font-bold rounded-lg border border-wes-700 transition-colors"
             >
               Close Manual
             </button>

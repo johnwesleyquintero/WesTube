@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { GeneratedPackage } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
@@ -33,7 +34,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({
       
       {/* Thumbnail Section */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+        <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
           <span className="w-8 h-8 rounded-lg bg-wes-pop/10 flex items-center justify-center mr-3 border border-wes-pop/20 text-wes-pop">
             <i className="fa-solid fa-image"></i>
           </span>
@@ -64,7 +65,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({
                   </button>
                 </div>
                 
-                <div className="w-full md:w-72 bg-black/50 min-h-[180px] flex items-center justify-center border-t md:border-t-0 md:border-l border-white/5 relative group">
+                <div className="w-full md:w-72 bg-wes-950/50 min-h-[180px] flex items-center justify-center border-t md:border-t-0 md:border-l border-wes-700 relative group">
                   {result.generatedImages?.[i] ? (
                     <>
                       <img 
@@ -134,7 +135,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({
                       )}
                     </>
                   ) : (
-                    <div className="text-slate-600 flex flex-col items-center">
+                    <div className="text-slate-500 flex flex-col items-center">
                       <i className="fa-regular fa-image text-3xl mb-2 opacity-50"></i>
                       <span className="text-[10px] uppercase tracking-widest">Preview Area</span>
                     </div>
@@ -147,7 +148,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({
 
       {/* Music Section */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+        <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
           <span className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center mr-3 border border-pink-500/20 text-pink-500">
             <i className="fa-solid fa-headphones"></i>
           </span>
@@ -158,7 +159,7 @@ export const AssetsTab: React.FC<AssetsTabProps> = ({
                <h4 className="text-[10px] font-bold text-pink-400 uppercase tracking-widest">Prompt Engineering (Suno/Udio)</h4>
                <CopyButton text={result.musicPrompt} />
             </div>
-            <p className="text-sm text-pink-100/80 font-mono bg-pink-500/10 p-4 rounded-lg border border-pink-500/20 mb-6">{result.musicPrompt}</p>
+            <p className="text-sm text-slate-300 font-mono bg-wes-800 p-4 rounded-lg border border-pink-500/20 mb-6">{result.musicPrompt}</p>
             
             <h4 className="text-[10px] font-bold text-pink-400 uppercase tracking-widest mb-2">Visual Aesthetic Guideline</h4>
             <p className="text-sm text-slate-300 font-light">{result.imageGenPrompt}</p>

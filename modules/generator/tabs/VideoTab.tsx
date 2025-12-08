@@ -29,7 +29,7 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
       {/* Header */}
       <div className="flex items-center justify-between">
          <div>
-            <h3 className="text-lg font-bold text-white flex items-center">
+            <h3 className="text-lg font-bold text-slate-200 flex items-center">
               <span className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center mr-3 border border-red-500/20 text-red-500">
                 <i className="fa-solid fa-film"></i>
               </span>
@@ -38,16 +38,16 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
             <p className="text-xs text-slate-500 mt-1 ml-11">Powered by Veo 3.1 • Image-to-Video Capable</p>
          </div>
          
-         <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
+         <div className="flex bg-wes-900/40 rounded-lg p-1 border border-wes-700">
              <button 
                onClick={() => setSelectedAspectRatio('16:9')}
-               className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider rounded transition-all ${selectedAspectRatio === '16:9' ? 'bg-wes-accent text-white' : 'text-slate-500 hover:text-white'}`}
+               className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider rounded transition-all ${selectedAspectRatio === '16:9' ? 'bg-wes-accent text-white' : 'text-slate-500 hover:text-slate-200'}`}
              >
                Landscape (16:9)
              </button>
              <button 
                onClick={() => setSelectedAspectRatio('9:16')}
-               className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider rounded transition-all ${selectedAspectRatio === '9:16' ? 'bg-wes-accent text-white' : 'text-slate-500 hover:text-white'}`}
+               className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider rounded transition-all ${selectedAspectRatio === '9:16' ? 'bg-wes-accent text-white' : 'text-slate-500 hover:text-slate-200'}`}
              >
                Shorts (9:16)
              </button>
@@ -59,14 +59,14 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
          <div className="glass-panel p-4 rounded-xl border border-wes-accent/30 bg-wes-accent/5 animate-pulse relative overflow-hidden">
             <div className="flex items-center gap-3 relative z-10">
                <i className="fa-solid fa-circle-notch fa-spin text-wes-accent"></i>
-               <span className="text-sm font-bold text-white">{progress}</span>
+               <span className="text-sm font-bold text-slate-200">{progress}</span>
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-wes-accent/10 to-transparent w-1/2 -skew-x-12 animate-slide-shine"></div>
          </div>
       )}
 
       {/* Custom Generation */}
-      <div className="glass-panel p-6 rounded-xl border border-white/5">
+      <div className="glass-panel p-6 rounded-xl border border-wes-700">
          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Custom Prompt</label>
          <div className="flex gap-4">
             <input 
@@ -74,7 +74,7 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder="A cyberpunk city with neon rain, cinematic lighting..."
-              className="flex-1 glass-input rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/50 transition-all placeholder-slate-600"
+              className="flex-1 glass-input rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-red-500/50 transition-all placeholder-slate-500"
             />
             <button 
               onClick={() => handleGenerate(customPrompt, `custom-${Date.now()}`)}
@@ -91,10 +91,10 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
 
       {/* Script Scene Integration */}
       <div className="space-y-4">
-         <h4 className="text-sm font-bold text-white border-b border-white/5 pb-2">Scenes from Script</h4>
+         <h4 className="text-sm font-bold text-slate-200 border-b border-wes-700 pb-2">Scenes from Script</h4>
          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {result.script.map((scene, idx) => (
-               <div key={idx} className="bg-wes-900/40 border border-white/5 rounded-xl p-4 hover:border-white/10 transition-colors flex flex-col h-full">
+               <div key={idx} className="bg-wes-900/40 border border-wes-700 rounded-xl p-4 hover:border-wes-600 transition-colors flex flex-col h-full">
                   <div className="flex justify-between items-start mb-2">
                      <span className="text-[10px] font-mono text-wes-accent bg-wes-accent/10 px-2 py-0.5 rounded">
                         {scene.timestamp}
@@ -121,7 +121,7 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
                      <div className="mt-auto space-y-3">
                         {/* If we have a generated static visual, show it as context */}
                         {scene.generatedVisual && (
-                           <div className="relative rounded-lg overflow-hidden aspect-video border border-white/10 group">
+                           <div className="relative rounded-lg overflow-hidden aspect-video border border-wes-700 group">
                               <img 
                                  src={scene.generatedVisual} 
                                  alt="Static Source" 
@@ -146,7 +146,7 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
                            <button 
                               onClick={() => handleGenerate(scene.visual, `scene-${idx}`)}
                               disabled={isGenerating}
-                              className="w-full py-2.5 bg-wes-800 hover:bg-wes-700 text-slate-400 hover:text-white rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-white/5"
+                              className="w-full py-2.5 bg-wes-800 hover:bg-wes-700 text-slate-400 hover:text-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border border-wes-700"
                            >
                               Generate from Text
                            </button>
@@ -160,14 +160,14 @@ export const VideoTab: React.FC<VideoTabProps> = ({ result, onVideoGenerated, sa
 
       {/* Gallery of Custom Generations */}
       {Object.keys(savedVideos).filter(k => k.startsWith('custom')).length > 0 && (
-         <div className="space-y-4 pt-8 border-t border-white/5">
-             <h4 className="text-sm font-bold text-white">Custom Generations</h4>
+         <div className="space-y-4 pt-8 border-t border-wes-700">
+             <h4 className="text-sm font-bold text-slate-200">Custom Generations</h4>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {Object.entries(savedVideos).filter(([k]) => k.startsWith('custom')).map(([key, url]) => (
                    <div key={key} className="glass-panel p-2 rounded-xl">
                       <video src={url} controls className="w-full h-auto rounded-lg aspect-video bg-black" />
                       <div className="flex justify-end mt-2 px-1">
-                         <a href={url} download="wes-custom-video.mp4" className="text-xs text-slate-500 hover:text-white"><i className="fa-solid fa-download"></i> Download</a>
+                         <a href={url} download="wes-custom-video.mp4" className="text-xs text-slate-500 hover:text-slate-300"><i className="fa-solid fa-download"></i> Download</a>
                       </div>
                    </div>
                 ))}
