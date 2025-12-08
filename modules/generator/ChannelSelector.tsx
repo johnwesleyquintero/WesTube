@@ -19,7 +19,7 @@ export const ChannelSelector: React.FC<ChannelSelectorProps> = ({ selectedChanne
             className={`relative flex items-center p-3 rounded-xl border transition-all duration-300 group overflow-hidden ${
               selectedChannel === channel.id
                 ? `bg-wes-accent/10 border-wes-accent/50 shadow-[0_0_20px_rgba(99,102,241,0.1)]`
-                : 'bg-wes-900/40 border-white/5 hover:border-white/10 hover:bg-wes-900/60'
+                : 'bg-wes-800/40 border-wes-700/30 hover:border-wes-700/60 hover:bg-wes-800/60'
             }`}
           >
             {/* Active Glow Bar */}
@@ -27,12 +27,12 @@ export const ChannelSelector: React.FC<ChannelSelectorProps> = ({ selectedChanne
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-wes-accent shadow-[0_0_10px_#6366f1]"></div>
             )}
 
-            <div className={`w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center mr-4 ${channel.color} border border-white/5 group-hover:scale-105 transition-transform`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-4 ${channel.color} border border-wes-700/30 group-hover:scale-105 transition-transform bg-wes-950/50`}>
               <i className={`fa-solid ${channel.icon} text-lg`}></i>
             </div>
             <div className="text-left">
-              <div className={`font-semibold text-sm ${selectedChannel === channel.id ? 'text-white' : 'text-slate-300'}`}>{channel.name}</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider">{channel.persona}</div>
+              <div className={`font-semibold text-sm ${selectedChannel === channel.id ? 'text-slate-200' : 'text-slate-300'}`}>{channel.name}</div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">{channel.persona}</div>
             </div>
           </button>
         ))}

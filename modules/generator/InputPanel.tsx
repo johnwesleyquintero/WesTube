@@ -44,8 +44,8 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   } = formState;
 
   return (
-    <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-black/50">
-      <div className="p-6 border-b border-wes-700 bg-wes-800/30">
+    <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-wes-950/20">
+      <div className="p-6 border-b border-wes-700 bg-wes-800/40">
         <h2 className="text-lg font-bold text-slate-200 flex items-center tracking-tight">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-wes-accent/20 text-wes-accent mr-3 border border-wes-accent/20">
              <i className="fa-solid fa-satellite-dish text-sm"></i>
@@ -94,7 +94,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
               
               <button 
                 onClick={() => setUseResearch(!useResearch)}
-                className={`w-12 h-6 rounded-full transition-all duration-300 relative ${useResearch ? 'bg-wes-pop' : 'bg-wes-700 border border-wes-600'}`}
+                className={`w-12 h-6 rounded-full transition-all duration-300 relative border ${useResearch ? 'bg-wes-pop border-wes-pop' : 'bg-wes-700 border-wes-600'}`}
               >
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all duration-300 shadow-md ${useResearch ? 'left-7' : 'left-1'}`}></div>
               </button>
@@ -149,7 +149,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
           className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center space-x-3
             ${loading || !topic 
               ? 'bg-wes-800 text-slate-500 border border-wes-700 cursor-not-allowed' 
-              : 'bg-gradient-to-r from-wes-accent to-wes-pop text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-[1.02] border border-white/10'
+              : 'bg-gradient-to-r from-wes-accent to-wes-pop text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-[1.02] border border-transparent'
             }`}
         >
           {loading ? (
