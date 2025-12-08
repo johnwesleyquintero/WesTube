@@ -196,21 +196,21 @@ export const History: React.FC = () => {
     <div className="h-full flex flex-col md:flex-row overflow-hidden gap-6">
       
       {/* List Column */}
-      <div className={`${selectedItem ? 'hidden md:flex' : 'flex'} w-full md:w-1/3 flex-col bg-wes-800 rounded-xl border border-wes-700 shadow-xl overflow-hidden`}>
-        <div className="p-5 border-b border-wes-700 bg-wes-800 flex justify-between items-center">
+      <div className={`${selectedItem ? 'hidden md:flex' : 'flex'} w-full md:w-1/3 flex-col glass-panel rounded-xl overflow-hidden`}>
+        <div className="p-5 border-b border-wes-700 bg-wes-800/50 flex justify-between items-center">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center">
+            <h2 className="text-lg font-bold text-slate-200 flex items-center">
               <i className="fa-solid fa-clock-rotate-left mr-3 text-slate-400"></i>
               Cloud Archive
             </h2>
             <p className="text-sm text-slate-400">Saved productions.</p>
           </div>
-          <button onClick={refreshHistory} className="text-slate-400 hover:text-white p-2">
+          <button onClick={refreshHistory} className="text-slate-400 hover:text-wes-accent p-2 transition-colors rounded hover:bg-wes-700/50">
             <i className={`fa-solid fa-rotate ${isLoading ? 'fa-spin' : ''}`}></i>
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-wes-950/20">
           {isLoading ? (
             <div className="text-center py-10 text-slate-500">
               <i className="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
@@ -239,9 +239,9 @@ export const History: React.FC = () => {
       {/* Viewer Column */}
       <div className={`flex-1 flex-col ${selectedItem ? 'flex' : 'hidden md:flex'}`}>
          {selectedItem ? (
-           <div className="h-full flex flex-col">
+           <div className="h-full flex flex-col animate-fadeIn">
              <div className="md:hidden mb-2">
-               <button onClick={() => setSelectedItem(null)} className="text-slate-400 text-sm flex items-center">
+               <button onClick={() => setSelectedItem(null)} className="text-slate-400 hover:text-wes-accent text-sm flex items-center p-2">
                  <i className="fa-solid fa-arrow-left mr-2"></i> Back to List
                </button>
              </div>
@@ -280,9 +280,9 @@ export const History: React.FC = () => {
              />
            </div>
          ) : (
-           <div className="h-full bg-wes-800/20 rounded-xl border border-wes-700/50 flex flex-col items-center justify-center text-slate-600 border-dashed">
-             <i className="fa-solid fa-cloud text-6xl mb-4 opacity-50"></i>
-             <p className="text-xl font-medium">Select a record</p>
+           <div className="h-full glass-panel rounded-xl border-dashed border-wes-700/50 flex flex-col items-center justify-center text-slate-500">
+             <i className="fa-solid fa-cloud text-6xl mb-4 opacity-50 text-wes-600"></i>
+             <p className="text-xl font-medium text-slate-400">Select a record</p>
              <p className="text-sm">View details of past productions stored in Supabase</p>
            </div>
          )}
