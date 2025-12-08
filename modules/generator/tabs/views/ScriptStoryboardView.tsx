@@ -62,9 +62,9 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
           const isRefiningAudio = refiningScene?.index === idx && refiningScene?.field === 'audio';
 
           return (
-          <div key={idx} className="glass-panel rounded-xl overflow-hidden flex flex-col border border-white/5 hover:border-white/10 transition-colors shadow-lg">
+          <div key={idx} className="glass-panel rounded-xl overflow-hidden flex flex-col border border-wes-700 hover:border-wes-600 transition-colors shadow-lg">
             {/* Top: Visual Area */}
-            <div className="relative aspect-video bg-black/40 border-b border-white/5 group">
+            <div className="relative aspect-video bg-wes-950 border-b border-wes-700 group">
               {scene.generatedVisual ? (
                 <>
                   <img 
@@ -149,7 +149,7 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
                       <button 
                         onClick={() => handleGenerateSceneVisual(scene.visual, idx)}
                         disabled={generatingSceneVisual === idx || batchProcessing}
-                        className="px-4 py-2 bg-wes-800 hover:bg-wes-700 text-slate-300 hover:text-white rounded-full text-xs font-bold uppercase tracking-wider border border-white/10 transition-all hover:scale-105"
+                        className="px-4 py-2 bg-wes-800 hover:bg-wes-700 text-slate-300 hover:text-white rounded-full text-xs font-bold uppercase tracking-wider border border-wes-700 transition-all hover:scale-105"
                       >
                         {generatingSceneVisual === idx ? (
                             <><i className="fa-solid fa-circle-notch fa-spin mr-2"></i> Rendering...</>
@@ -171,7 +171,7 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
               
               {/* Text Refinement Overlay */}
               {refinementInput?.index === idx && (
-                 <div className="absolute inset-0 z-40 bg-wes-950/95 p-4 flex flex-col animate-fadeIn">
+                 <div className="absolute inset-0 z-40 bg-wes-950/95 p-4 flex flex-col animate-fadeIn backdrop-blur-sm">
                      <label className="text-[10px] font-bold text-wes-accent uppercase mb-2">
                         Modify {refinementInput.field === 'visual' ? 'Visual' : 'Audio'} Script
                      </label>
@@ -179,20 +179,20 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
                         autoFocus
                         value={refinementInput.text}
                         onChange={(e) => setRefinementInput(prev => prev ? {...prev, text: e.target.value} : null)}
-                        className="flex-1 bg-white/5 border border-wes-accent/30 rounded p-2 text-xs text-white resize-none outline-none focus:border-wes-accent mb-3"
+                        className="flex-1 bg-wes-800 border border-wes-accent/30 rounded p-2 text-xs text-slate-200 resize-none outline-none focus:border-wes-accent mb-3 placeholder-slate-500"
                         placeholder="Instruction: e.g. 'Make it funnier'..."
                         onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && submitRefinement()}
                      />
                      <div className="flex gap-2 mt-auto">
                         <button 
                           onClick={() => setRefinementInput(null)} 
-                          className="flex-1 py-2 bg-white/10 text-xs rounded hover:bg-white/20"
+                          className="flex-1 py-2 bg-wes-800 text-slate-400 border border-wes-700 text-xs rounded hover:bg-wes-700"
                         >
                           Cancel
                         </button>
                         <button 
                           onClick={submitRefinement} 
-                          className="flex-1 py-2 bg-wes-accent text-white text-xs font-bold rounded hover:bg-wes-accent/80"
+                          className="flex-1 py-2 bg-wes-accent text-white text-xs font-bold rounded hover:bg-wes-accent/80 shadow-lg shadow-wes-accent/20"
                         >
                           Apply Change
                         </button>
@@ -207,13 +207,13 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
                     value={scene.visual}
                     onChange={(e) => handleUpdateScript?.(idx, 'visual', e.target.value)}
                     disabled={isRefiningVisual}
-                    className={`w-full bg-black/20 text-slate-400 text-xs p-2 pl-6 rounded border border-transparent focus:border-wes-accent/30 focus:bg-black/40 outline-none resize-none min-h-[60px] ${isRefiningVisual ? 'opacity-50 blur-sm' : ''}`}
+                    className={`w-full bg-wes-800/30 text-slate-400 text-xs p-2 pl-6 rounded border border-transparent focus:border-wes-accent/30 focus:bg-wes-800/50 outline-none resize-none min-h-[60px] ${isRefiningVisual ? 'opacity-50 blur-sm' : ''}`}
                     placeholder="Visual direction..."
                 />
                 {handleRefineScript && !isRefiningVisual && (
                     <button 
                       onClick={() => startRefinement(idx, 'visual')}
-                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-black/40 rounded"
+                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-wes-800/80 rounded border border-wes-700"
                     >
                       <i className="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
                     </button>
@@ -232,13 +232,13 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
                     value={scene.audio}
                     onChange={(e) => handleUpdateScript?.(idx, 'audio', e.target.value)}
                     disabled={isRefiningAudio}
-                    className={`w-full h-full bg-transparent text-slate-200 text-sm p-2 pl-6 rounded border border-transparent focus:border-white/10 outline-none resize-none leading-relaxed ${isRefiningAudio ? 'opacity-50 blur-sm' : ''}`}
+                    className={`w-full h-full bg-transparent text-slate-200 text-sm p-2 pl-6 rounded border border-transparent focus:border-wes-700 outline-none resize-none leading-relaxed ${isRefiningAudio ? 'opacity-50 blur-sm' : ''}`}
                     placeholder="Narration..."
                 />
                 {handleRefineScript && !isRefiningAudio && (
                     <button 
                       onClick={() => startRefinement(idx, 'audio')}
-                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-black/40 rounded"
+                      className="absolute top-1 right-1 text-slate-500 hover:text-wes-accent opacity-0 group-hover/edit:opacity-100 transition-opacity p-1 bg-wes-800/80 rounded border border-wes-700"
                     >
                       <i className="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
                     </button>
@@ -251,12 +251,12 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
               </div>
 
               {/* Audio Controls */}
-              <div className="flex items-center justify-between border-t border-white/5 pt-3 mt-1">
+              <div className="flex items-center justify-between border-t border-wes-700 pt-3 mt-1">
                 <div className="flex gap-2">
                     <button 
                       onClick={() => handlePlayAudio(scene.audio, idx)}
                       disabled={playingScene !== null}
-                      className={`text-xs px-2 py-1 rounded flex items-center gap-1.5 transition-colors ${playingScene === idx ? 'text-wes-accent' : 'text-slate-500 hover:text-white'}`}
+                      className={`text-xs px-2 py-1 rounded flex items-center gap-1.5 transition-colors border ${playingScene === idx ? 'bg-wes-accent text-white border-wes-accent' : 'bg-wes-800/50 border-wes-700/50 text-slate-500 hover:text-slate-200 hover:bg-wes-800'}`}
                     >
                       {playingScene === idx ? <i className="fa-solid fa-stop"></i> : <i className="fa-solid fa-play"></i>}
                       <span className="uppercase text-[10px] font-bold">Preview</span>
