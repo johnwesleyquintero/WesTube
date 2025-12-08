@@ -25,12 +25,9 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
   const cancelledRef = useRef(false);
   const animationFrameRef = useRef<number>(0);
 
-  // Visualization loop: When playing, generate "fake" volume data to make the Orb alive
-  // Since we are using raw audio buffers, real-time analysis requires deeper refactoring.
-  // This simulation provides 90% of the UX value.
+  // Visualization loop
   const animateOrb = () => {
     if (isPlaying) {
-      // Random fluctuation between 0.3 and 0.8
       const volatility = Math.random() * 0.5 + 0.3;
       setSimulatedVolume(volatility);
     } else {
@@ -55,11 +52,9 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
       setCurrentIndex(i);
       
       try {
-        // Play Audio and wait for it to finish
         await playAudio(result.script[i].audio, i);
       } catch (e) {
         console.error("Playback error:", e);
-        // If error, wait a small duration to simulate reading time
         await new Promise(r => setTimeout(r, 3000));
       }
     }
@@ -69,7 +64,6 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
 
   useEffect(() => {
     let timer: number;
-    // Auto-start after a brief buffer
     if (isInitializing) {
       timer = window.setTimeout(startSequence, 1000);
     }
@@ -81,8 +75,9 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
 
   const currentScene: ScriptScene = result.script[currentIndex];
 
+  // NOTE: Wrapped in "dark" class to force cinema mode colors regardless of theme
   return (
-    <div className="fixed inset-0 z-[60] bg-wes-950/95 flex flex-col items-center justify-center animate-fadeIn backdrop-blur-sm">
+    <div className="dark fixed inset-0 z-[60] bg-wes-950/95 flex flex-col items-center justify-center animate-fadeIn backdrop-blur-sm">
       
       {/* Visual Stage */}
       <div className="relative w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10 group">

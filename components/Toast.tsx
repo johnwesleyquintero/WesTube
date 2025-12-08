@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ToastMessage } from '../types';
 
@@ -21,16 +20,19 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
         glass-panel mb-3 p-4 rounded-r-lg border-l-4 ${borders[toast.type]} 
         shadow-xl flex items-start gap-3 min-w-[300px] max-w-md animate-fadeIn
         transform transition-all duration-300 hover:scale-[1.02]
+        bg-wes-900/90 dark:bg-wes-800/90
       `}
       role="alert"
     >
       <i className={`fa-solid ${icons[toast.type]} mt-0.5 text-lg`}></i>
       <div className="flex-1">
-        <p className="text-sm font-medium text-white leading-tight">{toast.message}</p>
+        {/* Changed text-white to text-slate-200 (which is mapped to high contrast in both modes) */}
+        <p className="text-sm font-medium text-slate-200 leading-tight">{toast.message}</p>
       </div>
       <button 
         onClick={() => onRemove(toast.id)}
-        className="text-slate-500 hover:text-white transition-colors"
+        className="text-slate-500 hover:text-slate-200 transition-colors"
+        aria-label="Close Notification"
       >
         <i className="fa-solid fa-xmark"></i>
       </button>
