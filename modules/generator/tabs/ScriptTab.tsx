@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { GeneratedPackage, ChannelConfig, ChannelId } from '../../../types';
 import { CopyButton } from '../../../components/CopyButton';
 import { ScriptTableView } from './views/ScriptTableView';
 import { ScriptStoryboardView } from './views/ScriptStoryboardView';
 import { DirectorPreview } from './DirectorPreview';
+import { TeleprompterView } from './views/TeleprompterView';
 import { CHANNELS } from '../../../constants';
 
 interface ScriptTabProps {
@@ -38,6 +40,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isTeleprompterMode, setIsTeleprompterMode] = useState(false);
 
   // Helper to resolve the correct voice for preview: Check Override -> Default
   const activeVoice = result.voice && result.voice !== 'default'
@@ -94,6 +97,14 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
         />
       )}
 
+      {/* Teleprompter Mode */}
+      {isTeleprompterMode && (
+        <TeleprompterView 
+          result={result} 
+          onClose={() => setIsTeleprompterMode(false)} 
+        />
+      )}
+
       {/* Hook & Branding Section - Stacked on Mobile */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="glass-panel p-4 md:p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
@@ -133,6 +144,16 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
              >
                 <i className="fa-solid fa-play"></i>
                 <span className="inline">Watch Animatic</span>
+             </button>
+
+             {/* Teleprompter Button */}
+             <button
+                onClick={() => setIsTeleprompterMode(true)}
+                className="flex-1 xl:flex-none justify-center px-4 py-1.5 bg-wes-accent/10 hover:bg-wes-accent/20 text-wes-accent border border-wes-accent/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.1)] hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                title="Open Studio Teleprompter"
+             >
+                <i className="fa-solid fa-tv"></i>
+                <span className="inline">Teleprompter</span>
              </button>
 
              <div className="hidden md:block w-px h-6 bg-wes-700 mx-2"></div>
