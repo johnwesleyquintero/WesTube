@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { MOODS, DURATIONS } from '../constants';
 import { GlassSelect } from './GlassSelect';
@@ -36,8 +34,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
-      <div className="bg-wes-950 border border-wes-700 rounded-xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+      <div className="glass-panel rounded-xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[90vh]">
         
         {/* Header & Tabs */}
         <div className="flex flex-col border-b border-wes-700 bg-wes-900/50">

@@ -66,16 +66,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-wes-accent to-wes-pop">Wesley</span>.
           </h1>
           <p className="text-slate-400 mt-2 text-sm font-light max-w-xl">
-            WesTube Engine v2.2 is online. Neural modules are primed for production.
+            WesTube Engine v2.3 is online. Neural modules are primed for production.
             Your digital empire is currently operating at <span className="text-wes-success font-mono">100% efficiency</span>.
           </p>
         </div>
         <div className="flex items-center gap-3">
-           <div className="px-4 py-2 bg-wes-800 border border-wes-700 rounded-lg text-xs">
+           <div className="px-4 py-2 bg-wes-800/50 border border-wes-700 rounded-lg text-xs">
               <span className="text-slate-500 uppercase tracking-widest mr-2">API Status</span>
               <span className="text-wes-success font-bold"><i className="fa-solid fa-circle text-[8px] mr-1.5 mb-0.5"></i>Connected</span>
            </div>
-           <div className="px-4 py-2 bg-wes-800 border border-wes-700 rounded-lg text-xs">
+           <div className="px-4 py-2 bg-wes-800/50 border border-wes-700 rounded-lg text-xs">
               <span className="text-slate-500 uppercase tracking-widest mr-2">Model</span>
               <span className="text-slate-300 font-bold">Gemini 2.5 Flash</span>
            </div>
@@ -199,7 +199,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
            {isLoading ? (
               <div className="flex flex-col gap-3">
                  {[1,2,3].map(i => (
-                    <div key={i} className="h-20 bg-wes-800 rounded-xl animate-pulse"></div>
+                    <div key={i} className="h-20 bg-wes-800/50 rounded-xl animate-pulse"></div>
                  ))}
               </div>
            ) : recentProjects.length === 0 ? (
@@ -213,7 +213,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     <div 
                       key={project.id}
                       onClick={() => onNavigate('history')}
-                      className="glass-panel p-4 rounded-xl flex items-center gap-4 hover:bg-wes-800 transition-colors cursor-pointer group border-l-4 border-l-transparent hover:border-l-wes-accent"
+                      className="glass-panel p-4 rounded-xl flex items-center gap-4 hover:bg-wes-800/30 transition-colors cursor-pointer group border-l-4 border-l-transparent hover:border-l-wes-accent"
                     >
                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${channel.color.replace('text-', 'bg-').replace('400', '500')}/20 ${channel.color}`}>
                           <i className={`fa-solid ${channel.icon}`}></i>
@@ -227,7 +227,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                           </p>
                        </div>
                        <div className="text-right hidden sm:block">
-                          <span className="text-[10px] bg-wes-800 border border-wes-700 px-2 py-1 rounded text-slate-400">
+                          <span className="text-[10px] bg-wes-800/50 border border-wes-700 px-2 py-1 rounded text-slate-400">
                              {project.script.length} Scenes
                           </span>
                        </div>

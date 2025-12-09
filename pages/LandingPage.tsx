@@ -8,7 +8,7 @@ export const LandingPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-wes-950 text-slate-200 overflow-hidden font-sans transition-colors duration-300">
+    <div className="min-h-screen flex flex-col md:flex-row bg-wes-950 text-slate-200 overflow-hidden font-sans transition-colors duration-500">
       
       {/* Absolute Toggle Button */}
       <button
@@ -22,9 +22,9 @@ export const LandingPage: React.FC = () => {
       {/* Left Panel - The Brand */}
       <div className="w-full md:w-1/2 relative overflow-hidden flex flex-col justify-between p-12">
         {/* Background Mesh Gradients */}
-        <div className="absolute inset-0 bg-wes-950 transition-colors duration-300">
-            <div className="absolute top-0 -left-20 w-[600px] h-[600px] bg-wes-accent/20 rounded-full blur-[120px]"></div>
-            <div className="absolute bottom-0 -right-20 w-[500px] h-[500px] bg-wes-pop/20 rounded-full blur-[120px]"></div>
+        <div className="absolute inset-0 bg-wes-950 transition-colors duration-500">
+            <div className="absolute top-0 -left-20 w-[600px] h-[600px] bg-wes-accent/10 rounded-full blur-[120px]"></div>
+            <div className="absolute bottom-0 -right-20 w-[500px] h-[500px] bg-wes-pop/10 rounded-full blur-[120px]"></div>
         </div>
         
         {/* Glass Overlay */}
@@ -36,7 +36,7 @@ export const LandingPage: React.FC = () => {
           <div className="mt-24">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-wes-900/50 border border-wes-700 backdrop-blur-md mb-6 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-wes-success mr-2 animate-pulse"></span>
-                <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">System v2.2 Online</span>
+                <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">System v2.3 Online</span>
             </div>
             {/* Using slate-200 which maps to High Contrast Text (Dark in Light Mode, Light in Dark Mode) */}
             <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight text-slate-200">
@@ -62,7 +62,7 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Right Panel - The Auth */}
-      <div className="w-full md:w-1/2 bg-wes-900/40 backdrop-blur-md border-l border-wes-700 flex flex-col items-center justify-center p-8 md:p-12 relative transition-colors duration-300">
+      <div className="w-full md:w-1/2 bg-wes-900/40 backdrop-blur-md border-l border-wes-700 flex flex-col items-center justify-center p-8 md:p-12 relative transition-colors duration-500">
          <div className="w-full max-w-sm relative z-10">
             <div className="mb-10 text-center md:text-left">
               <h2 className="text-2xl font-bold text-slate-200 mb-2 tracking-tight">Authenticate</h2>

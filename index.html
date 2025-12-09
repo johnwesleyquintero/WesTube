@@ -33,35 +33,41 @@
               slate: {
                 50:  'var(--slate-50)',
                 100: 'var(--slate-100)',
-                200: 'var(--slate-200)', // High Contrast Text (White in Dark / Black in Light)
-                300: 'var(--slate-300)', // Main Body Text
-                400: 'var(--slate-400)', // Muted Text
-                500: 'var(--slate-500)', // Dim Text
-                600: 'var(--slate-600)', // Borders
+                200: 'var(--slate-200)', // High Contrast Heading
+                300: 'var(--slate-300)', // Body Text
+                400: 'var(--slate-400)', // Muted / Metadata
+                500: 'var(--slate-500)', // Disabled / Icons
+                600: 'var(--slate-600)', 
                 700: 'var(--slate-700)',
                 800: 'var(--slate-800)',
                 900: 'var(--slate-900)',
                 950: 'var(--slate-950)',
               },
               wes: {
-                950: 'var(--wes-950)', // App Background
-                900: 'var(--wes-900)', // Panel Backgrounds
-                800: 'var(--wes-800)', // Secondary Surfaces
+                950: 'var(--wes-950)', // App Canvas
+                900: 'var(--wes-900)', // Panels / Cards
+                800: 'var(--wes-800)', // Secondary Surfaces / Hovers
                 700: 'var(--wes-700)', // Borders
                 600: 'var(--wes-600)', 
                 accent: 'var(--wes-accent)', 
                 pop: 'var(--wes-pop)', 
-                success: '#10b981',
+                success: 'var(--wes-success)',
+                danger: 'var(--wes-danger)',
               }
             },
             animation: {
-              fadeIn: 'fadeIn 0.5s ease-out',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              fadeIn: 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'slide-shine': 'slideShine 2s linear infinite',
             },
             keyframes: {
               fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '0%': { opacity: '0', transform: 'translateY(8px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              slideShine: {
+                '0%': { transform: 'translateX(-100%) skewX(-12deg)' },
+                '100%': { transform: 'translateX(200%) skewX(-12deg)' }
               }
             },
             backgroundImage: {
@@ -73,68 +79,79 @@
     </script>
     <style>
       :root {
-        /* LIGHT MODE (Photonic) - The "Paper" aesthetic */
+        /* 
+           LIGHT MODE (Photonic Aesthetic) 
+           Goal: Clean, high-contrast, professional "Laboratory" feel.
+        */
         
         /* 1. Surfaces */
-        --wes-950: #f1f5f9; /* Slate-100 - Clean Paper Background */
-        --wes-900: #ffffff; /* Pure White Panels */
-        --wes-800: #e2e8f0; /* Slate-200 Light Grey inputs/surfaces */
-        --wes-700: #cbd5e1; /* Slate-300 Borders */
-        --wes-600: #94a3b8;
+        --wes-950: #f8fafc; /* Slate-50: Main Canvas */
+        --wes-900: #ffffff; /* White: Panels/Cards */
+        --wes-800: #f1f5f9; /* Slate-100: Hover states */
+        --wes-700: #e2e8f0; /* Slate-200: Borders (Crisp) */
+        --wes-600: #cbd5e1; 
         
-        /* 2. Brand Colors - Tuned for AA/AAA Compliance on Light BG */
-        --wes-accent: #4338ca; /* Indigo-700 (High Contrast) */
-        --wes-pop: #7c3aed;    /* Violet-600 (Accessible on White) */
+        /* 2. Brand Colors (Darker/Richer for White Backgrounds) */
+        --wes-accent: #4f46e5; /* Indigo-600 */
+        --wes-pop: #7c3aed;    /* Violet-600 */
+        --wes-success: #059669; /* Emerald-600 */
+        --wes-danger: #dc2626;  /* Red-600 */
 
-        /* 3. Semantic Text Inversion (Dark text for Light Backgrounds) */
+        /* 3. Text Inversion (Mapping Slates to Dark Greys) */
         --slate-50:  #020617; 
         --slate-100: #0f172a;
-        --slate-200: #1e293b; /* Slate-800 - Primary Heading (Almost Black) */
-        --slate-300: #334155; /* Slate-700 - Body Copy (Dark Grey) */
-        --slate-400: #475569; /* Slate-600 - Muted Text (Readable) */
-        --slate-500: #64748b; /* Slate-500 - Dim Text */
-        --slate-600: #94a3b8;
-        --slate-700: #cbd5e1;
-        --slate-800: #e2e8f0;
-        --slate-900: #f1f5f9;
+        --slate-200: #0f172a; /* Primary Headings: Slate-900 (High Contrast) */
+        --slate-300: #334155; /* Body Text: Slate-700 (Readable) */
+        --slate-400: #64748b; /* Muted: Slate-500 */
+        --slate-500: #94a3b8; /* Icons: Slate-400 */
+        --slate-600: #cbd5e1;
+        --slate-700: #e2e8f0;
+        --slate-800: #f1f5f9;
+        --slate-900: #f8fafc;
         --slate-950: #ffffff;
 
         /* 4. Glass & Depth */
-        --glass-bg: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(241,245,249,0.95) 100%);
-        --glass-panel-bg: rgba(255, 255, 255, 0.85);
-        --glass-input-bg: #ffffff;
+        --glass-bg: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%);
+        --glass-panel-bg: rgba(255, 255, 255, 0.8);
+        --glass-input-bg: #f8fafc; 
         
-        --scroll-track: #e2e8f0;
-        --scroll-thumb: #94a3b8;
+        --scroll-track: #f1f5f9;
+        --scroll-thumb: #cbd5e1;
+        --scroll-thumb-hover: #94a3b8;
         
-        /* Stronger shadows for light mode definition */
+        /* Stronger shadows for light mode depth */
         --panel-shadow: 
           0 4px 6px -1px rgba(0, 0, 0, 0.05), 
           0 10px 15px -3px rgba(0, 0, 0, 0.05),
-          0 0 0 1px rgba(0,0,0,0.06); 
+          0 0 0 1px rgba(0,0,0,0.05); 
       }
 
       .dark {
-        /* DARK MODE (Void) */
+        /* 
+           DARK MODE (Void Aesthetic)
+           Goal: Deep, immersive, glowing "Cyberpunk" feel.
+        */
         
         /* 1. Surfaces */
-        --wes-950: #020617; /* Slate-950 */
-        --wes-900: #0B0F19; /* Deep Navy/Black */
-        --wes-800: #151B2B; /* Panel Surface */
-        --wes-700: #232D42; /* Borders */
-        --wes-600: #334155;
+        --wes-950: #020617; /* Slate-950: Main Canvas */
+        --wes-900: #0f172a; /* Slate-900: Panels */
+        --wes-800: #1e293b; /* Slate-800: Hover */
+        --wes-700: #334155; /* Slate-700: Borders */
+        --wes-600: #475569;
         
-        /* 2. Brand Colors */
-        --wes-accent: #6366f1; /* Indigo-500 */
-        --wes-pop: #8b5cf6;    /* Violet-500 */
+        /* 2. Brand Colors (Lighter/Neon for Dark Backgrounds) */
+        --wes-accent: #818cf8; /* Indigo-400 */
+        --wes-pop: #a78bfa;    /* Violet-400 */
+        --wes-success: #34d399; /* Emerald-400 */
+        --wes-danger: #f87171;  /* Red-400 */
 
-        /* 3. Semantic Text (Light text for Dark Backgrounds) */
+        /* 3. Text Inversion (Mapping Slates to Light Greys) */
         --slate-50:  #f8fafc;
         --slate-100: #f1f5f9;
-        --slate-200: #f1f5f9; /* Slate-100 - Primary Heading */
-        --slate-300: #cbd5e1; /* Slate-300 - Body Copy */
-        --slate-400: #94a3b8; /* Slate-400 - Muted Text */
-        --slate-500: #64748b; /* Slate-500 - Dim Text */
+        --slate-200: #f1f5f9; /* Primary Headings: Slate-100 (High Contrast) */
+        --slate-300: #cbd5e1; /* Body Text: Slate-300 (Readable) */
+        --slate-400: #94a3b8; /* Muted: Slate-400 */
+        --slate-500: #64748b; /* Icons: Slate-500 */
         --slate-600: #475569;
         --slate-700: #334155;
         --slate-800: #1e293b;
@@ -142,28 +159,32 @@
         --slate-950: #020617;
 
         /* 4. Glass & Depth */
-        --glass-bg: linear-gradient(145deg, rgba(21, 27, 43, 0.7) 0%, rgba(11, 15, 25, 0.9) 100%);
-        --glass-panel-bg: rgba(21, 27, 43, 0.6);
+        --glass-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(3, 7, 18, 0.9) 100%);
+        --glass-panel-bg: rgba(15, 23, 42, 0.6);
         --glass-input-bg: rgba(2, 6, 23, 0.4);
         
         --scroll-track: transparent;
         --scroll-thumb: #334155;
+        --scroll-thumb-hover: #475569;
         
-        --panel-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+        /* Glow shadows for dark mode */
+        --panel-shadow: 
+          0 0 0 1px rgba(255, 255, 255, 0.08),
+          0 10px 30px -5px rgba(0, 0, 0, 0.5);
       }
 
       /* Base Body Transition */
       body {
         background-color: var(--wes-950);
         color: var(--slate-300);
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s ease;
       }
       
-      /* Subtle pattern overlay */
+      /* Subtle pattern overlay - Adjust opacity for Light Mode */
       body {
          background-image: 
-          radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%), 
-          radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+          radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.03), transparent 20%), 
+          radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.03), transparent 20%);
          background-attachment: fixed;
       }
 
@@ -178,30 +199,30 @@
       ::-webkit-scrollbar-thumb {
         background: var(--scroll-thumb); 
         border-radius: 10px;
+        transition: background 0.2s;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: var(--wes-accent); 
+        background: var(--scroll-thumb-hover); 
       }
 
-      /* Glassmorphism Utilities - Mapped to Variables */
+      /* Glassmorphism Utilities */
       .glass-panel {
         background: var(--glass-panel-bg);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 1px solid var(--wes-700);
         box-shadow: var(--panel-shadow);
-        transition: all 0.3s ease;
+        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       }
       
       .glass-input {
         background: var(--glass-input-bg);
         border: 1px solid var(--wes-700);
-        transition: all 0.3s ease;
-        color: var(--slate-200); /* Uses high contrast mapped color */
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--slate-200); 
       }
       
-      /* Accessibility: Global High Contrast Focus Rings */
-      /* Matches Tailwind 'focus-visible' utility pattern but enforces it globally */
+      /* Accessibility: Global Focus Rings */
       :focus-visible {
         outline: 2px solid var(--wes-accent);
         outline-offset: 2px;
@@ -209,9 +230,8 @@
 
       .glass-input:focus, button:focus-visible, a:focus-visible, select:focus-visible {
         border-color: var(--wes-accent);
-        outline: 2px solid var(--wes-accent);
-        outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
       }
       
       .glass-input::placeholder {

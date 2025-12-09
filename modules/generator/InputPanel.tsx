@@ -45,7 +45,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
   return (
     <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-wes-950/20">
-      <div className="p-6 border-b border-wes-700 bg-wes-800/40">
+      <div className="p-6 border-b border-wes-700 bg-wes-800/30">
         <h2 className="text-lg font-bold text-slate-200 flex items-center tracking-tight">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-wes-accent/20 text-wes-accent mr-3 border border-wes-accent/20">
              <i className="fa-solid fa-satellite-dish text-sm"></i>
@@ -77,12 +77,12 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Describe your video concept..."
-            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-slate-200 placeholder-slate-500 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
+            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-slate-200 placeholder-slate-400 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
           />
         </div>
 
         {/* Research Toggle */}
-        <div className="glass-panel p-4 rounded-xl border border-wes-700 bg-wes-800/50">
+        <div className="glass-panel p-4 rounded-xl border border-wes-700 bg-wes-800/30">
            <div className="flex items-center justify-between">
               <div>
                 <label className="text-[10px] font-bold text-wes-pop uppercase tracking-widest flex items-center gap-2">
@@ -142,7 +142,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
       </div>
 
-      <div className="p-6 border-t border-wes-700 bg-wes-800/80">
+      <div className="p-6 border-t border-wes-700 bg-wes-800/30">
         <button
           onClick={onGenerate}
           disabled={loading || !topic}
@@ -157,7 +157,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
               <i className="fa-solid fa-brain fa-pulse text-sm"></i>
               <div className="flex flex-col items-start leading-none ml-2">
                  <span>REASONING ACTIVE</span>
-                 <span className="text-[9px] opacity-60 font-normal normal-case mt-1">Planning structure...</span>
+                 <span className="text-[9px] opacity-80 font-normal normal-case mt-1">Planning structure...</span>
               </div>
             </>
           ) : (
