@@ -15,19 +15,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [activeTab, setActiveTab] = useState<Tab>('config');
   const [defaultDuration, setDefaultDuration] = useState('Medium (5-8m)');
   const [defaultMood, setDefaultMood] = useState(MOODS[0]);
+  const [apiKey, setApiKey] = useState('');
 
   // Load from local storage on mount
   useEffect(() => {
     const savedDuration = localStorage.getItem('wes_default_duration');
     const savedMood = localStorage.getItem('wes_default_mood');
+    const savedApiKey = localStorage.getItem('wes_api_key');
 
     if (savedDuration) setDefaultDuration(savedDuration);
     if (savedMood) setDefaultMood(savedMood);
+    if (savedApiKey) setApiKey(savedApiKey);
   }, []);
 
   const handleSave = () => {
     localStorage.setItem('wes_default_duration', defaultDuration);
     localStorage.setItem('wes_default_mood', defaultMood);
+    
+    if (apiKey.trim()) {
+      localStorage.setItem('wes_api_key', apiKey.trim());
+    } else {
+      localStorage.removeItem('wes_api_key');
+    }
+
     onClose();
     // Force a reload to apply changes cleanly across the app
     window.location.reload(); 
@@ -82,6 +92,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           {activeTab === 'config' && (
             <div className="p-4 md:p-6 space-y-8">
               
+              {/* API Key Section */}
+              <div className="space-y-4">
+                 <h3 className="text-sm font-bold text-slate-200 flex items-center">
+                    <i className="fa-solid fa-key mr-2 text-slate-400"></i>
+                    API Configuration
+                 </h3>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">
+                      Custom API Key (Optional)
+                    </label>
+                    <input
+                      type="password"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="Enter Gemini API Key (starts with AIza...)"
+                      className="w-full glass-input rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-wes-accent transition-all bg-transparent placeholder-slate-600"
+                    />
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      If set, this key will override the system default. It is stored securely in your browser's Local Storage. 
+                      Clear this field to revert to the default environment key.
+                    </p>
+                 </div>
+              </div>
+
+              <div className="h-px bg-wes-800 w-full"></div>
+
               {/* Defaults */}
               <div className="space-y-4">
                  <h3 className="text-sm font-bold text-slate-200 flex items-center">

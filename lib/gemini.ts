@@ -9,7 +9,7 @@ import { constructSystemInstruction, constructUserPrompt, enhanceVisualPrompt } 
 const getClient = (): GoogleGenAI => {
   const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("API Key is missing. Please ensure process.env.API_KEY is configured.");
+    throw new Error("API Key is missing. Please ensure process.env.API_KEY is configured or set a custom key in Settings.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -334,7 +334,7 @@ export const generateVeoVideo = async (
   aspectRatio: '16:9' | '9:16' = '16:9',
   imageContext?: string // Optional Base64 Data URI
 ): Promise<string> => {
-  const apiKey = process.env.API_KEY || getApiKey();
+  const apiKey = getApiKey();
   const ai = new GoogleGenAI({ apiKey });
 
   // Prepare call parameters

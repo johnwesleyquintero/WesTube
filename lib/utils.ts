@@ -3,10 +3,14 @@
 // Shared utility functions for WesTube Engine
 
 /**
- * Retrieves the API Key from Environment variables.
- * strictly adheres to security guidelines.
+ * Retrieves the API Key from Environment variables or Local Storage.
+ * Prioritizes user-provided key in localStorage ('wes_api_key') over process.env.
  */
 export const getApiKey = (): string => {
+  if (typeof window !== 'undefined') {
+    const storedKey = localStorage.getItem('wes_api_key');
+    if (storedKey) return storedKey;
+  }
   return process.env.API_KEY || '';
 };
 
