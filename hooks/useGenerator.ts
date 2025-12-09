@@ -7,7 +7,7 @@ import { generateVideoPackage, refineScriptSegment, scoutLocations } from '../li
 import { saveHistoryItem } from '../lib/history';
 import { useAudio } from './useAudio';
 import { useAssetGenerator } from './useAssetGenerator';
-import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/packageManipulation';
+import { updatePackageSceneVisual, updatePackageThumbnail, updatePackageSceneAudio } from '../lib/packageManipulation';
 import { useToast } from '../context/ToastContext';
 import { useProject } from '../context/ProjectContext';
 
@@ -108,24 +108,30 @@ export const useGenerator = () => {
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!result) return;
     
-    // Invalidate audio cache if audio text changes
-    if (field === 'audio') {
-      audioGen.invalidateCache(index);
-    }
-
     setResult(prev => {
       if (!prev) return null;
       const updatedScript = [...prev.script];
-      updatedScript[index] = {
-        ...updatedScript[index],
-        [field]: value
-      };
+      
+      // If audio text changes, we must clear the cached audio
+      if (field === 'audio') {
+        updatedScript[index] = {
+          ...updatedScript[index],
+          audio: value,
+          generatedAudio: undefined // Clear cache
+        };
+      } else {
+        updatedScript[index] = {
+          ...updatedScript[index],
+          [field]: value
+        };
+      }
+
       return {
         ...prev,
         script: updatedScript
       };
     });
-  }, [result, audioGen]);
+  }, [result]);
 
   const handleRefineScript = useCallback(async (index: number, field: 'visual' | 'audio', instruction: string) => {
     if (!result) return;
@@ -205,21 +211,53 @@ export const useGenerator = () => {
     });
   }, []);
 
-  const handlePlayAudio = useCallback((text: string, index: number) => {
-    // Determine which voice to use: Package override > Channel Default
-    const targetVoice = result?.voice && result.voice !== 'default' 
-      ? result.voice 
-      : activeChannelConfig.voice;
+  const handlePlayAudio = useCallback(async (index: number) => {
+    if (!result) return;
+    const scene = result.script[index];
+    
+    // Check cache first
+    let audioToPlay = scene.generatedAudio;
+    
+    if (!audioToPlay) {
+       // Generate
+       const targetVoice = result.voice && result.voice !== 'default' 
+         ? result.voice 
+         : activeChannelConfig.voice;
 
-    audioGen.playAudio(text, targetVoice, index);
+       const generated = await audioGen.generateAudio(scene.audio, targetVoice);
+       if (generated) {
+         audioToPlay = generated;
+         // Persist to state
+         setResult(prev => prev ? updatePackageSceneAudio(prev, index, generated) : null);
+       }
+    }
+
+    if (audioToPlay) {
+      await audioGen.playAudioData(audioToPlay, index);
+    }
   }, [result, activeChannelConfig, audioGen]);
 
-  const handleDownloadAudio = useCallback((text: string, index: number) => {
-    const targetVoice = result?.voice && result.voice !== 'default' 
-      ? result.voice 
-      : activeChannelConfig.voice;
+  const handleDownloadAudio = useCallback(async (index: number) => {
+    if (!result) return;
+    const scene = result.script[index];
+    
+    let audioToDl = scene.generatedAudio;
+    
+    if (!audioToDl) {
+      const targetVoice = result.voice && result.voice !== 'default' 
+         ? result.voice 
+         : activeChannelConfig.voice;
       
-    audioGen.downloadAudio(text, targetVoice, index, `wes-narrator-${selectedChannel}`);
+      const generated = await audioGen.generateAudio(scene.audio, targetVoice);
+      if (generated) {
+         audioToDl = generated;
+         setResult(prev => prev ? updatePackageSceneAudio(prev, index, generated) : null);
+      }
+    }
+    
+    if (audioToDl) {
+      audioGen.downloadAudioData(audioToDl, index, `wes-narrator-${selectedChannel}`);
+    }
   }, [result, activeChannelConfig, audioGen, selectedChannel]);
 
   const handleScoutLocations = useCallback(async () => {

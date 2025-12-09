@@ -10,8 +10,8 @@ interface ScriptTabProps {
   result: GeneratedPackage;
   handleUpdateScript?: (idx: number, field: 'visual' | 'audio', val: string) => void;
   handleRefineScript?: (idx: number, field: 'visual' | 'audio', instruction: string) => void;
-  handlePlayAudio: (text: string, idx: number) => any; // Allow promise return
-  handleDownloadAudio: (text: string, idx: number) => void;
+  handlePlayAudio: (idx: number) => Promise<void>; 
+  handleDownloadAudio: (idx: number) => void;
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   handleEditSceneVisual?: (base64: string, prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
@@ -43,11 +43,6 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
   const activeVoice = result.voice && result.voice !== 'default'
     ? result.voice 
     : (result.channelId ? CHANNELS[result.channelId].voice : 'Zephyr');
-
-  // Wrapper to force promise return for the director preview if the hook doesn't explicitly return one (it does, but TS might complain)
-  const safePlayAudio = async (text: string, idx: number) => {
-    return handlePlayAudio(text, idx);
-  };
 
   const downloadScriptTxt = () => {
     let text = `TITLE: ${result.title}\nHOOK: ${result.hook}\n\n`;
@@ -93,7 +88,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
       {isPreviewMode && (
         <DirectorPreview 
           result={result}
-          playAudio={safePlayAudio}
+          playAudio={handlePlayAudio}
           onClose={() => setIsPreviewMode(false)}
           voiceName={activeVoice}
         />

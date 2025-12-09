@@ -10,9 +10,9 @@ interface ScriptStoryboardViewProps {
   generatingSceneVisual?: number | null;
   editingSceneVisual?: number | null;
   batchProcessing: boolean;
-  handlePlayAudio: (text: string, idx: number) => void;
+  handlePlayAudio: (idx: number) => void;
   playingScene: number | null;
-  handleDownloadAudio: (text: string, idx: number) => void;
+  handleDownloadAudio: (idx: number) => void;
   refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
 }
 
@@ -254,16 +254,23 @@ export const ScriptStoryboardView: React.FC<ScriptStoryboardViewProps> = ({
               <div className="flex items-center justify-between border-t border-wes-700 pt-3 mt-1">
                 <div className="flex gap-2">
                     <button 
-                      onClick={() => handlePlayAudio(scene.audio, idx)}
+                      onClick={() => handlePlayAudio(idx)}
                       disabled={playingScene !== null}
                       className={`text-xs px-2 py-1 rounded flex items-center gap-1.5 transition-colors border ${playingScene === idx ? 'bg-wes-accent text-white border-wes-accent' : 'bg-wes-800/50 border-wes-700/50 text-slate-500 hover:text-slate-200 hover:bg-wes-800'}`}
                     >
-                      {playingScene === idx ? <i className="fa-solid fa-stop"></i> : <i className="fa-solid fa-play"></i>}
+                      {playingScene === idx ? <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> : <i className="fa-solid fa-play"></i>}
                       <span className="uppercase text-[10px] font-bold">Preview</span>
                     </button>
+                    
+                    {/* Cached Indicator */}
+                    {scene.generatedAudio && (
+                       <span className="text-[10px] font-mono text-wes-success bg-wes-success/10 px-2 py-0.5 rounded border border-wes-success/20 flex items-center gap-1 animate-fadeIn" title="Audio cached">
+                         <i className="fa-solid fa-bolt text-[8px]"></i> Cached
+                       </span>
+                    )}
                 </div>
                 <button 
-                    onClick={() => handleDownloadAudio(scene.audio, idx)}
+                    onClick={() => handleDownloadAudio(idx)}
                     className="text-slate-500 hover:text-wes-success transition-colors"
                     title="Download Audio"
                 >

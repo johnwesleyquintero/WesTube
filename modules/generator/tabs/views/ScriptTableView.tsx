@@ -8,9 +8,9 @@ interface ScriptTableViewProps {
   handleGenerateSceneVisual?: (prompt: string, idx: number) => void;
   generatingSceneVisual?: number | null;
   batchProcessing: boolean;
-  handlePlayAudio: (text: string, idx: number) => void;
+  handlePlayAudio: (idx: number) => void;
   playingScene: number | null;
-  handleDownloadAudio: (text: string, idx: number) => void;
+  handleDownloadAudio: (idx: number) => void;
   downloadingAudio: number | null;
   refiningScene?: {index: number, field: 'visual' | 'audio'} | null;
 }
@@ -141,21 +141,28 @@ export const ScriptTableView: React.FC<ScriptTableViewProps> = ({
                   {/* Audio Column */}
                   <td className="px-5 py-5 text-slate-200 align-top leading-relaxed relative">
                     <div className="flex flex-col gap-3 group/edit">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                           <button 
-                            onClick={() => handlePlayAudio(scene.audio, idx)}
+                            onClick={() => handlePlayAudio(idx)}
                             disabled={playingScene !== null || downloadingAudio !== null}
                             className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all border ${playingScene === idx ? 'bg-wes-accent text-white border-wes-accent' : 'bg-wes-800/50 border-wes-700/50 text-slate-500 hover:text-slate-200 hover:bg-wes-800'}`}
                           >
                             {playingScene === idx ? <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> : <i className="fa-solid fa-play text-[10px] pl-0.5"></i>}
                           </button>
                           <button 
-                            onClick={() => handleDownloadAudio(scene.audio, idx)}
+                            onClick={() => handleDownloadAudio(idx)}
                             disabled={playingScene !== null || downloadingAudio !== null}
                             className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all border ${downloadingAudio === idx ? 'bg-wes-success text-white border-wes-success' : 'bg-wes-800/50 border-wes-700/50 text-slate-500 hover:text-wes-success hover:bg-wes-800'}`}
                           >
                             {downloadingAudio === idx ? <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> : <i className="fa-solid fa-download text-[10px]"></i>}
                           </button>
+
+                          {/* Cached Indicator */}
+                          {scene.generatedAudio && (
+                             <span className="ml-1 text-[10px] font-mono text-wes-success bg-wes-success/10 px-2 py-0.5 rounded border border-wes-success/20 animate-fadeIn" title="Audio cached in memory">
+                               Cached
+                             </span>
+                          )}
                       </div>
 
                       {isInputingAudio ? (

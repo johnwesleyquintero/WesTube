@@ -6,65 +6,48 @@ import { useToast } from '../context/ToastContext';
 export const useAudio = () => {
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const [downloadingIndex, setDownloadingIndex] = useState<number | null>(null);
-  const [audioCache, setAudioCache] = useState<Record<number, string>>({});
   const toast = useToast();
 
   const resetAudioState = useCallback(() => {
     setPlayingIndex(null);
     setDownloadingIndex(null);
-    setAudioCache({});
   }, []);
 
-  const invalidateCache = useCallback((index: number) => {
-    setAudioCache(prev => {
-      const newCache = { ...prev };
-      delete newCache[index];
-      return newCache;
-    });
-  }, []);
+  const generateAudio = async (text: string, voice: string): Promise<string | null> => {
+    try {
+      const base64Audio = await generateSpeech(text, voice);
+      return base64Audio;
+    } catch (e: any) {
+      console.error("Audio generation failed", e);
+      const msg = e instanceof Error ? e.message : "Failed to generate audio.";
+      toast.error(msg);
+      return null;
+    }
+  };
 
-  const playAudio = async (text: string, voice: string, index: number) => {
+  const playAudioData = async (base64Audio: string, index: number) => {
     if (playingIndex !== null) return; // Prevent multiple streams
     
-    // Critical: Resume AudioContext immediately inside the click handler event loop
-    // to prevent browser autoplay blocking.
+    // Critical: Resume AudioContext immediately inside the click handler
     await resumeAudioContext();
     
     setPlayingIndex(index);
 
     try {
-      let base64Audio = audioCache[index];
-      
-      // If not cached, generate it
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
-      // Play it
       await playRawAudio(base64Audio);
     } catch (e: any) {
       console.error("Audio playback failed", e);
-      const msg = e instanceof Error ? e.message : "Failed to generate audio preview.";
-      toast.error(msg);
+      toast.error("Playback failed.");
     } finally {
       setPlayingIndex(null);
     }
   };
 
-  const downloadAudio = async (text: string, voice: string, index: number, filenamePrefix: string) => {
+  const downloadAudioData = async (base64Audio: string, index: number, filenamePrefix: string) => {
     if (downloadingIndex !== null) return;
     setDownloadingIndex(index);
 
     try {
-      let base64Audio = audioCache[index];
-      
-      // If not cached, generate it first
-      if (!base64Audio) {
-        base64Audio = await generateSpeech(text, voice);
-        setAudioCache(prev => ({ ...prev, [index]: base64Audio }));
-      }
-
       // Create WAV blob and download
       const wavBlob = createWavBlob(base64Audio);
       const url = URL.createObjectURL(wavBlob);
@@ -76,8 +59,7 @@ export const useAudio = () => {
       toast.success("Audio downloaded successfully.");
     } catch (e: any) {
       console.error("Audio download failed", e);
-      const msg = e instanceof Error ? e.message : "Failed to download audio.";
-      toast.error(msg);
+      toast.error("Failed to download audio.");
     } finally {
       setDownloadingIndex(null);
     }
@@ -86,9 +68,9 @@ export const useAudio = () => {
   return {
     playingIndex,
     downloadingIndex,
-    playAudio,
-    downloadAudio,
-    resetAudioState,
-    invalidateCache
+    generateAudio,
+    playAudioData,
+    downloadAudioData,
+    resetAudioState
   };
 };

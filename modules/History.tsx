@@ -5,7 +5,7 @@ import { CHANNELS } from '../constants';
 import { OutputPanel } from './generator/OutputPanel';
 import { useAudio } from '../hooks/useAudio';
 import { useAssetGenerator } from '../hooks/useAssetGenerator';
-import { updatePackageSceneVisual, updatePackageThumbnail } from '../lib/packageManipulation';
+import { updatePackageSceneVisual, updatePackageThumbnail, updatePackageSceneAudio } from '../lib/packageManipulation';
 import { HistoryListItem } from './history/HistoryListItem';
 
 export const History: React.FC = () => {
@@ -29,10 +29,10 @@ export const History: React.FC = () => {
   const { 
     playingIndex, 
     downloadingIndex, 
-    playAudio, 
-    downloadAudio, 
-    resetAudioState,
-    invalidateCache
+    generateAudio,
+    playAudioData,
+    downloadAudioData, 
+    resetAudioState
   } = useAudio();
 
   const refreshHistory = async () => {
@@ -51,7 +51,7 @@ export const History: React.FC = () => {
     refreshHistory();
   }, []);
 
-  // Reset audio cache when switching items (by ID), NOT on every state update
+  // Reset audio playback state when switching items
   useEffect(() => {
     resetAudioState();
   }, [selectedItem?.id, resetAudioState]);
@@ -82,15 +82,55 @@ export const History: React.FC = () => {
     return CHANNELS[selectedItem.channelId] || CHANNELS[ChannelId.TECH];
   }, [selectedItem]);
 
-  const handlePlayAudio = useCallback((text: string, index: number) => {
-    if (!selectedItem || !text) return;
-    playAudio(text, getActiveChannelConfig().voice, index);
-  }, [selectedItem, playAudio, getActiveChannelConfig]);
+  const handlePlayAudio = useCallback(async (index: number) => {
+    if (!selectedItem) return;
+    const scene = selectedItem.script[index];
+    
+    let audioToPlay = scene.generatedAudio;
+    
+    if (!audioToPlay) {
+       const targetVoice = selectedItem.voice && selectedItem.voice !== 'default' 
+         ? selectedItem.voice 
+         : getActiveChannelConfig().voice;
 
-  const handleDownloadAudio = useCallback((text: string, index: number) => {
-    if (!selectedItem || !text) return;
-    downloadAudio(text, getActiveChannelConfig().voice, index, `wes-narrator-${selectedItem.id}`);
-  }, [selectedItem, downloadAudio, getActiveChannelConfig]);
+       const generated = await generateAudio(scene.audio, targetVoice);
+       if (generated) {
+         audioToPlay = generated;
+         const updatedItem = updatePackageSceneAudio(selectedItem, index, generated);
+         setSelectedItem(updatedItem);
+         setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+       }
+    }
+
+    if (audioToPlay) {
+      await playAudioData(audioToPlay, index);
+    }
+  }, [selectedItem, generateAudio, playAudioData, getActiveChannelConfig]);
+
+  const handleDownloadAudio = useCallback(async (index: number) => {
+    if (!selectedItem) return;
+    const scene = selectedItem.script[index];
+    
+    let audioToDl = scene.generatedAudio;
+    
+    if (!audioToDl) {
+      const targetVoice = selectedItem.voice && selectedItem.voice !== 'default' 
+         ? selectedItem.voice 
+         : getActiveChannelConfig().voice;
+      
+      const generated = await generateAudio(scene.audio, targetVoice);
+      if (generated) {
+         audioToDl = generated;
+         const updatedItem = updatePackageSceneAudio(selectedItem, index, generated);
+         setSelectedItem(updatedItem);
+         setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+      }
+    }
+
+    if (audioToDl) {
+       downloadAudioData(audioToDl, index, `wes-narrator-${selectedItem.id}`);
+    }
+  }, [selectedItem, generateAudio, downloadAudioData, getActiveChannelConfig]);
 
   // --- Optimized Update Logic using packageUtils ---
 
@@ -149,15 +189,21 @@ export const History: React.FC = () => {
   const handleUpdateScript = useCallback((index: number, field: 'visual' | 'audio', value: string) => {
     if (!selectedItem) return;
     
-    if (field === 'audio') {
-      invalidateCache(index);
-    }
-
     const updatedScript = [...selectedItem.script];
-    updatedScript[index] = {
-      ...updatedScript[index],
-      [field]: value
-    };
+    
+    // Clear audio cache if text changes
+    if (field === 'audio') {
+      updatedScript[index] = {
+        ...updatedScript[index],
+        audio: value,
+        generatedAudio: undefined
+      };
+    } else {
+      updatedScript[index] = {
+        ...updatedScript[index],
+        [field]: value
+      };
+    }
     
     const updatedItem = {
       ...selectedItem,
@@ -166,7 +212,7 @@ export const History: React.FC = () => {
 
     setSelectedItem(updatedItem);
     setHistory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
-  }, [selectedItem, invalidateCache]);
+  }, [selectedItem]);
 
   const handleVideoGenerated = (key: string, url: string) => {
      if (!selectedItem) return;

@@ -24,6 +24,7 @@ export interface ScriptScene {
   visual: string;
   audio: string;
   generatedVisual?: string; // Base64 image string for the scene
+  generatedAudio?: string; // Base64 audio string for the scene
 }
 
 export interface LocationScoutData {

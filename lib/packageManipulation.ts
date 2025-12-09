@@ -36,3 +36,24 @@ export const updatePackageSceneVisual = (
     script: updatedScript
   };
 };
+
+/**
+ * Immutably updates a specific scene's audio asset within the script array.
+ * Pass undefined as audioBase64 to clear the cache (e.g. when text changes).
+ */
+export const updatePackageSceneAudio = (
+  pkg: GeneratedPackage, 
+  index: number, 
+  audioBase64: string | undefined
+): GeneratedPackage => {
+  const updatedScript = [...pkg.script];
+  updatedScript[index] = {
+    ...updatedScript[index],
+    generatedAudio: audioBase64
+  };
+
+  return {
+    ...pkg,
+    script: updatedScript
+  };
+};

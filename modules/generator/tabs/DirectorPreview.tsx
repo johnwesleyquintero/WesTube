@@ -4,7 +4,7 @@ import { AudioOrb } from '../../../components/AudioOrb';
 
 interface DirectorPreviewProps {
   result: GeneratedPackage;
-  playAudio: (text: string, idx: number) => Promise<void>;
+  playAudio: (idx: number) => Promise<void>;
   onClose: () => void;
   voiceName: string;
 }
@@ -52,7 +52,7 @@ export const DirectorPreview: React.FC<DirectorPreviewProps> = ({
       setCurrentIndex(i);
       
       try {
-        await playAudio(result.script[i].audio, i);
+        await playAudio(i);
       } catch (e) {
         console.error("Playback error:", e);
         await new Promise(r => setTimeout(r, 3000));
