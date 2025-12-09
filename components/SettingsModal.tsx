@@ -34,8 +34,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
-      <div className="glass-panel rounded-xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden max-h-[90vh]">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+      <div className="glass-panel rounded-xl shadow-2xl w-full md:max-w-2xl flex flex-col overflow-hidden max-h-[90vh] md:h-auto">
         
         {/* Header & Tabs */}
         <div className="flex flex-col border-b border-wes-700 bg-wes-900/50">
@@ -46,7 +46,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </span>
               Settings & Documentation
             </h2>
-            <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">
+            <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-wes-800">
               <i className="fa-solid fa-xmark text-xl"></i>
             </button>
           </div>
@@ -80,7 +80,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           
           {/* TAB: CONFIGURATION */}
           {activeTab === 'config' && (
-            <div className="p-6 space-y-8">
+            <div className="p-4 md:p-6 space-y-8">
               
               {/* Defaults */}
               <div className="space-y-4">
@@ -89,7 +89,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                     Production Defaults
                  </h3>
                  
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <GlassSelect 
                      label="Default Duration"
                      options={DURATIONS}
@@ -109,7 +109,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
           {/* TAB: SYSTEM MANUAL */}
           {activeTab === 'manual' && (
-            <div className="p-6 space-y-8 text-sm text-slate-300">
+            <div className="p-4 md:p-6 space-y-8 text-sm text-slate-300">
               {/* Introduction */}
               <div className="bg-wes-900/40 p-4 rounded-lg border border-wes-700">
                 <h3 className="text-slate-200 font-bold mb-2 flex items-center">

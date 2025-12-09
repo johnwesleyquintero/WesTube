@@ -44,18 +44,18 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   } = formState;
 
   return (
-    <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-wes-950/20">
-      <div className="p-6 border-b border-wes-700 bg-wes-800/30">
+    <div className="w-full xl:w-1/3 glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl shadow-wes-950/20 max-h-[calc(100vh-8rem)] xl:max-h-full">
+      <div className="p-4 md:p-6 border-b border-wes-700 bg-wes-800/30">
         <h2 className="text-lg font-bold text-slate-200 flex items-center tracking-tight">
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-wes-accent/20 text-wes-accent mr-3 border border-wes-accent/20">
              <i className="fa-solid fa-satellite-dish text-sm"></i>
           </span>
           Mission Control
         </h2>
-        <p className="text-xs text-slate-500 mt-1 ml-11">Configure production parameters.</p>
+        <p className="text-xs text-slate-500 mt-1 ml-11 hidden sm:block">Configure production parameters.</p>
       </div>
       
-      <div className="p-6 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+      <div className="p-4 md:p-6 space-y-6 md:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
         
         {/* Channel Selector */}
         <ChannelSelector 
@@ -77,7 +77,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Describe your video concept..."
-            className={`w-full h-32 glass-input rounded-xl p-4 text-sm text-slate-200 placeholder-slate-400 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
+            className={`w-full h-24 md:h-32 glass-input rounded-xl p-4 text-sm text-slate-200 placeholder-slate-400 resize-none font-medium focus:outline-none focus:border-wes-accent focus:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all ${hasContext ? 'border-wes-success/30 bg-wes-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
           />
         </div>
 
@@ -89,7 +89,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
                   <i className="fa-brands fa-google"></i>
                   Deep Research
                 </label>
-                <p className="text-xs text-slate-500 mt-1">Ground content in live web data.</p>
+                <p className="text-[10px] md:text-xs text-slate-500 mt-1">Ground content in live web data.</p>
               </div>
               
               <button 
@@ -108,7 +108,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Director's Overrides</h3>
              </div>
              
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GlassSelect 
                   label="Visual Aesthetic"
                   options={VISUAL_STYLES}
@@ -125,7 +125,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
         </div>
 
         {/* Mood & Duration */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <GlassSelect 
             label="Mood"
             options={MOODS}
@@ -142,11 +142,11 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
       </div>
 
-      <div className="p-6 border-t border-wes-700 bg-wes-800/30">
+      <div className="p-4 md:p-6 border-t border-wes-700 bg-wes-800/30">
         <button
           onClick={onGenerate}
           disabled={loading || !topic}
-          className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center space-x-3
+          className={`w-full py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center space-x-3
             ${loading || !topic 
               ? 'bg-wes-800 text-slate-500 border border-wes-700 cursor-not-allowed' 
               : 'bg-gradient-to-r from-wes-accent to-wes-pop text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-[1.02] border border-transparent'

@@ -99,16 +99,16 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
         />
       )}
 
-      {/* Hook & Branding Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
+      {/* Hook & Branding Section - Stacked on Mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="glass-panel p-4 md:p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-[10px] font-bold text-wes-accent uppercase tracking-widest">The Hook (0-15s)</h3>
             <CopyButton text={result.hook} />
           </div>
-          <p className="text-lg text-slate-200 font-serif leading-relaxed italic border-l-2 border-wes-accent/50 pl-4">{result.hook}</p>
+          <p className="text-sm md:text-lg text-slate-200 font-serif leading-relaxed italic border-l-2 border-wes-accent/50 pl-4">{result.hook}</p>
         </div>
-        <div className="glass-panel p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
+        <div className="glass-panel p-4 md:p-5 rounded-xl bg-gradient-to-br from-wes-800/40 to-transparent">
             <h3 className="text-[10px] font-bold text-wes-pop uppercase tracking-widest mb-3">Branding Directive</h3>
             <p className="text-sm text-slate-300 leading-relaxed">{result.brandingNote}</p>
             {result.visualStyle && (
@@ -119,28 +119,28 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center px-1 gap-4 border-b border-wes-700 pb-4">
-          <div className="flex items-center gap-4">
+      {/* Toolbar - Flexible Layout for Mobile */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-wes-700 pb-4">
+          <div className="flex items-center gap-4 w-full xl:w-auto justify-between xl:justify-start">
             <h3 className="text-lg font-bold text-slate-200 tracking-tight flex items-center gap-2">
               <i className="fa-solid fa-clapperboard text-wes-pop"></i>
               Director's Board
             </h3>
-            <span className="text-xs text-slate-500 font-mono bg-wes-800 px-2 py-0.5 rounded border border-wes-700">{result.script.length} Scenes</span>
+            <span className="text-xs text-slate-500 font-mono bg-wes-800 px-2 py-0.5 rounded border border-wes-700 flex-shrink-0">{result.script.length} Scenes</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full xl:w-auto">
              
              {/* Director Mode Button */}
              <button
                 onClick={() => setIsPreviewMode(true)}
-                className="px-4 py-1.5 bg-wes-success/10 hover:bg-wes-success/20 text-wes-success border border-wes-success/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                className="flex-1 xl:flex-none justify-center px-4 py-1.5 bg-wes-success/10 hover:bg-wes-success/20 text-wes-success border border-wes-success/20 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
              >
                 <i className="fa-solid fa-play"></i>
-                <span className="hidden sm:inline">Watch Animatic</span>
+                <span className="inline">Watch Animatic</span>
              </button>
 
-             <div className="w-px h-6 bg-wes-700 mx-2"></div>
+             <div className="hidden md:block w-px h-6 bg-wes-700 mx-2"></div>
 
              {/* View Toggle */}
              <div className="flex bg-wes-800 rounded-lg p-1 border border-wes-700">
@@ -165,7 +165,7 @@ export const ScriptTab: React.FC<ScriptTabProps> = ({
                 <button
                   onClick={handleBatchRender}
                   disabled={batchProcessing || generatingSceneVisual !== null}
-                  className="text-xs bg-wes-pop/10 text-wes-pop border border-wes-pop/20 hover:bg-wes-pop/20 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider"
+                  className="text-xs bg-wes-pop/10 text-wes-pop border border-wes-pop/20 hover:bg-wes-pop/20 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 font-bold uppercase tracking-wider ml-auto xl:ml-0"
                   title="Generate visuals for all scenes"
                 >
                   {batchProcessing ? (

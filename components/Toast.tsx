@@ -18,7 +18,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
     <div 
       className={`
         glass-panel mb-3 p-4 rounded-r-lg border-l-4 ${borders[toast.type]} 
-        shadow-xl flex items-start gap-3 min-w-[300px] max-w-md animate-fadeIn
+        shadow-xl flex items-start gap-3 w-[calc(100vw-2rem)] sm:w-auto sm:min-w-[300px] max-w-md animate-fadeIn
         transform transition-all duration-300 hover:scale-[1.02]
         bg-wes-900/90 dark:bg-wes-800/90
       `}
@@ -27,7 +27,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
       <i className={`fa-solid ${icons[toast.type]} mt-0.5 text-lg`}></i>
       <div className="flex-1">
         {/* Changed text-white to text-slate-200 (which is mapped to high contrast in both modes) */}
-        <p className="text-sm font-medium text-slate-200 leading-tight">{toast.message}</p>
+        <p className="text-sm font-medium text-slate-200 leading-tight break-words">{toast.message}</p>
       </div>
       <button 
         onClick={() => onRemove(toast.id)}
