@@ -34,8 +34,8 @@ interface OutputPanelProps {
     handleEditThumbnail: (base64: string, prompt: string, idx: number) => void;
     handleGenerateSceneVisual: (prompt: string, idx: number) => void;
     handleEditSceneVisual: (base64: string, prompt: string, idx: number) => void;
-    handlePlayAudio: (text: string, idx: number) => void;
-    handleDownloadAudio: (text: string, idx: number) => void;
+    handlePlayAudio: (idx: number) => Promise<void>;
+    handleDownloadAudio: (idx: number) => void;
     handleVideoGenerated?: (key: string, url: string) => void;
     handleScoutLocations?: () => void;
   };
